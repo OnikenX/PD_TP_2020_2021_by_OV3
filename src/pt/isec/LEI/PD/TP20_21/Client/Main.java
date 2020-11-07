@@ -1,4 +1,4 @@
-package tp_2021_pd_joaoValente_joaoGoncalves_VascoOliveira.Client;
+package pt.isec.LEI.PD.TP20_21.Client;
 
 import javafx.application.*;
 import javafx.stage.Stage;

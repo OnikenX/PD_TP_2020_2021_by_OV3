@@ -1,5 +1,4 @@
-package tp_2021_pd_joaoValente_joaoGoncalves_VascoOliveira.shared;
-
+package pt.isec.LEI.PD.TP20_21.shared;
 public class Cliente {
     private String nome;
     private String username;

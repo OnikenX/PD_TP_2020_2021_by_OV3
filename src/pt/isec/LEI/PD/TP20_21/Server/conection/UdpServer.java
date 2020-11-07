@@ -1,4 +1,4 @@
-package tp_2021_pd_joaoValente_joaoGoncalves_VascoOliveira.Server.conection;
+package pt.isec.LEI.PD.TP20_21.Server.conection;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

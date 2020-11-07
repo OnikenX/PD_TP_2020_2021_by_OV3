@@ -1,6 +1,5 @@
-package tp_2021_pd_joaoValente_joaoGoncalves_VascoOliveira.Server.conection;
+package pt.isec.LEI.PD.TP20_21.Server.conection;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 
