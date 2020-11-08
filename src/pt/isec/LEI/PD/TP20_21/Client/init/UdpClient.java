@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.*;
 import java.util.StringTokenizer;
 
+import static pt.isec.LEI.PD.TP20_21.shared.Consts.*;
+
 public class UdpClient {
 
     public static final int MAX_SIZE = 256;
@@ -28,9 +30,7 @@ public class UdpClient {
 
             socket = new DatagramSocket();
             socket.setSoTimeout(TIMEOUT * 1000);
-
-            packet = new DatagramPacket(TIME_REQUEST.getBytes(), TIME_REQUEST.length(), serverAddr,
-                    serverPort);
+            packet = new DatagramPacket(PEDIR_CONECCAO.getBytes(), PEDIR_CONECCAO.length(), serverAddr, serverPort);
 
             socket.send(packet);
 

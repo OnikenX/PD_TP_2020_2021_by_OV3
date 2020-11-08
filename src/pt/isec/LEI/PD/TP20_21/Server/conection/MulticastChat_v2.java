@@ -2,8 +2,6 @@ package pt.isec.LEI.PD.TP20_21.Server.conection;
 
 import java.io.*;
 import java.net.*;
-
-
 class Msg implements Serializable {
     public static final long serialVersionUID = 10L;
 
@@ -127,18 +125,18 @@ public class MulticastChat_v2 extends Thread {
         MulticastChat_v2 t = null;
 
         if (args.length != 4) {
-            System.out.println("Sintaxe: java MulticastChat <nickname> <group multicast> <porto> <inter>");
+            System.out.println("Sintaxe: java MulticastChat <nickname> <group multicast> <porto> <interface>");
             return;
         }
 
         try {
-            group = InetAddress.getByName(args[1]);
-            port = Integer.parseInt(args[2]);
+            group = InetAddress.getByName(args[1]);     //group multicast
+            port = Integer.parseInt(args[2]);    //porto
 
             socket = new MulticastSocket(port);
 
             try {
-                socket.setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getByName(args[2])));
+                socket.setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getByName(args[2]))); //porto
             } catch (SocketException | NullPointerException | UnknownHostException | SecurityException e) {
                 socket.setNetworkInterface(NetworkInterface.getByName(args[3]));
             }
