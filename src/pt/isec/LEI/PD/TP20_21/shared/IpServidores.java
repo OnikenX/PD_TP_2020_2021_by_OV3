@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 public class IpServidores {
     public final boolean resposta;
-    private ArrayList<IpServidor> servidoresDisponiveis = new ArrayList<IpServidor>();
+    private ArrayList<IpServidor> servidoresDisponiveis;
 
-    IpServidores(boolean resposta) {
-        this.resposta = resposta;
+    public IpServidores() {
+        resposta = false;
+        servidoresDisponiveis = new ArrayList<>();
     }
 
 

@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.conection;
 
 import pt.isec.LEI.PD.TP20_21.shared.IpServidor;
+import pt.isec.LEI.PD.TP20_21.shared.IpServidores;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -47,7 +48,7 @@ public class UdpServer {
                     System.out.println("Recebido \"" + receivedMsg + "\" de " +
                         packet.getAddress().getHostAddress() + ":" + packet.getPort());
 
-                if (!receivedMsg.equalsIgnoreCase(TIME_REQUEST)) {
+                if (!receivedMsg.equalsIgnoreCase(PEDIR_CONECCAO)) {
                     continue;
                 }
 
@@ -57,13 +58,16 @@ public class UdpServer {
 //
 //                packet.setData(timeMsg.getBytes());
 //                packet.setLength(timeMsg.length());
-                IpServidor resposta;
+                IpServidores resposta;
                 if(verificarServidor()){
-    resposta =   new IpServidores();
+                    resposta =  new IpServidores();
                     packet.setData(ACEITAR_CONECCAO.getBytes());
                     packet.setLength(ACEITAR_CONECCAO.length());
-                }else{
-                    var aEnviar = .getBytes();
+                }
+                else {
+                    var aEnviar =
+
+
 
                     packet.setData();
                     packet.setLength(REJEITAR_CONECCAO.length());
