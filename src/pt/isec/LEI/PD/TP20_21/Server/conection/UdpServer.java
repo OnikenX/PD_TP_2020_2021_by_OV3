@@ -12,11 +12,11 @@ import java.util.Calendar;
 import static pt.isec.LEI.PD.TP20_21.shared.Consts.*;
 
 
-public class UdpServer {
+public class UdpServer extends Thread{
     public static final int MAX_SIZE = 256;
     public static final String TIME_REQUEST = "TIME";
 
-    public static void listener(String[] args) {
+    public static void run(String[] args) {
 
         int listeningPort;
         DatagramSocket socket = null;
@@ -24,14 +24,14 @@ public class UdpServer {
         String receivedMsg, timeMsg;
         Calendar calendar;
 
-        if (args.length != 1) {
-            System.out.println("Sintaxe: java UdpTimeServer_v2 listeningPort");
-            return;
-        }
+//        if (args.length != 1) {
+//            System.out.println("Sintaxe: java UdpTimeServer_v2 listeningPort");
+//            return;
+//        }
 
         try {
 
-            listeningPort = Integer.parseInt(args[0]);
+            listeningPort = 6969;//Integer.parseInt(args[0]);
             socket = new DatagramSocket(listeningPort);
 
             if (DEBUG)
@@ -58,21 +58,47 @@ public class UdpServer {
 //
 //                packet.setData(timeMsg.getBytes());
 //                packet.setLength(timeMsg.length());
+
+
+
+
                 IpServidores resposta;
                 if(verificarServidor()){
-                    resposta =  new IpServidores();
+
+                    resposta =  new IpServidores(true,null, 66969);
                     packet.setData(ACEITAR_CONECCAO.getBytes());
                     packet.setLength(ACEITAR_CONECCAO.length());
                 }
                 else {
+
                     var aEnviar =
 
 
 
-                    packet.setData();
-                    packet.setLength(REJEITAR_CONECCAO.length());
-
                 }
+
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = null;
+                try {
+                    out = new ObjectOutputStream(bos);
+                    out.writeObject(IpServidores);
+                    out.flush();
+                    byte[] yourBytes = bos.toByteArray();
+
+                } finally {
+                    try {
+                        bos.close();
+                    } catch (IOException ex) {
+                        // ignore close exception
+                    }
+                }
+
+
+
+
+                packet.setData(ipServidor);
+                packet.setLength(REJEITAR_CONECCAO.length());
                 //O ip e porto de destino ja' se encontram definidos em packet
                 socket.send(packet);
 
