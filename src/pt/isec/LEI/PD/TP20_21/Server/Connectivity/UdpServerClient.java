@@ -47,8 +47,7 @@ public class UdpServerClient extends Thread {
                 packet = new DatagramPacket(PEDIR_CONECCAO.getBytes(), PEDIR_CONECCAO.length(), PEDIR_CONECCAO.length());
                 socket.receive(packet);
 
-                receivedMsg = new String(packet.getData(), 0, packet.getLength());
-
+                receivedMsg =
                 if (DEBUG)
                     System.out.println("Recebido \"" + receivedMsg + "\" de " +
                             packet.getAddress().getHostAddress() + ":" + packet.getPort());

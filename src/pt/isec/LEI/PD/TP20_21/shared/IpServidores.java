@@ -22,5 +22,12 @@ public class IpServidores implements Serializable {
         this.servidoresDisponiveis = servidoresDisponiveis;
     }
 
+    public IpServidores(IpServidores is) {
+        this.resposta = is.resposta;
+        this.servidoresDisponiveis = new LinkedList<>();
+        this.servidoresDisponiveis.addAll(is.servidoresDisponiveis);
+        this.port = is.port;
+    }
+
 
 }
