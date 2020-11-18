@@ -1,4 +1,4 @@
-package pt.isec.LEI.PD.TP20_21.Server.conection;
+package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
 import java.io.*;
 import java.net.*;

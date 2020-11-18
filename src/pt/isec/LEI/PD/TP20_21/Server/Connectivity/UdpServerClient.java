@@ -1,28 +1,33 @@
-package pt.isec.LEI.PD.TP20_21.Server.conection;
+package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
-import pt.isec.LEI.PD.TP20_21.shared.IpServidor;
+import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.IpServidores;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.Calendar;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Consts.*;
 
 
-public class UdpServer extends Thread{
-    public static final int MAX_SIZE = 256;
-    public static final String TIME_REQUEST = "TIME";
+public class UdpServerClient extends Thread {
+    int port;
+    Server server;
 
-    public static void run(String[] args) {
+    public UdpServerClient(Server server, int port){
+        super();
+        this.port = port;
+        this.server = server;
+    }
+
+    public void run() {
 
         int listeningPort;
         DatagramSocket socket = null;
         DatagramPacket packet; //para receber os pedidos e enviar as respostas
-        String receivedMsg, timeMsg;
-        Calendar calendar;
 
 //        if (args.length != 1) {
 //            System.out.println("Sintaxe: java UdpTimeServer_v2 listeningPort");
@@ -39,14 +44,14 @@ public class UdpServer extends Thread{
 
             while (true) {
 
-                packet = new DatagramPacket(PEDIR_CONECCAO.getBytes(), PEDIR_CONECCAO.length(), MAX_SIZE);
+                packet = new DatagramPacket(PEDIR_CONECCAO.getBytes(), PEDIR_CONECCAO.length(), PEDIR_CONECCAO.length());
                 socket.receive(packet);
 
                 receivedMsg = new String(packet.getData(), 0, packet.getLength());
 
                 if (DEBUG)
                     System.out.println("Recebido \"" + receivedMsg + "\" de " +
-                        packet.getAddress().getHostAddress() + ":" + packet.getPort());
+                            packet.getAddress().getHostAddress() + ":" + packet.getPort());
 
                 if (!receivedMsg.equalsIgnoreCase(PEDIR_CONECCAO)) {
                     continue;
@@ -60,21 +65,14 @@ public class UdpServer extends Thread{
 //                packet.setLength(timeMsg.length());
 
 
-
-
                 IpServidores resposta;
-                if(verificarServidor()){
+                if (Server.verificarServidor()) {
 
-                    resposta =  new IpServidores(true,null, 66969);
-                    packet.setData(ACEITAR_CONECCAO.getBytes());
-                    packet.setLength(ACEITAR_CONECCAO.length());
-                }
-                else {
-
-                    var aEnviar =
-
-
-
+                    //crea uma
+                    int TCPport = server.createTCPClientConnection();
+                    resposta = new IpServidores(true, null, TCPport);
+                } else {
+                    resposta = new IpServidores(false, server.getServersInfo(), -1);
                 }
 
 
@@ -82,10 +80,11 @@ public class UdpServer extends Thread{
                 ObjectOutputStream out = null;
                 try {
                     out = new ObjectOutputStream(bos);
-                    out.writeObject(IpServidores);
+                    out.writeObject((Object) resposta);
                     out.flush();
-                    byte[] yourBytes = bos.toByteArray();
-
+                    byte[] respostaBytes = bos.toByteArray();
+                    packet.setData(respostaBytes);
+                    packet.setLength(respostaBytes.length);
                 } finally {
                     try {
                         bos.close();
@@ -93,12 +92,6 @@ public class UdpServer extends Thread{
                         // ignore close exception
                     }
                 }
-
-
-
-
-                packet.setData(ipServidor);
-                packet.setLength(REJEITAR_CONECCAO.length());
                 //O ip e porto de destino ja' se encontram definidos em packet
                 socket.send(packet);
 
@@ -118,9 +111,4 @@ public class UdpServer extends Thread{
     }
 
 
-
-
-    private static boolean verificarServidor() {
-        return true;
-    }
 }
