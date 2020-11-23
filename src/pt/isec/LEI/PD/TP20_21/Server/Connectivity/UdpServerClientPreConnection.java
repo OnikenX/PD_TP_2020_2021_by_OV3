@@ -1,23 +1,22 @@
 package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
-import pt.isec.LEI.PD.TP20_21.shared.IpServidores;
+import pt.isec.LEI.PD.TP20_21.shared.Respostas;
+import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import static pt.isec.LEI.PD.TP20_21.shared.Consts.*;
-
-
-public class UdpServerClient extends Thread {
+/**
+ * Uma thread que fica constantemente a espera de connections de clientes.
+ */
+public class UdpServerClientPreConnection extends Thread {
     int port;
     Server server;
 
-    public UdpServerClient(Server server, int port){
+    public UdpServerClientPreConnection(Server server, int port) {
         super();
         this.port = port;
         this.server = server;
@@ -28,31 +27,28 @@ public class UdpServerClient extends Thread {
         int listeningPort;
         DatagramSocket socket = null;
         DatagramPacket packet; //para receber os pedidos e enviar as respostas
-
-//        if (args.length != 1) {
-//            System.out.println("Sintaxe: java UdpTimeServer_v2 listeningPort");
-//            return;
-//        }
+        String receivedMsg;
 
         try {
 
             listeningPort = 6969;//Integer.parseInt(args[0]);
             socket = new DatagramSocket(listeningPort);
 
-            if (DEBUG)
-                System.out.println("UDP receive conections iniciado...");
+            if (Utils.Consts.DEBUG)
+                System.out.println("UdpServerClientPreConnection iniciado...");
 
             while (true) {
-
-                packet = new DatagramPacket(PEDIR_CONECCAO.getBytes(), PEDIR_CONECCAO.length(), PEDIR_CONECCAO.length());
+                packet = new DatagramPacket(Utils.Consts.PEDIR_CONECCAO.getBytes(), 0, Utils.Consts.PEDIR_CONECCAO.getBytes().length);
                 socket.receive(packet);
+                if(Utils.Consts.DEBUG)
+                    System.out.println("Foi recebido pedido do cliente {"+packet.getAddress()+","+ packet.getPort()+"} para ligação tcp");
 
-                receivedMsg =
-                if (DEBUG)
+                receivedMsg = new String(packet.getData(), 0, packet.getLength());
+                if (Utils.Consts.DEBUG)
                     System.out.println("Recebido \"" + receivedMsg + "\" de " +
                             packet.getAddress().getHostAddress() + ":" + packet.getPort());
 
-                if (!receivedMsg.equalsIgnoreCase(PEDIR_CONECCAO)) {
+                if (!receivedMsg.equalsIgnoreCase(Utils.Consts.PEDIR_CONECCAO)) {
                     continue;
                 }
 
@@ -64,36 +60,22 @@ public class UdpServerClient extends Thread {
 //                packet.setLength(timeMsg.length());
 
 
-                IpServidores resposta;
-                if (Server.verificarServidor()) {
-
-                    //crea uma
-                    int TCPport = server.createTCPClientConnection();
-                    resposta = new IpServidores(true, null, TCPport);
+                Respostas.RUdpClientServerPreConnection resposta;
+                if (server.verifyServerAvailability()) {
+                    if (Utils.Consts.DEBUG)
+                        System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
+                    resposta = new Respostas.RUdpClientServerPreConnection(server.getTcpPort(), server.getServersForClient());
                 } else {
-                    resposta = new IpServidores(false, server.getServersInfo(), -1);
+                    if (Utils.Consts.DEBUG)
+                        System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
+                    resposta = new Respostas.RUdpClientServerPreConnection(-1, server.getServersForClient());
                 }
 
-
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream out = null;
-                try {
-                    out = new ObjectOutputStream(bos);
-                    out.writeObject((Object) resposta);
-                    out.flush();
-                    byte[] respostaBytes = bos.toByteArray();
-                    packet.setData(respostaBytes);
-                    packet.setLength(respostaBytes.length);
-                } finally {
-                    try {
-                        bos.close();
-                    } catch (IOException ex) {
-                        // ignore close exception
-                    }
-                }
+                byte[] respostabytes = Utils.objectToBytes(resposta);
+                assert respostabytes != null;
+                packet.setData(respostabytes, 0, respostabytes.length);
                 //O ip e porto de destino ja' se encontram definidos em packet
                 socket.send(packet);
-
             }
 
         } catch (NumberFormatException e) {

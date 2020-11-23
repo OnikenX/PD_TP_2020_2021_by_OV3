@@ -1,11 +1,9 @@
-package pt.isec.LEI.PD.TP20_21.shared.Cliente;
+package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
 
-import pt.isec.LEI.PD.TP20_21.shared.Cliente.Cliente;
-
-class ClienteServer extends Cliente {
+class UtilizadorServer extends Utilizador {
     protected String username;
     private String hash;
-    public ClienteServer(String nome, String foto, String username, String password){
+    public UtilizadorServer(String nome, String foto, String username, String password){
         super(nome, foto);
         this.username = username;
         createHash(password);

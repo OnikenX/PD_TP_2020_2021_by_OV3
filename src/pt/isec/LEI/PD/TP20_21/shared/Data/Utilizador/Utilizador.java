@@ -1,8 +1,8 @@
-package pt.isec.LEI.PD.TP20_21.shared.Cliente;
-public class Cliente {
+package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
+public class Utilizador {
     protected String nome;
     protected String foto;
-    public Cliente(String nome, String foto){
+    public Utilizador(String nome, String foto){
         this.nome = nome;
         this.foto = foto;
     }
