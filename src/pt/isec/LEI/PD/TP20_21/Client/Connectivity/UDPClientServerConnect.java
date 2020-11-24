@@ -27,6 +27,7 @@ public class UDPClientServerConnect extends Thread {
             try {
                 while ((server = connectUdp()) == null) ;
             }catch(Error e){
+                //Caso ocorra erro a ligar a um server ele cancela a coneçao.
                 break;
             }
             if (resposta.TcpPort != -1) {
