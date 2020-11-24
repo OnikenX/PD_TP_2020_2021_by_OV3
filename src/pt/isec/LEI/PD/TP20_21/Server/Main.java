@@ -10,6 +10,6 @@ public class Main {
         if(Utils.Consts.DEBUG)
             System.out.println("A iniciar o servidor...");
         var s = new Server();
-
+        System.out.println("Acabado sem grandes problemas....");
     }
 }

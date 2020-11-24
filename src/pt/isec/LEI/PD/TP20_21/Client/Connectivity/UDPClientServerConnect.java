@@ -30,8 +30,15 @@ public class UDPClientServerConnect extends Thread {
                 //Caso ocorra erro a ligar a um server ele cancela a coneçao.
                 break;
             }
+            if(Utils.Consts.DEBUG)
+                System.out.println("Recebido resposta de : "+ server + "; port:" + resposta.TcpPort+"; servers: "+resposta.servers);
             if (resposta.TcpPort != -1) {
-                connectTcp(server);
+                try {
+                    connectTcp(server);
+                } catch (Exception e) {
+
+                    break;
+                }
             }
         }
     }
@@ -102,12 +109,9 @@ public class UDPClientServerConnect extends Thread {
         return null;
     }
 
-    private void connectTcp(InetAddress ip) {
-        try {
-            wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private void connectTcp(InetAddress ip) throws Exception {
+        //tenta connectar
+        throw new Exception();
     }
 
     public void resumeThis(){

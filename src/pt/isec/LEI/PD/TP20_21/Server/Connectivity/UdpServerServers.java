@@ -4,5 +4,4 @@ package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 //e depois responde sempre que recebe
 public class UdpServerServers {
 
-
 }

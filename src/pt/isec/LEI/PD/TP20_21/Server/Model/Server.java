@@ -30,14 +30,21 @@ public class Server {
     }
 
     public Server() {
+
+
         // onde vai seorganizar as coisas da memoria
         serverData = new ServerData();
 
+        //criar thread para as ligações tcp
+        tcpServerClient = new TcpServerClientAccepter(this);
+        tcpServerClient.start();
+
+        //implementar uma forma de parar o isto
+        //synchronized ()
         //criação da thread que aceita clientes
         udpServerClientPreConnection = new UdpServerClientPreConnection(this, Utils.Consts.UDPClientRequestPort);
         udpServerClientPreConnection.start();
 
-        //criar thread para as ligações tcp
 
 
         //thread que fica a receber mensagens de outros servidores
