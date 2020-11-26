@@ -7,13 +7,13 @@ import java.util.LinkedList;
  * Faz manegamento dos objectos na memoria, toma conta dos dados e mexe na database
  */
  public class ServerData {
-    private LinkedList<IpServidorServidor> servers;
+    private LinkedList<ServidorExterno> servers;
 
     public ServerData() {
         this.servers = new LinkedList<>();
     }
 
-    public synchronized LinkedList<IpServidorServidor> getServers() {
+    public synchronized LinkedList<ServidorExterno> getServers() {
         return servers;
     }
 }

@@ -2,7 +2,7 @@ package pt.isec.LEI.PD.TP20_21.Server.Model;
 
 import pt.isec.LEI.PD.TP20_21.Server.Connectivity.TcpServerClientAccepter;
 import pt.isec.LEI.PD.TP20_21.Server.Connectivity.UdpServerClientPreConnection;
-import pt.isec.LEI.PD.TP20_21.shared.IpServidor;
+import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.net.Socket;
@@ -60,7 +60,7 @@ public class Server {
     }
 
     public boolean verifyServerAvailability() {
-        for (IpServidorServidor s : serverData.getServers()) {
+        for (ServidorExterno s : serverData.getServers()) {
             if (s.getLotacao() < clientes.size() / 2)
                 return false;
         }
@@ -70,12 +70,12 @@ public class Server {
     //returna uma lista de servidores por lotação, começando por aqueles que estao mais vazios ate aqueles que estao mais cheios
 
 
-    public LinkedList<IpServidor> getServersForClient() {
+    public LinkedList<IpPort> getServersForClient() {
         Collections.sort(serverData.getServers());
         int max = 5;
         if (serverData.getServers().size() < 300)
             max = serverData.getServers().size();
-        var linkedList = new LinkedList<IpServidor>();
+        var linkedList = new LinkedList<IpPort>();
         for (int i = 0; i < max; i++)
             linkedList.add(serverData.getServers().get(i).getForClient());
         return linkedList;

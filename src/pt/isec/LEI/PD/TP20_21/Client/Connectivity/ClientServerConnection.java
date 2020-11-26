@@ -1,6 +1,6 @@
 package pt.isec.LEI.PD.TP20_21.Client.Connectivity;
 
-import pt.isec.LEI.PD.TP20_21.shared.IpServidor;
+import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.net.*;
 import java.util.LinkedList;
 
-public class UDPClientServerConnect extends Thread {
-    private final LinkedList<IpServidor> servers = new LinkedList<>();
+public class ClientServerConnection extends Thread {
+    private final LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> servers = new LinkedList<>();
     private int tries;
     private int retries;
     private Respostas.RUdpClientServerPreConnection resposta = null;
@@ -36,7 +36,6 @@ public class UDPClientServerConnect extends Thread {
                 try {
                     connectTcp(server);
                 } catch (Exception e) {
-
                     break;
                 }
             }
@@ -44,17 +43,10 @@ public class UDPClientServerConnect extends Thread {
     }
 
 
-    static class IpPort {
-        public final String ip;
-        public final int port;
 
-        public IpPort(String ip, int port) {
-            this.ip = ip;
-            this.port = port;
-        }
-
-    }
-
+    /**
+     * Seleciona o proximo ip/port para o servidor a ligar
+     */
     private IpPort getIpPort() {
         if (servers.size() == 0) {
             if (retries <= 3) {
@@ -71,7 +63,7 @@ public class UDPClientServerConnect extends Thread {
             }
             if (tries >= servers.size())
                 throw new Error("Não existem servidores online contactaveis.");
-            return new IpPort(servers.get(tries).getIp(), servers.get(tries).getPort());
+            return new IpPort(servers.get(tries).ip, servers.get(tries).port);
         }
     }
 
@@ -118,8 +110,8 @@ public class UDPClientServerConnect extends Thread {
         notify();
     }
 
-    private static LinkedList<IpServidor> connectToServer(String ip, int port) {
-        var thread = new UDPClientServerConnect();
+    private static LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> connectToServer(String ip, int port) {
+        var thread = new ClientServerConnection();
         thread.start();
         onSpinWait();
         return thread.servers;

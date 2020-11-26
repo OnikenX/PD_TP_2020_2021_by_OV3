@@ -10,7 +10,7 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.TIMEOUT_PINGS;
 /**
  * Guarda a lista de servidores para o Server
  */
-public class IpServidores extends LinkedList<IpServidorServidor> implements Serializable {
+public class Servidores extends LinkedList<ServidorExterno> implements Serializable {
 
     public void removeTimedOut() {
         var it = this.listIterator();

@@ -12,10 +12,10 @@ public class Respostas implements Serializable {
      * Se a variavel TcpPort -1 quer dizer que o servidor não aceitou a ligação.
      */
     public static class RUdpClientServerPreConnection implements Serializable{
-        public final LinkedList<IpServidor> servers;
+        public final LinkedList<IpPort> servers;
         public final int TcpPort;
 
-        public RUdpClientServerPreConnection(int TcpPort, LinkedList<IpServidor> servers) {
+        public RUdpClientServerPreConnection(int TcpPort, LinkedList<IpPort> servers) {
             this.TcpPort = TcpPort;
             this.servers = servers;
         }

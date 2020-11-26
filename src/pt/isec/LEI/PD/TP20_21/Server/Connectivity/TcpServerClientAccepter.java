@@ -1,13 +1,10 @@
 package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
-import pt.isec.LEI.PD.TP20_21.shared.Respostas;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -19,8 +16,8 @@ public class TcpManager {
     private Server server;
     private int port;
     private ServerSocket serverSocket;
-
-
+    private final LinkedList<TcpServerClientConnection> tcpServerClientConnections = new LinkedList<>();
+    private static final int TIMEOUT = 3;//segungos
     public TcpManager(Server server){
         this.server = server;
         try {
@@ -28,10 +25,15 @@ public class TcpManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        serverSocket.setSoTimeout(3*1000);
         port = serverSocket.getLocalPort();
     }
-
-     static class TcpServerClientAccepter extends Thread {
+    //TODO: continuar a fazer esta parte e completar o TcpServerClientConnection
+    public ligarCliente(){
+        serverSocket.accept();
+        tcpServerClientConnections.add(new TcpServerClientConnection());
+    }
+     static class TcpServerClientConnection extends Thread {
         private int port = -1;
         private boolean stop = false;
 

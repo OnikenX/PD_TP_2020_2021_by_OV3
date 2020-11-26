@@ -4,8 +4,8 @@ package pt.isec.LEI.PD.TP20_21.Server.Model;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.VERIFICA_SERVERS;
 
 public class VerificaServers extends Thread {
-    IpServidores ips;
-    public VerificaServers(IpServidores ips) {
+    Servidores ips;
+    public VerificaServers(Servidores ips) {
         this.ips = ips;
     }
 
