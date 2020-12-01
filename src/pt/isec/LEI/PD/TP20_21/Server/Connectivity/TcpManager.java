@@ -1,13 +1,16 @@
 package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * Faz a connecção inicial do client
@@ -18,24 +21,42 @@ public class TcpManager {
     private ServerSocket serverSocket;
     private final LinkedList<TcpServerClientConnection> tcpServerClientConnections = new LinkedList<>();
     private static final int TIMEOUT = 3;//segungos
-    public TcpManager(Server server){
+
+    public TcpManager(Server server) {
         this.server = server;
         try {
             serverSocket = new ServerSocket(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        serverSocket.setSoTimeout(3*1000);
+        try {
+            serverSocket.setSoTimeout(3 * 1000);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         port = serverSocket.getLocalPort();
     }
+
     //TODO: continuar a fazer esta parte e completar o TcpServerClientConnection
-    public ligarCliente(){
-        serverSocket.accept();
-        tcpServerClientConnections.add(new TcpServerClientConnection());
+    public void ligarCliente() throws IOException {
+        var socket = serverSocket.accept();
+        tcpServerClientConnections.add(new TcpServerClientConnection(socket));
+
     }
-     static class TcpServerClientConnection extends Thread {
+
+    static class TcpServerClientConnection extends Thread {
         private int port = -1;
         private boolean stop = false;
+        private final Socket s;
+        private final InputStream iS;
+        private final OutputStream oS;
+
+
+        public TcpServerClientConnection(Socket socket) throws IOException {
+            this.s = socket;
+            iS = s.getInputStream();
+            oS = s.getOutputStream();
+        }
 
 
         //TODO: ver a sincronização de threads e proteção de dados em multithreads
@@ -51,30 +72,35 @@ public class TcpManager {
             return port;
         }
 
+
+        //Message sender
+        public void sendMessage(Object o) throws IOException {
+            oS.write(Objects.requireNonNull(Utils.objectToBytes(o)));
+        }
+
+
+        //Messsage receiver
+        public void receiveMessages() {
+            this.start();
+        }
+
         @Override
         public void run() {
             super.run();
+            byte[] bytes;
+            Object object;
             try {
-
                 while (!stop) {
-                    Socket s = serverSocket.accept();
-                    InputStream iS = s.getInputStream();
-                    OutputStream oS = s.getOutputStream();
+                    Utils.bytesToObject(iS.readAllBytes());
 
-                    byte[] bufStr = new byte[256];
-
-                    int nBytes = iS.read(bufStr);
-                    String msgRecebida = new String(bufStr, 0, nBytes);
-                    String msgResposta = "olaaaaaa";
-
-                    bufStr = msgResposta.getBytes();
-                    oS.write(bufStr);
-                    s.close();
                 }
-
-                serverSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                try {
+                    s.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         }
     }

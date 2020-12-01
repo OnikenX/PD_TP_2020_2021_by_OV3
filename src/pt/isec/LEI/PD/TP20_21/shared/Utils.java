@@ -105,5 +105,16 @@ public class Utils {
          * Porta e endereço do servidor par coneção de default para o client se ligar ao servidor
          */
         public static int UDPClientRequestPort = 6969 ;
+
+
+
+        //DATABASE STUFF
+        public static final  String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+        public static final int DB_PORT = 3306;
+        public static final String DB_ADDRESS = "localhost";
+        public static final String DB_TABLE = "messager_db";
+        public static final String DB_URL = "jdbc:mysql://" + DB_ADDRESS + ":"+DB_PORT+"/" + DB_TABLE;
+        public static final String USER = System.getenv("PDTP_SERVER_DB_USER")!= null ? System.getenv("PDTP_SERVER_DB_USER") :"root";
+        public static final String PASS = System.getenv("PDTP_SERVER_DB_PASS")!= null ? System.getenv("PDTP_SERVER_DB_PASS") :"P4ssword@";
     }
 }

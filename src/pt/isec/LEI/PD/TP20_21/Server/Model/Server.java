@@ -1,11 +1,12 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model;
 
-import pt.isec.LEI.PD.TP20_21.Server.Connectivity.TcpServerClientAccepter;
+import pt.isec.LEI.PD.TP20_21.Server.Connectivity.TcpManager;
 import pt.isec.LEI.PD.TP20_21.Server.Connectivity.UdpServerClientPreConnection;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-import java.net.Socket;
+import java.net.*;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -14,8 +15,8 @@ import java.util.LinkedList;
  * Tem sobre responsablidade direta todas as coneções do servidor
  */
 public class Server {
-    private LinkedList<TcpServerClientAccepter> clientConnections;
-    private TcpServerClientAccepter tcpServerClient;
+    private LinkedList<TcpManager> clientConnections;
+    private TcpManager tcpServerClient;
     private final UdpServerClientPreConnection udpServerClientPreConnection;
     private final ServerData serverData;
     private LinkedList<Socket> clientes;//é uma lista de sockets dos clientes
@@ -29,14 +30,15 @@ public class Server {
         return tcpServerClient.getPort();
     }
 
-    public Server() {
-
+    public Server() throws SQLException {
+        //TODO: fazer o udpMulticast
+        //TODO: recerber os outros servidores se existirem outros criar uma nova database
 
         // onde vai seorganizar as coisas da memoria
         serverData = new ServerData();
 
         //criar thread para as ligações tcp
-        tcpServerClient = new TcpServerClientAccepter(this);
+        tcpServerClient = new TcpManager(this);
         tcpServerClient.start();
 
         //implementar uma forma de parar o isto
@@ -44,7 +46,6 @@ public class Server {
         //criação da thread que aceita clientes
         udpServerClientPreConnection = new UdpServerClientPreConnection(this, Utils.Consts.UDPClientRequestPort);
         udpServerClientPreConnection.start();
-
 
 
         //thread que fica a receber mensagens de outros servidores
@@ -55,7 +56,7 @@ public class Server {
         return udpServerClientPreConnection;
     }
 
-    private synchronized LinkedList<TcpServerClientAccepter> getClientConnections() {
+    private synchronized LinkedList<TcpManager> getClientConnections() {
         return clientConnections;
     }
 
@@ -80,4 +81,6 @@ public class Server {
             linkedList.add(serverData.getServers().get(i).getForClient());
         return linkedList;
     }
+
+
 }

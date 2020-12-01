@@ -17,7 +17,6 @@ public class VerificaServers extends Thread {
                 sleep(VERIFICA_SERVERS * 1000);
             } catch (InterruptedException ignored) {
             }
-
         }
     }
 }
