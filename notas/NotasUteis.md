@@ -14,3 +14,12 @@ Para o bloquiamento de threads da jeito saber [o que é o thread monitor em java
 
 [exemplo de syncronizar threads](https://docs.oracle.com/javase/tutorial/essential/concurrency/syncmeth.html)
 
+### Server configuração
+
+criação de um directorio para cada server e uma base de dados
+para isso criar um script de python para automatizar a criaçõ de servers
+
+
+- bd -> menssager_db_*numero do server*
+- criação da database tem de ser dinamica
+- directorio -> server_*numero do server*

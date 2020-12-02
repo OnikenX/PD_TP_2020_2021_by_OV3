@@ -50,7 +50,7 @@ public class ClientServerConnection extends Thread {
     private IpPort getIpPort() {
         if (servers.size() == 0) {
             if (retries <= 3) {
-                return new IpPort(Utils.Consts.ServerAddress, Utils.Consts.UDPClientRequestPort);
+                return new IpPort(Utils.Consts.SERVER_ADDRESS, Utils.Consts.UDP_CLIENT_REQUEST_PORT);
             } else {
                 if(Utils.Consts.DEBUG)
                     System.err.println("Não existem servidores online contactaveis.");

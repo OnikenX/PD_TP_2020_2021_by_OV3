@@ -2,9 +2,15 @@ package pt.isec.LEI.PD.TP20_21.shared;
 
 import java.io.*;
 import java.time.Instant;
+import java.util.Objects;
 
 public class Utils {
-    public static byte[] objectToBytes(Object object)  {
+
+    static int getObjectSize(Object obj){
+        return Objects.requireNonNull(Utils.objectToBytes(obj)).length;
+    }
+
+    public static byte[] objectToBytes(Object object) {
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
         ObjectOutput oo = null;
         try {
@@ -33,6 +39,7 @@ public class Utils {
         }
         return resposta;
     }
+
     public static Object bytesToObject(byte[] bytes) {
         ObjectInputStream iStream = null;
         try {
@@ -57,7 +64,7 @@ public class Utils {
         return object;
     }
 
-    public static long getTimeStamp(){
+    public static long getTimeStamp() {
         return Instant.now().getEpochSecond();
     }
 
@@ -72,11 +79,24 @@ public class Utils {
          * Mensagem a enviar para fazer um pedido de conecao do cliente ao servidor
          */
         public static final String PEDIR_CONECCAO = "1";
+
+
+        //multicast
         /**
          * Porta a ser partilhada a todos os server para fazer multicast
          */
-        public static final int UDP_MulticastServerPort = 5432;
-        public static final String ServerAddress = "localhost";
+        public static final int UDP_MULTICAST_PORT = 5432;
+
+        /**
+         * grupo de multicast para se ligar
+         */
+        public static final String UDP_MULTICAST_GROUP = "224.0.0.169";
+
+
+
+
+        public static final String SERVER_ADDRESS = "localhost";
+
         /**
          * maximo de users existente num servidor
          */
@@ -86,35 +106,37 @@ public class Utils {
         /**
          * tamanho maximo pedido pelo enunciado para os envios de tcp(em bytes)
          */
-        public static final int MAX_SIZE_PER_PACKET = 5000;
-
-
+        public static final int MAX_SIZE_PER_PACKET = 5 * 1024;
 
 
         /**
-         * Tempos em que o cliente vai verificando valores(em segundos)
+         * Tempos em que o server vai verificando valores(em segundos)
          */
-        public static final int VERIFICA_SERVERS = 15;
+        public static final int SERVER_VERIFY_SERVERS_TIMER = 15;
+
         /**
          * Timeout para um servidor ser removido da lista(em segundos)
          */
         public static final int TIMEOUT_PINGS = 30;
 
+        /**
+         * Variavel para um modo de debug
+         */
         public static boolean DEBUG = true;
+
         /**
          * Porta e endereço do servidor par coneção de default para o client se ligar ao servidor
          */
-        public static int UDPClientRequestPort = 6969 ;
-
+        public static int UDP_CLIENT_REQUEST_PORT = 6969;
 
 
         //DATABASE STUFF
-        public static final  String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+        public static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
         public static final int DB_PORT = 3306;
         public static final String DB_ADDRESS = "localhost";
         public static final String DB_TABLE = "messager_db";
-        public static final String DB_URL = "jdbc:mysql://" + DB_ADDRESS + ":"+DB_PORT+"/" + DB_TABLE;
-        public static final String USER = System.getenv("PDTP_SERVER_DB_USER")!= null ? System.getenv("PDTP_SERVER_DB_USER") :"root";
-        public static final String PASS = System.getenv("PDTP_SERVER_DB_PASS")!= null ? System.getenv("PDTP_SERVER_DB_PASS") :"P4ssword@";
+        public static final String DB_URL = "jdbc:mysql://" + DB_ADDRESS + ":" + DB_PORT + "/" + DB_TABLE;
+        public static final String USER = System.getenv("PDTP_SERVER_DB_USER") != null ? System.getenv("PDTP_SERVER_DB_USER") : "root";
+        public static final String PASS = System.getenv("PDTP_SERVER_DB_PASS") != null ? System.getenv("PDTP_SERVER_DB_PASS") : "P4ssword@";
     }
 }

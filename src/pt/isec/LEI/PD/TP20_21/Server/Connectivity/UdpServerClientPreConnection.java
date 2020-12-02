@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
 import pt.isec.LEI.PD.TP20_21.shared.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
@@ -28,36 +29,26 @@ public class UdpServerClientPreConnection extends Thread {
         DatagramSocket socket = null;
         DatagramPacket packet; //para receber os pedidos e enviar as respostas
         String receivedMsg;
-
         try {
 
             listeningPort = 6969;//Integer.parseInt(args[0]);
             socket = new DatagramSocket(listeningPort);
-
+            Mensagens.PedidoDeLigar pedidoDeLigar;
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpServerClientPreConnection iniciado...");
 
             while (true) {
-                packet = new DatagramPacket(Utils.Consts.PEDIR_CONECCAO.getBytes(), 0, Utils.Consts.PEDIR_CONECCAO.getBytes().length);
+                packet = new DatagramPacket(new byte[Mensagens.PedidoDeLigar.SIZE], 0, Mensagens.PedidoDeLigar.SIZE);
                 socket.receive(packet);
                 if(Utils.Consts.DEBUG)
                     System.out.println("Foi recebido pedido do cliente {"+packet.getAddress()+","+ packet.getPort()+"} para ligação tcp");
 
-                receivedMsg = new String(packet.getData(), 0, packet.getLength());
+                pedidoDeLigar = (Mensagens.PedidoDeLigar)Utils.bytesToObject(packet.getData());
+
                 if (Utils.Consts.DEBUG)
-                    System.out.println("Recebido \"" + receivedMsg + "\" de " +
+                    System.out.println("Recebido \"" + pedidoDeLigar + "\" de " +
                             packet.getAddress().getHostAddress() + ":" + packet.getPort());
 
-                if (!receivedMsg.equalsIgnoreCase(Utils.Consts.PEDIR_CONECCAO)) {
-                    continue;
-                }
-
-//                calendar = GregorianCalendar.getInstance();
-//                timeMsg = calendar.get(GregorianCalendar.HOUR_OF_DAY) + ":" +
-//                        calendar.get(GregorianCalendar.MINUTE) + ":" + calendar.get(GregorianCalendar.SECOND);
-//
-//                packet.setData(timeMsg.getBytes());
-//                packet.setLength(timeMsg.length());
 
 
                 Respostas.RUdpClientServerPreConnection resposta;

@@ -6,9 +6,12 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
 
 public class test {
     public static void main(String[] args) {
-        sql();
+        String lol = "00000000000000000000000000000000000000000000000000000000000000";
 
     }
+
+
+
 
     //testar o password hashing
     static void testhash() {
@@ -35,21 +38,24 @@ public class test {
         Statement stmt = null;//mesagem a enviar
         ResultSet rs = null;//resultado
 
-        int id = 0;
+        int id = -1;
         try {
             Class.forName(JDBC_DRIVER);
 
-//STEP 3: Open a connection
+//STEP 2: Open a connection
             System.out.println("Connecting to database...");
 
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
-//STEP 4: Execute a query
+//STEP 3: Execute a query
             System.out.println("Creating statement...");
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM utilizadores where id = 1;");
-            rs.next();
-            System.out.println("utilizador 1:"+rs.getString("username")+", hash da password:"+rs.getString("hash"));
+            rs = stmt.executeQuery("SELECT * FROM utilizadores;");
+            int i = 0;
+            while (rs.next())
+                System.out.println("utilizador "+ (++i) +":" + rs.getString("username") + ", hash da password:" + rs.getString("hash"));
+            if (i == 0)
+                System.out.println("nao existem users");
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }

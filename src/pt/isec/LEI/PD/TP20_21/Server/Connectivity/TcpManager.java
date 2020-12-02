@@ -40,17 +40,23 @@ public class TcpManager {
     //TODO: continuar a fazer esta parte e completar o TcpServerClientConnection
     public void ligarCliente() throws IOException {
         var socket = serverSocket.accept();
-        tcpServerClientConnections.add(new TcpServerClientConnection(socket));
 
+        /**
+         * identifica a que user este client
+         */
+        int userId =-1;
+        tcpServerClientConnections.add(new TcpServerClientConnection(socket));
     }
 
+    /**
+     * Representa uma coneção do server para o cliente
+     */
     static class TcpServerClientConnection extends Thread {
         private int port = -1;
         private boolean stop = false;
         private final Socket s;
         private final InputStream iS;
         private final OutputStream oS;
-
 
         public TcpServerClientConnection(Socket socket) throws IOException {
             this.s = socket;
@@ -79,11 +85,14 @@ public class TcpManager {
         }
 
 
-        //Messsage receiver
+        /**
+         * Começa a thread que recebe mensagens
+         */
         public void receiveMessages() {
             this.start();
         }
 
+        //recebe mensagens
         @Override
         public void run() {
             super.run();

@@ -20,4 +20,12 @@ public class Respostas implements Serializable {
             this.servers = servers;
         }
     }
+
+    public static class RUdpMulticast implements Serializable {
+        public final IpPort server;
+
+        public RUdpMulticast(IpPort server) {
+            this.server = server;
+        }
+    }
 }

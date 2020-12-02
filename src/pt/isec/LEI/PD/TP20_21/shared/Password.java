@@ -6,6 +6,10 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+
+/**
+ * Transforma simples passwords em hashs e verifica os hashs com as passwords originais.
+ */
 public class Password {
     // The higher the number of iterations the more 
     // expensive computing the hash is for us and

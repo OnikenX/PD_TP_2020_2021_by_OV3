@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model;
 
 import pt.isec.LEI.PD.TP20_21.Server.Connectivity.TcpManager;
+import pt.isec.LEI.PD.TP20_21.Server.Connectivity.UdpMultiCast;
 import pt.isec.LEI.PD.TP20_21.Server.Connectivity.UdpServerClientPreConnection;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
@@ -16,35 +17,37 @@ import java.util.LinkedList;
  */
 public class Server {
     private LinkedList<TcpManager> clientConnections;
-    private TcpManager tcpServerClient;
+    private TcpManager tcpManager;
     private final UdpServerClientPreConnection udpServerClientPreConnection;
     private final ServerData serverData;
-    private LinkedList<Socket> clientes;//é uma lista de sockets dos clientes
-    private LinkedList<ClientReceiver> clientReceivers;//é uma lista de threads que fica a receber mensagens
+    private final Servidores servidores;
 
     public synchronized LinkedList<Socket> getClientes() {
         return clientes;
     }
 
     public int getTcpPort() {
-        return tcpServerClient.getPort();
+        return tcpManager.getPort();
     }
 
     public Server() throws SQLException {
-        //TODO: fazer o udpMulticast
-        //TODO: recerber os outros servidores se existirem outros criar uma nova database
+
+        //multicast
+        new UdpMultiCast();
+
+        servidores = new Servidores();
 
         // onde vai seorganizar as coisas da memoria
         serverData = new ServerData();
 
         //criar thread para as ligações tcp
-        tcpServerClient = new TcpManager(this);
-        tcpServerClient.start();
+        tcpManager = new TcpManager(this);
+        tcpManager.start();
 
         //implementar uma forma de parar o isto
         //synchronized ()
         //criação da thread que aceita clientes
-        udpServerClientPreConnection = new UdpServerClientPreConnection(this, Utils.Consts.UDPClientRequestPort);
+        udpServerClientPreConnection = new UdpServerClientPreConnection(this, Utils.Consts.UDP_CLIENT_REQUEST_PORT);
         udpServerClientPreConnection.start();
 
 
@@ -74,7 +77,7 @@ public class Server {
     public LinkedList<IpPort> getServersForClient() {
         Collections.sort(serverData.getServers());
         int max = 5;
-        if (serverData.getServers().size() < 300)
+        if (serverData.getServers().ize() < 300)
             max = serverData.getServers().size();
         var linkedList = new LinkedList<IpPort>();
         for (int i = 0; i < max; i++)
@@ -83,4 +86,7 @@ public class Server {
     }
 
 
+    public Servidores getServidores() {
+        return servidores;
+    }
 }

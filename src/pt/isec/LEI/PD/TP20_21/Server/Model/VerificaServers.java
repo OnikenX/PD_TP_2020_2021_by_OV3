@@ -1,20 +1,27 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model;
 
 
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.VERIFICA_SERVERS;
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.SERVER_VERIFY_SERVERS_TIMER;
 
+/**
+ * Verificação se os servidores estão activos.
+ *
+ * Esta é uma thread auto enicializada e do tipo daemon.
+ */
 public class VerificaServers extends Thread {
-    Servidores ips;
-    public VerificaServers(Servidores ips) {
-        this.ips = ips;
+    private Server server;
+    public VerificaServers(Server server) {
+        this.server = server;
+        this.setDaemon(true);
+        this.start();
     }
 
     @Override
     public void run() {
         while (true) {
-            ips.removeTimedOut();
+            server.getIps().removeTimedOut();
             try {
-                sleep(VERIFICA_SERVERS * 1000);
+                sleep(SERVER_VERIFY_SERVERS_TIMER * 1000);
             } catch (InterruptedException ignored) {
             }
         }

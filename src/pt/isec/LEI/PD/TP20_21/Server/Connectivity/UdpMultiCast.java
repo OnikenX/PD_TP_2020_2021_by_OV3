@@ -1,48 +1,60 @@
 package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
-import pt.isec.LEI.PD.TP20_21.shared.Respostas;
+import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.*;
 import java.net.*;
 
+
 public class UdpMultiCast extends Thread {
 
-    public static int MAX_SIZE = 1000;
-    protected String username;
-    protected MulticastSocket s;
+    //    protected String username;
+    protected MulticastSocket multicastSocket;
     protected boolean running;
+    protected Server server;
 
-    public void terminate() {
+    public UdpMultiCast(Server server) throws IOException {
+        this.multicastSocket = new MulticastSocket(Utils.Consts.UDP_MULTICAST_PORT);
+        multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
+
+        this.server = server;
+        this.running = false;
+        setDaemon(true);
+
+        start();
+    }
+
+    public synchronized void terminate() {
         running = false;
     }
 
+    //recebe uma mensagem multicast
     @Override
     public void run() {
 
-        int listeningPort;
         DatagramPacket packet; //para receber os pedidos e enviar as respostas
-        String receivedMsg;
-
-        if (s == null || !running)
+        Object receivedObject;
+        if (multicastSocket == null || !running)
             return;
-
         try {
-            packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
-
+            packet = new DatagramPacket(new byte[Utils.Consts.MAX_SIZE_PER_PACKET], Utils.Consts.MAX_SIZE_PER_PACKET);
             if (Utils.Consts.DEBUG)
-                System.out.println("UdpServerClientPreConnection iniciado...");
-
+                System.out.println("UdpMultiCast activado iniciado...");
             while (running) {
-                packet = new DatagramPacket(Utils.Consts.PEDIR_CONECCAO.getBytes(), 0, Utils.Consts.PEDIR_CONECCAO.getBytes().length);
-                s.receive(packet);
-                if(Utils.Consts.DEBUG)
-                    System.out.println("Foi recebido pedido do cliente {"+packet.getAddress()+","+ packet.getPort()+"} para ligação tcp");
-
-                receivedMsg = new String(packet.getData(), 0, packet.getLength());
+                multicastSocket.receive(packet);
                 if (Utils.Consts.DEBUG)
-                    System.out.println("Recebido \"" + receivedMsg + "\" de " +
-                            packet.getAddress().getHostAddress() + ":" + packet.getPort());
+                    System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação UdpMulticast");
+
+                receivedObject = Utils.bytesToObject(packet.getData());
+                if (receivedObject == null) {
+                    if (Utils.Consts.DEBUG)
+                        System.out.println("Received object is null, skipping...");
+                    continue;
+                }
+                if (Utils.Consts.DEBUG)
+                    System.out.println("Recebido \"" + receivedObject + "\" de " +
+                            packet.getAddress().getHostAddress() + ":" + packet.getPort() + " [" + packet.getLength() + " bytes]");
 
                 if (!receivedMsg.equalsIgnoreCase(Utils.Consts.PEDIR_CONECCAO)) {
                     continue;
@@ -52,9 +64,8 @@ public class UdpMultiCast extends Thread {
                 assert respostabytes != null;
                 packet.setData(respostabytes, 0, respostabytes.length);
                 //O ip e porto de destino ja' se encontram definidos em packet
-                s.send(packet);
+                multicastSocket.send(packet);
             }
-
         } catch (NumberFormatException e) {
             System.out.println("O porto de escuta deve ser um inteiro positivo.");
         } catch (SocketException e) {
@@ -62,67 +73,22 @@ public class UdpMultiCast extends Thread {
         } catch (IOException e) {
             System.out.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
         } finally {
-            if (s != null) {
-                s.close();
+            if (multicastSocket != null) {
+                multicastSocket.close();
             }
         }
     }
 
 
+    //enviar mensagem
 
-    public static void comunicaMultiCast() {
-        InetAddress group;
-        int port;
-        MulticastSocket socket = null;
-        DatagramPacket dgram;
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String msg;
-        ByteArrayOutputStream buff;
-        ObjectOutputStream out;
+    /**
+     * Envia uma mensagem por multicast
+     *
+     * @param mensagem       a enviar
+     * @param recebeResposta se deve esperar por uma resposta ou não, returna null se nao receber uma.
+     */
+    synchronized public Object enviaMulticast(Object mensagem, boolean recebeResposta) {
 
-        UdpMultiCast t = null;
-
-        try {
-            group = InetAddress.getByName(args[1]);
-            port = Integer.parseInt(args[2]);
-
-            socket = new MulticastSocket(port);
-
-            try {
-                socket.setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getByName(args[2])));
-            } catch (SocketException | NullPointerException | UnknownHostException | SecurityException e) {
-                socket.setNetworkInterface(NetworkInterface.getByName(args[3]));
-            }
-
-            socket.joinGroup(group);
-
-            t = new MulticastChat_v2(args[0], socket);
-            t.start();
-
-            System.out.println("> ");
-            while (true) {
-                msg = in.readLine();
-                if (msg.equalsIgnoreCase(EXIT)) {
-                    break;
-                }
-                buff = new ByteArrayOutputStream();
-                out = new ObjectOutputStream(buff);
-                out.writeObject(new Msg(args[0], msg));
-                out.flush();
-                out.close();
-
-                dgram = new DatagramPacket(buff.toByteArray(), buff.size(), group, port);
-                socket.send(dgram);
-            }
-        } catch (NumberFormatException | IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (t != null) {
-                t.terminate();
-            }
-            if (socket != null) {
-                socket.close();
-            }
-        }
     }
 }

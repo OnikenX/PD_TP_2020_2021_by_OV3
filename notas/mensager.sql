@@ -1,7 +1,7 @@
 SET GLOBAL time_zone = '+0:00'; /* Necessario porque temos uma coluna do tipo timestamp/date/datetime */
 
-CREATE DATABASE IF NOT EXISTS messager_db;
-USE messager_db;
+CREATE DATABASE IF NOT EXISTS messager_db_{};
+USE messager_db_{};
 
 DROP TABLE IF EXISTS mensagens;
 DROP TABLE IF EXISTS canais;
@@ -12,12 +12,9 @@ drop table if exists ficheiros;
 create table ficheiros
 (
     id   int  not null auto_increment unique,
-    path text not null,
+    nome text not null,
     PRIMARY KEY (id)
 );
-drop table utilizadores;
-drop table canais;
-drop table mensagens;
 create table utilizadores
 (
     id           int         not null auto_increment unique,
@@ -39,23 +36,26 @@ create table canais
     foreign key (moderadorId) references utilizadores (id)
 );
 
-drop table mensagens;
+
 create table mensagens
 (
     id            int                                 not null auto_increment unique,
     dataHoraEnvio timestamp DEFAULT CURRENT_TIMESTAMP not null,
     authorId      int                                 not null,
     canalId       int                                 not null,
-    mensagem    text not null ,
-        isAFile bool not null ,
+
+    isAFile       bool                                not null,
+    mensagem      text,
+    fileId        int,
     PRIMARY KEY (id),
     FOREIGN KEY (authorId) REFERENCES utilizadores (id),
-    foreign key (canalId) references canais (id)
+    foreign key (canalId) references canais (id),
+    foreign key (fileId) references ficheiros(id)
 
 );
 
-CREATE USER IF NOT EXISTS `server`@`localhost` IDENTIFIED BY 'W-pass-123';
-GRANT SELECT, INSERT, UPDATE, DELETE ON * TO `server`@`localhost`;
+CREATE USER IF NOT EXISTS `server_{}`@`localhost` IDENTIFIED BY 'W-pass-{}';
+GRANT SELECT, INSERT, UPDATE, DELETE ON * TO `server{}`@`localhost`;
 
 FLUSH PRIVILEGES;
 
