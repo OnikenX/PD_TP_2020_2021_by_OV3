@@ -23,8 +23,8 @@ public class Respostas implements Serializable {
             this.TcpPort = -1;
             this.servers = null;
         }
-        setAll(int )
-    }
 
+
+    }
 
 }

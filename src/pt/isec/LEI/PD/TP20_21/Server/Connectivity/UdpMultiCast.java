@@ -21,7 +21,7 @@ public class UdpMultiCast extends Thread {
 
     public UdpMultiCast(Server server) throws IOException {
         this.multicastSocket = new MulticastSocket(Utils.Consts.UDP_MULTICAST_PORT);
-        multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST));
+        multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
 
         this.server = server;
         this.running = false;
@@ -39,8 +39,8 @@ public class UdpMultiCast extends Thread {
     public void run() {
         Class<?> classType=null;
 
-        DatagramPacket packet = null; //para receber os pedidos e enviar as respostas
-        Object receivedObject = null;
+        DatagramPacket packet; //para receber os pedidos e enviar as respostas
+        Object receivedObject;
         if (multicastSocket == null || !running)
             return;
         try {
@@ -94,6 +94,7 @@ public class UdpMultiCast extends Thread {
      * @param recebeResposta se deve esperar por uma resposta ou não, returna null se nao receber uma.
      */
     synchronized public Object enviaMulticast(Object mensagem, boolean recebeResposta) {
-
+        //TODO: nao sei o que isto faz mas pode ser preciso mais tarde
+        return null;
     }
 }

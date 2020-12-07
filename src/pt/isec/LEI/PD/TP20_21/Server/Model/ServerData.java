@@ -9,7 +9,7 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
  * Faz manegamento dos objectos na memoria, toma conta dos dados e mexe na database
  */
 public class ServerData {
-    private Servidores servers;
+    private Servidores servidores;
 
     //sql vars
     Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
@@ -34,12 +34,15 @@ public class ServerData {
 
     public boolean userExist(String username) throws SQLException {
         String hash;
+        boolean return_value;
         ResultSet rs = executeQuery("SELECT * FROM utilizadores where username =" + username+";");
-        if(rs.next()){
+        if((return_value = rs.next())){
             rs.getString("hash");
         }
-
+        rs.close();
+        return return_value;
     }
+
     public synchronized ResultSet executeQuery(String sqlcommand) throws SQLException {
         return stmt.executeQuery(sqlcommand);
     }
@@ -51,11 +54,11 @@ public class ServerData {
         return exists;
     }
 
-    public synchronized Servidores getServers() {
-        return servers;
+    public synchronized Servidores getServidores() {
+        return servidores;
     }
 
-    public void addUser(String username, String hash) {
+    public void addUser(String username, String hash) throws SQLException {
         executeQuery("");
     }
 }

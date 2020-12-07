@@ -18,7 +18,15 @@ public class TcpManager {
     private Server server;
     private int port;
     private ServerSocket serverSocket;
-    private final LinkedList<TcpServerClientConnection> tcpServerClientConnections = new LinkedList<>();
+
+    public TcpServerClientConnections getTcpServerClientConnections() {
+        return tcpServerClientConnections;
+    }
+
+    private final TcpServerClientConnections tcpServerClientConnections = new TcpServerClientConnections();
+    static public class TcpServerClientConnections extends LinkedList<TcpServerClientConnection> {
+
+    }
     private static final int TIMEOUT = 3;//segungos
 
     public TcpManager(Server server) {

@@ -19,7 +19,7 @@ public class VerificaServers extends Thread {
     @Override
     public void run() {
         while (true) {
-            server.getIps().removeTimedOut();
+            server.getServidores().removeTimedOut();
             try {
                 sleep(SERVER_VERIFY_SERVERS_TIMER * 1000);
             } catch (InterruptedException ignored) {

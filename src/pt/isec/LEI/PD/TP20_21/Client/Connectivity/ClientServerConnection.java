@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
+import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
 import pt.isec.LEI.PD.TP20_21.shared.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
@@ -22,16 +23,16 @@ public class ClientServerConnection extends Thread {
     @Override
     public void run() {
         super.run();
-        InetAddress server = null ;
+        InetAddress server = null;
         while (true) {//condição para que o servidor esteja sempre a conectar
             try {
                 while ((server = connectUdp()) == null) ;
-            }catch(Error e){
+            } catch (Error e) {
                 //Caso ocorra erro a ligar a um server ele cancela a coneçao.
                 break;
             }
-            if(Utils.Consts.DEBUG)
-                System.out.println("Recebido resposta de : "+ server + "; port:" + resposta.TcpPort+"; servers: "+resposta.servers);
+            if (Utils.Consts.DEBUG)
+                System.out.println("Recebido resposta de : " + server + "; port:" + resposta.TcpPort + "; servers: " + resposta.servers);
             if (resposta.TcpPort != -1) {
                 try {
                     connectTcp(server);
@@ -43,7 +44,6 @@ public class ClientServerConnection extends Thread {
     }
 
 
-
     /**
      * Seleciona o proximo ip/port para o servidor a ligar
      */
@@ -52,7 +52,7 @@ public class ClientServerConnection extends Thread {
             if (retries <= 3) {
                 return new IpPort(Utils.Consts.SERVER_ADDRESS, Utils.Consts.UDP_CLIENT_REQUEST_PORT);
             } else {
-                if(Utils.Consts.DEBUG)
+                if (Utils.Consts.DEBUG)
                     System.err.println("Não existem servidores online contactaveis.");
                 throw new Error("Não existem servidores online contactaveis.");
             }
@@ -74,25 +74,25 @@ public class ClientServerConnection extends Thread {
      */
     private InetAddress connectUdp() {
         try {
+
             IpPort ipPort = getIpPort();
-            byte[] messageSend = Utils.Consts.PEDIR_CONECCAO.getBytes();
 
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(
-                    messageSend, 0, messageSend.length,
-                    InetAddress.getByName(ipPort.ip), ipPort.port
-            );
+                    new byte[Mensagens.PedidoDeLigar.SIZE],
+                    0, Mensagens.PedidoDeLigar.SIZE);
             socket.setSoTimeout(TIMEOUT * 1000);
+            //send packet
             socket.send(packet);
+
+            //receive packet
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
             socket.receive(packet);
-            //byte[] bufferreceived = new byte[packet.getLength()]; //considerar criar uma coisa mais limitade se ouver problemas a criar esta drena
             resposta = (Respostas.RUdpClientServerPreConnection) Utils.bytesToObject(packet.getData());
             retries = 0;
             tries = 0;
             return packet.getAddress();
-
         } catch (SocketTimeoutException | SocketException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class ClientServerConnection extends Thread {
         throw new Exception();
     }
 
-    public void resumeThis(){
+    public void resumeThis() {
         notify();
     }
 

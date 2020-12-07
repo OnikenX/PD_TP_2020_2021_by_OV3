@@ -16,12 +16,12 @@ import java.util.LinkedList;
  * Tem sobre responsablidade direta todas as coneções do servidor
  */
 public class Server {
-    private final LinkedList<TcpManager> clientConnections;
+//    private final LinkedList<TcpManager> clientConnections;
     private TcpManager tcpManager;
-    private final UdpMultiCast udpMultiCast;
-    private final UdpServerClientPreConnection udpServerClientPreConnection;
-    private final ServerData serverData;
-    private final Servidores servidores;
+    private UdpMultiCast udpMultiCast;
+    private UdpServerClientPreConnection udpServerClientPreConnection;
+    private ServerData serverData;
+    private Servidores servidores;
 
     public int getTcpPort() { return tcpManager.getPort(); }
 
@@ -34,7 +34,7 @@ public class Server {
         serverData = new ServerData();
 
         //multicast
-        udpMultiCast = new UdpMultiCast(this);
+         udpMultiCast = new UdpMultiCast(this);
 
         //criar thread para as ligações tcp
         tcpManager = new TcpManager(this);
@@ -49,20 +49,16 @@ public class Server {
 
         //thread que fica a receber mensagens de outros servidores
 
-        clientConnections = new LinkedList<>();
+//        tcpManager. = new LinkedList<>();
     }
 
     private synchronized UdpServerClientPreConnection getUdpServerClientPreConnection() {
         return udpServerClientPreConnection;
     }
 
-    private synchronized LinkedList<TcpManager> getClientConnections() {
-        return clientConnections;
-    }
-
     public boolean verifyServerAvailability() {
-        for (ServidorExterno s : serverData.getServers()) {
-            if (s.getLotacao() < clientes.size() / 2)
+        for (ServidorExterno s : serverData.getServidores()) {
+            if (s.getLotacao() < tcpManager.getTcpServerClientConnections().size() /2)
                 return false;
         }
         return true;
@@ -72,13 +68,13 @@ public class Server {
     //que estao mais vazios ate aqueles que estao mais cheios
 
     public LinkedList<IpPort> getServersForClient() {
-        Collections.sort(serverData.getServers());
+        Collections.sort(serverData.getServidores());
         int max = 5;
-        if (serverData.getServers().size() < 300)
-            max = serverData.getServers().size();
+        if (serverData.getServidores().size() < 300)
+            max = serverData.getServidores().size();
         var linkedList = new LinkedList<IpPort>();
         for (int i = 0; i < max; i++)
-            linkedList.add(serverData.getServers().get(i).getForClient());
+            linkedList.add(serverData.getServidores().get(i).getForClient());
         return linkedList;
     }
 
