@@ -7,8 +7,8 @@ public class Mensagens implements Serializable {
     /**
      * pedido para se ligar ao servidor, é um registo se {isRegistado} é falso caso contrario é um login
      */
-    public static class PedidoDeLigar implements Serializable{
-        private String username  = "00000000000000000000000000000000000000000000000000000000000000";
+    public static class PedidoDeLigar implements Serializable {
+        private String username = "00000000000000000000000000000000000000000000000000000000000000";
         private String password = "00000000000000000000000000000000000000000000000000000000000000";
         private boolean registado = false;
         public static int SIZE = 210;//na verdade o size é 205 mas meti mais 5 so pelo seguro
@@ -40,10 +40,11 @@ public class Mensagens implements Serializable {
         /**
          * Construtor de default com username e password a 62 characters e registado a false
          */
-        public PedidoDeLigar() {}
+        public PedidoDeLigar() {
+        }
 
-         public void setAll(String username, String password, boolean registado){
-            if (username.getBytes().length >62 || password.getBytes().length > 62)
+        public void setAll(String username, String password, boolean registado) {
+            if (username.getBytes().length > 62 || password.getBytes().length > 62)
                 throw new IllegalArgumentException("Username and password sizes must be smaller than 62.");
             this.username = username;
             this.password = password;
@@ -53,6 +54,15 @@ public class Mensagens implements Serializable {
 
         public PedidoDeLigar(String username, String password, boolean registado) {
             setAll(username, password, registado);
+        }
+
+
+    }
+
+    public static class Ping{
+        private int lotacao;
+        public Ping(int lotacao){
+            this.lotacao = lotacao;
         }
     }
 }

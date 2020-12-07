@@ -1,10 +1,14 @@
 package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.SocketException;
 
 
 public class UdpMultiCast extends Thread {
@@ -13,10 +17,11 @@ public class UdpMultiCast extends Thread {
     protected MulticastSocket multicastSocket;
     protected boolean running;
     protected Server server;
+    int port;
 
     public UdpMultiCast(Server server) throws IOException {
         this.multicastSocket = new MulticastSocket(Utils.Consts.UDP_MULTICAST_PORT);
-        multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
+        multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST));
 
         this.server = server;
         this.running = false;
@@ -32,9 +37,10 @@ public class UdpMultiCast extends Thread {
     //recebe uma mensagem multicast
     @Override
     public void run() {
+        Class<?> classType=null;
 
-        DatagramPacket packet; //para receber os pedidos e enviar as respostas
-        Object receivedObject;
+        DatagramPacket packet = null; //para receber os pedidos e enviar as respostas
+        Object receivedObject = null;
         if (multicastSocket == null || !running)
             return;
         try {
@@ -54,24 +60,23 @@ public class UdpMultiCast extends Thread {
                 }
                 if (Utils.Consts.DEBUG)
                     System.out.println("Recebido \"" + receivedObject + "\" de " +
-                            packet.getAddress().getHostAddress() + ":" + packet.getPort() + " [" + packet.getLength() + " bytes]");
+                            packet.getAddress().getHostAddress() + ":" + packet.getPort() + " [" + packet.getLength());
+                classType = receivedObject.getClass();
+                if (classType == Mensagens.Ping.class){
 
-                if (!receivedMsg.equalsIgnoreCase(Utils.Consts.PEDIR_CONECCAO)) {
-                    continue;
+                }else{
+                    throw new ClassNotFoundException();
                 }
-
-                byte[] respostabytes = Utils.objectToBytes(resposta);
-                assert respostabytes != null;
-                packet.setData(respostabytes, 0, respostabytes.length);
-                //O ip e porto de destino ja' se encontram definidos em packet
-                multicastSocket.send(packet);
             }
         } catch (NumberFormatException e) {
-            System.out.println("O porto de escuta deve ser um inteiro positivo.");
+            System.err.println("O porto de escuta deve ser um inteiro positivo.");
         } catch (SocketException e) {
-            System.out.println("Ocorreu um erro ao nivel do socket UDP:\n\t" + e);
+            System.err.println("Ocorreu um erro ao nivel do socket UDP:\n\t" + e);
         } catch (IOException e) {
-            System.out.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
+            System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
+        } catch (ClassNotFoundException e) {
+            System.err.println("Class "+ ((classType!=null) ? classType.toString():"none") + " não ");
+            e.printStackTrace();
         } finally {
             if (multicastSocket != null) {
                 multicastSocket.close();
@@ -83,7 +88,7 @@ public class UdpMultiCast extends Thread {
     //enviar mensagem
 
     /**
-     * Envia uma mensagem por multicast
+     * Envia uma mensagem por mulClass<?>ticast
      *
      * @param mensagem       a enviar
      * @param recebeResposta se deve esperar por uma resposta ou não, returna null se nao receber uma.

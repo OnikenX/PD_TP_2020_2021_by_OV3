@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -26,12 +25,8 @@ public class TcpManager {
         this.server = server;
         try {
             serverSocket = new ServerSocket(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
             serverSocket.setSoTimeout(3 * 1000);
-        } catch (SocketException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         port = serverSocket.getLocalPort();
@@ -46,6 +41,10 @@ public class TcpManager {
          */
         int userId =-1;
         tcpServerClientConnections.add(new TcpServerClientConnection(socket));
+    }
+
+    public synchronized int getPort() {
+        return port;
     }
 
     /**

@@ -19,13 +19,12 @@ public class Respostas implements Serializable {
             this.TcpPort = TcpPort;
             this.servers = servers;
         }
-    }
-
-    public static class RUdpMulticast implements Serializable {
-        public final IpPort server;
-
-        public RUdpMulticast(IpPort server) {
-            this.server = server;
+        public RUdpClientServerPreConnection(){
+            this.TcpPort = -1;
+            this.servers = null;
         }
+        setAll(int )
     }
+
+
 }

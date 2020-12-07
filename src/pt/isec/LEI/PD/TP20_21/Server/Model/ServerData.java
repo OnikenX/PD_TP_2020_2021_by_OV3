@@ -33,15 +33,18 @@ public class ServerData {
     }
 
     public boolean userExist(String username) throws SQLException {
-     return verifyExistenceOf("utilizadores", "username = \""+username+"\"");
-    }
+        String hash;
+        ResultSet rs = executeQuery("SELECT * FROM utilizadores where username =" + username+";");
+        if(rs.next()){
+            rs.getString("hash");
+        }
 
+    }
     public synchronized ResultSet executeQuery(String sqlcommand) throws SQLException {
         return stmt.executeQuery(sqlcommand);
     }
 
     public  boolean verifyExistenceOf(String table, String condition) throws SQLException {
-
         ResultSet rs = executeQuery("SELECT * FROM "+table+" where "+condition+";");
         var exists = rs.next();
         rs.close();
@@ -50,6 +53,10 @@ public class ServerData {
 
     public synchronized Servidores getServers() {
         return servers;
+    }
+
+    public void addUser(String username, String hash) {
+        executeQuery("");
     }
 }
 

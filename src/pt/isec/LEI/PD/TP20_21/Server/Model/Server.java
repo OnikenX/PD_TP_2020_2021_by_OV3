@@ -6,7 +6,7 @@ import pt.isec.LEI.PD.TP20_21.Server.Connectivity.UdpServerClientPreConnection;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-import java.net.*;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -16,36 +16,32 @@ import java.util.LinkedList;
  * Tem sobre responsablidade direta todas as coneções do servidor
  */
 public class Server {
-    private LinkedList<TcpManager> clientConnections;
+    private final LinkedList<TcpManager> clientConnections;
     private TcpManager tcpManager;
+    private final UdpMultiCast udpMultiCast;
     private final UdpServerClientPreConnection udpServerClientPreConnection;
     private final ServerData serverData;
     private final Servidores servidores;
 
-    public synchronized LinkedList<Socket> getClientes() {
-        return clientes;
-    }
+    public int getTcpPort() { return tcpManager.getPort(); }
 
-    public int getTcpPort() {
-        return tcpManager.getPort();
-    }
+    public Server() throws SQLException, ClassNotFoundException, IOException {
 
-    public Server() throws SQLException {
-
-        //multicast
-        new UdpMultiCast();
-
+        //criar a lista de servidores
         servidores = new Servidores();
 
-        // onde vai seorganizar as coisas da memoria
+        //data
         serverData = new ServerData();
+
+        //multicast
+        udpMultiCast = new UdpMultiCast(this);
 
         //criar thread para as ligações tcp
         tcpManager = new TcpManager(this);
-        tcpManager.start();
 
         //implementar uma forma de parar o isto
-        //synchronized ()
+
+
         //criação da thread que aceita clientes
         udpServerClientPreConnection = new UdpServerClientPreConnection(this, Utils.Consts.UDP_CLIENT_REQUEST_PORT);
         udpServerClientPreConnection.start();
@@ -53,6 +49,7 @@ public class Server {
 
         //thread que fica a receber mensagens de outros servidores
 
+        clientConnections = new LinkedList<>();
     }
 
     private synchronized UdpServerClientPreConnection getUdpServerClientPreConnection() {
@@ -71,13 +68,13 @@ public class Server {
         return true;
     }
 
-    //returna uma lista de servidores por lotação, começando por aqueles que estao mais vazios ate aqueles que estao mais cheios
-
+    //returna uma lista de servidores por lotação, começando por aqueles
+    //que estao mais vazios ate aqueles que estao mais cheios
 
     public LinkedList<IpPort> getServersForClient() {
         Collections.sort(serverData.getServers());
         int max = 5;
-        if (serverData.getServers().ize() < 300)
+        if (serverData.getServers().size() < 300)
             max = serverData.getServers().size();
         var linkedList = new LinkedList<IpPort>();
         for (int i = 0; i < max; i++)
@@ -85,6 +82,9 @@ public class Server {
         return linkedList;
     }
 
+    public ServerData getServerData() {
+        return serverData;
+    }
 
     public Servidores getServidores() {
         return servidores;
