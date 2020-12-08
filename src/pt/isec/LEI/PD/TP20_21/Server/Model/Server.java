@@ -25,7 +25,7 @@ public class Server {
 
     public int getTcpPort() { return tcpManager.getPort(); }
 
-    public Server() throws SQLException, ClassNotFoundException, IOException {
+    public Server(int server_number) throws SQLException, ClassNotFoundException, IOException {
 
         //criar a lista de servidores
         servidores = new Servidores();

@@ -17,7 +17,7 @@ public class ServerData {
     Statement stmt;
 
 
-    public ServerData() throws SQLException, ClassNotFoundException {
+    public ServerData(int server_number) throws SQLException, ClassNotFoundException {
         //sql configs
 //STEP 2: Register JDBC driver
         Class.forName(JDBC_DRIVER);

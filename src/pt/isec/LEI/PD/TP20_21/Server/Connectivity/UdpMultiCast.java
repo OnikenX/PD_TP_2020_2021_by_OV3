@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
+
 
 public class UdpMultiCast extends Thread {
 
@@ -37,17 +39,20 @@ public class UdpMultiCast extends Thread {
     //recebe uma mensagem multicast
     @Override
     public void run() {
-        Class<?> classType=null;
+        Class<?> classType = null;
 
         DatagramPacket packet; //para receber os pedidos e enviar as respostas
         Object receivedObject;
         if (multicastSocket == null || !running)
             return;
+
+        if (Utils.Consts.DEBUG)
+            System.out.println("UdpMultiCast activado iniciado...");
         try {
-            packet = new DatagramPacket(new byte[Utils.Consts.MAX_SIZE_PER_PACKET], Utils.Consts.MAX_SIZE_PER_PACKET);
-            if (Utils.Consts.DEBUG)
-                System.out.println("UdpMultiCast activado iniciado...");
             while (running) {
+                packet = new DatagramPacket(
+                        new byte[Utils.Consts.MAX_SIZE_PER_PACKET], Utils.Consts.MAX_SIZE_PER_PACKET);
+                DatagramPacket(new byte[objectToBytes(new Mensagens.PedidoDeLigar()).length], 0, Mensagens.PedidoDeLigar.SIZE);
                 multicastSocket.receive(packet);
                 if (Utils.Consts.DEBUG)
                     System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação UdpMulticast");
@@ -62,26 +67,31 @@ public class UdpMultiCast extends Thread {
                     System.out.println("Recebido \"" + receivedObject + "\" de " +
                             packet.getAddress().getHostAddress() + ":" + packet.getPort() + " [" + packet.getLength());
                 classType = receivedObject.getClass();
-                if (classType == Mensagens.Ping.class){
+                if (classType == Mensagens.Ping.class) {
 
-                }else{
+                } else {
                     throw new ClassNotFoundException();
                 }
             }
-        } catch (NumberFormatException e) {
+        } catch (
+                NumberFormatException e) {
             System.err.println("O porto de escuta deve ser um inteiro positivo.");
-        } catch (SocketException e) {
+        } catch (
+                SocketException e) {
             System.err.println("Ocorreu um erro ao nivel do socket UDP:\n\t" + e);
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
-        } catch (ClassNotFoundException e) {
-            System.err.println("Class "+ ((classType!=null) ? classType.toString():"none") + " não ");
+        } catch (
+                ClassNotFoundException e) {
+            System.err.println("Class " + ((classType != null) ? classType.toString() : "none") + " não ");
             e.printStackTrace();
         } finally {
             if (multicastSocket != null) {
                 multicastSocket.close();
             }
         }
+
     }
 
 
