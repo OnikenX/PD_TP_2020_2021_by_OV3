@@ -1,13 +1,16 @@
+import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
 import java.sql.*;
+import java.util.Objects;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class test {
     public static void main(String[] args) {
         String lol = "00000000000000000000000000000000000000000000000000000000000000";
-
+        System.out.println(Objects.requireNonNull(Objects.requireNonNull(objectToBytes(new Mensagens.PedidoDeLigar()))).length);
     }
 
 

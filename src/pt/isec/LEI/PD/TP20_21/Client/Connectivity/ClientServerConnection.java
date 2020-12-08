@@ -9,11 +9,17 @@ import java.io.IOException;
 import java.net.*;
 import java.util.LinkedList;
 
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
+
 public class ClientServerConnection extends Thread {
     private final LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> servers = new LinkedList<>();
     private int tries;
     private int retries;
     private Respostas.RUdpClientServerPreConnection resposta = null;
+    private Mensagens.PedidoDeLigar pedido;
+    public ClientServerConnection(Mensagens.PedidoDeLigar pedido){
+        this.pedido = pedido ;
+    }
 
     /**
      * timeout para conectar com o server(em segundos)
@@ -26,7 +32,7 @@ public class ClientServerConnection extends Thread {
         InetAddress server = null;
         while (true) {//condição para que o servidor esteja sempre a conectar
             try {
-                while ((server = connectUdp()) == null) ;
+                while ((server = connectUdp(pedido)) == null) ;
             } catch (Error e) {
                 //Caso ocorra erro a ligar a um server ele cancela a coneçao.
                 break;
@@ -72,15 +78,17 @@ public class ClientServerConnection extends Thread {
      *
      * @return o ip do servidor em caso de se fazer uma resposta com sucesso, caso contrario returna null
      */
-    private InetAddress connectUdp() {
+    private InetAddress connectUdp(Mensagens.PedidoDeLigar pedido) {
         try {
-
             IpPort ipPort = getIpPort();
-
+            var pedidoBytes = objectToBytes(pedido);
             DatagramSocket socket = new DatagramSocket();
+            assert pedidoBytes != null;
             DatagramPacket packet = new DatagramPacket(
-                    new byte[Mensagens.PedidoDeLigar.SIZE],
-                    0, Mensagens.PedidoDeLigar.SIZE);
+                    pedidoBytes, pedidoBytes.length,
+                    InetAddress.getByName(Utils.Consts.SERVER_ADDRESS),
+                    Utils.Consts.UDP_CLIENT_REQUEST_PORT
+            );
             socket.setSoTimeout(TIMEOUT * 1000);
             //send packet
             socket.send(packet);
@@ -116,4 +124,5 @@ public class ClientServerConnection extends Thread {
         onSpinWait();
         return thread.servers;
     }
+    
 }

@@ -1,21 +1,22 @@
 SET GLOBAL time_zone = '+0:00'; /* Necessario porque temos uma coluna do tipo timestamp/date/datetime */
 
-CREATE DATABASE IF NOT EXISTS messager_db_{};
-USE messager_db_{};
+CREATE DATABASE IF NOT EXISTS messager_db_1;
+USE messager_db_1;
 
-DROP TABLE IF EXISTS mensagens;
-DROP TABLE IF EXISTS canais;
-DROP TABLE IF EXISTS utilizadores;
-drop table if exists ficheiros;
+# serve para resetar a base de dados
+# DROP TABLE IF EXISTS mensagens;
+# DROP TABLE IF EXISTS canais;
+# DROP TABLE IF EXISTS utilizadores;
+# drop table if exists ficheiros;
 
 
-create table ficheiros
+create table if not exists ficheiros
 (
     id   int  not null auto_increment unique,
     nome text not null,
     PRIMARY KEY (id)
 );
-create table utilizadores
+create table if not exists utilizadores
 (
     id           int         not null auto_increment unique,
     username     varchar(50) not null unique,
@@ -25,7 +26,7 @@ create table utilizadores
     FOREIGN KEY (profilepicId) REFERENCES ficheiros (id)
 );
 
-create table canais
+create table if not exists canais
 (
     id          int  not null auto_increment unique,
     nome        text not null,
@@ -37,7 +38,7 @@ create table canais
 );
 
 
-create table mensagens
+create table if not exists mensagens
 (
     id            int                                 not null auto_increment unique,
     dataHoraEnvio timestamp DEFAULT CURRENT_TIMESTAMP not null,
@@ -54,8 +55,8 @@ create table mensagens
 
 );
 
-CREATE USER IF NOT EXISTS `server_{}`@`localhost` IDENTIFIED BY 'W-pass-{}';
-GRANT SELECT, INSERT, UPDATE, DELETE ON * TO `server{}`@`localhost`;
+CREATE USER IF NOT EXISTS `server_1`@`localhost` IDENTIFIED BY 'W-pass-123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON * TO `server_1`@`localhost`;
 
 FLUSH PRIVILEGES;
 

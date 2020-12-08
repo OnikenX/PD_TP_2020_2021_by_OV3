@@ -15,6 +15,8 @@ public class ServerData {
     Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
     Connection conn;
     Statement stmt;
+
+
     public ServerData() throws SQLException, ClassNotFoundException {
         //sql configs
 //STEP 2: Register JDBC driver
@@ -44,7 +46,9 @@ public class ServerData {
     }
 
     public synchronized ResultSet executeQuery(String sqlcommand) throws SQLException {
-        return stmt.executeQuery(sqlcommand);
+        var result = stmt.executeQuery(sqlcommand);
+        conn.commit();
+        return result;
     }
 
     public  boolean verifyExistenceOf(String table, String condition) throws SQLException {

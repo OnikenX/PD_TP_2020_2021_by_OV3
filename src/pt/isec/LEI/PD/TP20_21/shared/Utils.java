@@ -12,7 +12,7 @@ public class Utils {
 
     public static byte[] objectToBytes(Object object) {
         ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-        ObjectOutput oo = null;
+        ObjectOutput oo;
         try {
             oo = new ObjectOutputStream(bStream);
         } catch (IOException e) {

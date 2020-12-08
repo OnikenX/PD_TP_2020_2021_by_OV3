@@ -12,6 +12,8 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.Objects;
 
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
+
 /**
  * Uma thread que fica constantemente a espera de connections de clientes.
  */
@@ -39,7 +41,7 @@ public class UdpServerClientPreConnection extends Thread {
                 System.out.println("UdpServerClientPreConnection iniciado...");
 
             while (true) {
-                packet = new DatagramPacket(new byte[Mensagens.PedidoDeLigar.SIZE], 0, Mensagens.PedidoDeLigar.SIZE);
+                packet = new DatagramPacket(new byte[objectToBytes(new Mensagens.PedidoDeLigar()).length], 0, Mensagens.PedidoDeLigar.SIZE);
                 socket.receive(packet);
                 if (Utils.Consts.DEBUG)
                     System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação tcp");
@@ -75,7 +77,7 @@ public class UdpServerClientPreConnection extends Thread {
                     resposta = new Respostas.RUdpClientServerPreConnection(-1, server.getServersForClient());
                 }
 
-                byte[] respostabytes = Utils.objectToBytes(resposta);
+                byte[] respostabytes = objectToBytes(resposta);
                 assert respostabytes != null;
                 packet.setData(respostabytes, 0, respostabytes.length);
                 //O ip e porto de destino ja' se encontram definidos em packet

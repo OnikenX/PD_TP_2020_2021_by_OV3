@@ -1,6 +1,9 @@
 package pt.isec.LEI.PD.TP20_21.shared;
 
 import java.io.Serializable;
+import java.util.Objects;
+
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class Mensagens implements Serializable {
 
@@ -8,10 +11,10 @@ public class Mensagens implements Serializable {
      * pedido para se ligar ao servidor, é um registo se {isRegistado} é falso caso contrario é um login
      */
     public static class PedidoDeLigar implements Serializable {
-        private String username = "00000000000000000000000000000000000000000000000000000000000000";
-        private String password = "00000000000000000000000000000000000000000000000000000000000000";
+        private String username = "1111111111111111111111111111111111111111111111111111111111111111";
+        private String password = "1111111111111111111111111111111111111111111111111111111111111111";
         private boolean registado = false;
-        public static int SIZE = 210;//na verdade o size é 205 mas meti mais 5 so pelo seguro
+        public static int SIZE = (Objects.requireNonNull(objectToBytes(new PedidoDeLigar())).length);//na verdade o size é 205 mas meti mais 5 so pelo seguro
 
         @Override
         public String toString() {
@@ -38,13 +41,12 @@ public class Mensagens implements Serializable {
         }
 
         /**
-         * Construtor de default com username e password a 62 characters e registado a false
+         * Construtor de default com username e password a 64 characters e registado a false
          */
-        public PedidoDeLigar() {
-        }
+        public PedidoDeLigar() {}
 
         public void setAll(String username, String password, boolean registado) {
-            if (username.getBytes().length > 62 || password.getBytes().length > 62)
+            if (username.getBytes().length > 64 || password.getBytes().length > 64)
                 throw new IllegalArgumentException("Username and password sizes must be smaller than 62.");
             this.username = username;
             this.password = password;
