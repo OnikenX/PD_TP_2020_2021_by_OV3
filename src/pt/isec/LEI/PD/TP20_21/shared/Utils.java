@@ -1,5 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.shared;
 
+import com.mysql.cj.PingTarget;
+
 import java.io.*;
 import java.time.Instant;
 import java.util.Objects;
@@ -117,7 +119,13 @@ public class Utils {
         /**
          * Timeout para um servidor ser removido da lista(em segundos)
          */
-        public static final int TIMEOUT_PINGS = 30;
+        public static final int TIMEOUT_PINGS = 50;
+
+
+        /**
+         * Intervalo entre pings
+         */
+        public static final int PING_INTERVAL = 5;
 
         /**
          * Variavel para um modo de debug

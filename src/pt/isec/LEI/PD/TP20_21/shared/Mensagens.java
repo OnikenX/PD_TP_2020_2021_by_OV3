@@ -61,9 +61,20 @@ public class Mensagens implements Serializable {
 
     }
 
-    public static class Ping{
+    public static class Ping implements Serializable {
         private int lotacao;
+//        public static int SIZE = (Objects.requireNonNull(objectToBytes(new Ping())).length);
+
         public Ping(int lotacao){
+            this.lotacao = lotacao;
+        }
+        public Ping() {}
+
+        public int getLotacao() {
+            return lotacao;
+        }
+
+        public void setLotacao(int lotacao) {
             this.lotacao = lotacao;
         }
     }
