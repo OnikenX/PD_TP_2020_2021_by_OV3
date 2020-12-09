@@ -17,7 +17,7 @@ public class Main {
             System.out.println("A iniciar o servidor...");
         try {
             var s = new Server(server_number);
-        } catch (SQLException | IOException | ClassNotFoundException throwables) {
+        } catch (SQLException | IOException | ClassNotFoundException | InterruptedException throwables) {
             throwables.printStackTrace();
         }
         System.out.println("Acabado sem grandes problemas....");

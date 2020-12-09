@@ -1,4 +1,4 @@
-import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
+import pt.isec.LEI.PD.TP20_21.shared.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
 import java.sql.*;
@@ -10,9 +10,22 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 public class test {
     public static void main(String[] args) {
         String lol = "00000000000000000000000000000000000000000000000000000000000000";
-        System.out.println(Objects.requireNonNull(Objects.requireNonNull(objectToBytes(new Mensagens.PedidoDeLigar()))).length);
+        System.out.println(Objects.requireNonNull(Objects.requireNonNull(objectToBytes(new Pedido.Conectar()))).length);
+        createThread();
+        System.out.println("started thread");
+        try {
+            Thread.sleep(3000);
+
+        System.out.println("finishing program...");
+        Thread.sleep(600);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
+    static public void createThread(){
+        new thread();
+    }
 
 
 
@@ -93,18 +106,21 @@ public class test {
 
     static class thread extends Thread {
         public static int conas = 1;
+        public thread(){
+            setDaemon(true);
+            start();
+        }
 
         @Override
         public void run() {
-            super.run();
-            int threadnumber = conas++;
-            System.out.println("testing thread " + threadnumber + "...");
-            try {
-                sleep(60000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("testing thread " + threadnumber + "...");
+           while(true){
+               System.out.println("ping...");
+               try {
+                   sleep(500);
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+           }
         }
     }
 

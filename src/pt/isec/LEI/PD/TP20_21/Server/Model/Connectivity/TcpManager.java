@@ -1,6 +1,7 @@
-package pt.isec.LEI.PD.TP20_21.Server.Connectivity;
+package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -27,7 +28,6 @@ public class TcpManager {
     static public class TcpServerClientConnections extends LinkedList<TcpServerClientConnection> {
 
     }
-    private static final int TIMEOUT = 3;//segungos
 
     public TcpManager(Server server) {
         this.server = server;
@@ -41,14 +41,10 @@ public class TcpManager {
     }
 
     //TODO: continuar a fazer esta parte e completar o TcpServerClientConnection
-    public void ligarCliente() throws IOException {
+    public int ligarCliente(int user_id) throws IOException {
         var socket = serverSocket.accept();
-
-        /**
-         * identifica a que user este client
-         */
-        int userId =-1;
-        tcpServerClientConnections.add(new TcpServerClientConnection(socket));
+        tcpServerClientConnections.add(new TcpServerClientConnection(user_id));
+        return getPort();
     }
 
     public synchronized int getPort() {
@@ -58,24 +54,22 @@ public class TcpManager {
     /**
      * Representa uma coneção do server para o cliente
      */
-    static class TcpServerClientConnection extends Thread {
+    class TcpServerClientConnection extends Thread {
         private int port = -1;
         private boolean stop = false;
-        private final Socket s;
-        private final InputStream iS;
-        private final OutputStream oS;
+        private Socket s;
+        private InputStream iS;
+        private OutputStream oS;
+        private final int user_id;
 
-        public TcpServerClientConnection(Socket socket) throws IOException {
-            this.s = socket;
-            iS = s.getInputStream();
-            oS = s.getOutputStream();
+        public TcpServerClientConnection(int user_id) throws IOException {
+            this.user_id = user_id;
+            start();
         }
 
 
         //TODO: ver a sincronização de threads e proteção de dados em multithreads
-        public boolean isStop() {
-            return stop;
-        }
+
 
         public void setStop(boolean stop) {
             this.stop = stop;
@@ -104,11 +98,17 @@ public class TcpManager {
         public void run() {
             super.run();
             byte[] bytes;
-            Object object;
+            Object input;
             try {
+                s = serverSocket.accept();
+                iS = s.getInputStream();
+                oS = s.getOutputStream();
                 while (!stop) {
-                    Utils.bytesToObject(iS.readAllBytes());
-
+                    input = Utils.bytesToObject(iS.readAllBytes());
+                    if(input.getClass() == Mensagem.class){
+                        var mensagem = (Mensagem)input;
+                        System.out.println(mensagem.getConteudo());
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -5,7 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import pt.isec.LEI.PD.TP20_21.Client.Connectivity.ClientServerConnection;
 import pt.isec.LEI.PD.TP20_21.Client.gui.Gui;
-import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
+import pt.isec.LEI.PD.TP20_21.shared.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 public class Main extends Application {
@@ -13,7 +13,7 @@ public class Main extends Application {
         if (Utils.Consts.DEBUG)
             System.out.println("A comecar o cliente....");
 
-        var pedido = new Mensagens.PedidoDeLigar("lol", "password", false);
+        var pedido = new Pedido.Conectar("lol", "password", false);
 
         ClientServerConnection connection = new ClientServerConnection(pedido);
         connection.start();

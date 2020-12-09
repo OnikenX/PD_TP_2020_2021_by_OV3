@@ -1,7 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
-import pt.isec.LEI.PD.TP20_21.shared.Mensagens;
+import pt.isec.LEI.PD.TP20_21.shared.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
@@ -15,9 +15,9 @@ public class ClientServerConnection extends Thread {
     private final LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> servers = new LinkedList<>();
     private int tries;
     private int retries;
-    private Respostas.RUdpClientServerPreConnection resposta = null;
-    private Mensagens.PedidoDeLigar pedido;
-    public ClientServerConnection(Mensagens.PedidoDeLigar pedido){
+    private Respostas.PedidoDeLigar resposta = null;
+    private Pedido.Conectar pedido;
+    public ClientServerConnection(Pedido.Conectar pedido){
         this.pedido = pedido;
 
     }
@@ -79,7 +79,7 @@ public class ClientServerConnection extends Thread {
      *
      * @return o ip do servidor em caso de se fazer uma resposta com sucesso, caso contrario returna null
      */
-    private InetAddress connectUdp(Mensagens.PedidoDeLigar pedido) {
+    private InetAddress connectUdp(Pedido.Conectar pedido) {
         try {
             IpPort ipPort = getIpPort();
             var pedidoBytes = objectToBytes(pedido);
@@ -98,7 +98,7 @@ public class ClientServerConnection extends Thread {
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
             socket.receive(packet);
-            resposta = (Respostas.RUdpClientServerPreConnection) Utils.bytesToObject(packet.getData());
+            resposta = (Respostas.PedidoDeLigar) Utils.bytesToObject(packet.getData());
             retries = 0;
             tries = 0;
             return packet.getAddress();
@@ -119,7 +119,7 @@ public class ClientServerConnection extends Thread {
         notify();
     }
 
-    private static LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> connectToServer(String ip, int port, Mensagens.PedidoDeLigar pedido) {
+    private static LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> connectToServer(String ip, int port, Pedido.Conectar pedido) {
         var thread = new ClientServerConnection(pedido);
         thread.start();
         onSpinWait();

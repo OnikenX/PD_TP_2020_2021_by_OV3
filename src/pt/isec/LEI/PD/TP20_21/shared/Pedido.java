@@ -5,16 +5,16 @@ import java.util.Objects;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
-public class Mensagens implements Serializable {
+public class Pedido implements Serializable {
 
     /**
      * pedido para se ligar ao servidor, é um registo se {isRegistado} é falso caso contrario é um login
      */
-    public static class PedidoDeLigar implements Serializable {
+    public static class Conectar implements Serializable {
         private String username = "1111111111111111111111111111111111111111111111111111111111111111";
         private String password = "1111111111111111111111111111111111111111111111111111111111111111";
         private boolean registado = false;
-        public static int SIZE = (Objects.requireNonNull(objectToBytes(new PedidoDeLigar())).length);//na verdade o size é 205 mas meti mais 5 so pelo seguro
+        public static int SIZE = (Objects.requireNonNull(objectToBytes(new Conectar())).length);//na verdade o size é 205 mas meti mais 5 so pelo seguro
 
         @Override
         public String toString() {
@@ -43,7 +43,7 @@ public class Mensagens implements Serializable {
         /**
          * Construtor de default com username e password a 64 characters e registado a false
          */
-        public PedidoDeLigar() {}
+        public Conectar() {}
 
         public void setAll(String username, String password, boolean registado) {
             if (username.getBytes().length > 64 || password.getBytes().length > 64)
@@ -54,7 +54,7 @@ public class Mensagens implements Serializable {
         }
 
 
-        public PedidoDeLigar(String username, String password, boolean registado) {
+        public Conectar(String username, String password, boolean registado) {
             setAll(username, password, registado);
         }
 

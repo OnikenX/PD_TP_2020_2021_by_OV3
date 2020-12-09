@@ -1,12 +1,10 @@
 package pt.isec.LEI.PD.TP20_21.shared;
 
-import com.mysql.cj.PingTarget;
-
 import java.io.*;
 import java.time.Instant;
 import java.util.Objects;
 
-public class Utils {
+public  class Utils {
 
     static int getObjectSize(Object obj){
         return Objects.requireNonNull(Utils.objectToBytes(obj)).length;
@@ -76,6 +74,20 @@ public class Utils {
      */
 
     public static class Consts {
+        /**
+         * Error sent quando um user com o mesmo nome existe
+         */
+        public static final int ERROR_USER_ALREADY_EXISTS = -2;
+        /**
+         * Erro quando a informação do utilizador nao coincide com o que esta no server
+         */
+        public static final int ERROR_USER_INFO_NOT_MATCH = -3;
+        /**
+         * Erro quando existem outras servers menos lotados do que este
+         */
+        public static final int ERROR_SERVER_FULL = -3;
+
+
 
         /**
          * Mensagem a enviar para fazer um pedido de conecao do cliente ao servidor
