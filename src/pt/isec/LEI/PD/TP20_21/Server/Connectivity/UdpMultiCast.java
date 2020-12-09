@@ -9,11 +9,12 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.util.Objects;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 
-public class UdpMultiCast extends Thread {
+ public  class UdpMultiCast extends Thread {
 
     //    protected String username;
     protected MulticastSocket multicastSocket;
@@ -42,36 +43,20 @@ public class UdpMultiCast extends Thread {
         Class<?> classType = null;
 
         DatagramPacket packet; //para receber os pedidos e enviar as respostas
-        Object receivedObject;
         if (multicastSocket == null || !running)
             return;
 
         if (Utils.Consts.DEBUG)
             System.out.println("UdpMultiCast activado iniciado...");
         try {
+            Mensagens.Ping ping = new Mensagens.Ping();
             while (running) {
-                packet = new DatagramPacket(
-                        new byte[Utils.Consts.MAX_SIZE_PER_PACKET], Utils.Consts.MAX_SIZE_PER_PACKET);
-                DatagramPacket(new byte[objectToBytes(new Mensagens.PedidoDeLigar()).length], 0, Mensagens.PedidoDeLigar.SIZE);
-                multicastSocket.receive(packet);
-                if (Utils.Consts.DEBUG)
-                    System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação UdpMulticast");
+                ping.setLotacao(server.getTcpConnections_size());
 
-                receivedObject = Utils.bytesToObject(packet.getData());
-                if (receivedObject == null) {
-                    if (Utils.Consts.DEBUG)
-                        System.out.println("Received object is null, skipping...");
-                    continue;
-                }
-                if (Utils.Consts.DEBUG)
-                    System.out.println("Recebido \"" + receivedObject + "\" de " +
-                            packet.getAddress().getHostAddress() + ":" + packet.getPort() + " [" + packet.getLength());
-                classType = receivedObject.getClass();
-                if (classType == Mensagens.Ping.class) {
-
-                } else {
-                    throw new ClassNotFoundException();
-                }
+                byte[] pingBytes =  Objects.requireNonNull(objectToBytes(ping));
+                packet = new DatagramPacket( pingBytes, 0, pingBytes.length);
+                multicastSocket.send(packet);
+                Thread.sleep(Utils.Consts.PING_INTERVAL);
             }
         } catch (
                 NumberFormatException e) {
@@ -82,9 +67,7 @@ public class UdpMultiCast extends Thread {
         } catch (
                 IOException e) {
             System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
-        } catch (
-                ClassNotFoundException e) {
-            System.err.println("Class " + ((classType != null) ? classType.toString() : "none") + " não ");
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             if (multicastSocket != null) {
