@@ -18,7 +18,8 @@ public class ClientServerConnection extends Thread {
     private Respostas.RUdpClientServerPreConnection resposta = null;
     private Mensagens.PedidoDeLigar pedido;
     public ClientServerConnection(Mensagens.PedidoDeLigar pedido){
-        this.pedido = pedido ;
+        this.pedido = pedido;
+
     }
 
     /**
@@ -118,8 +119,8 @@ public class ClientServerConnection extends Thread {
         notify();
     }
 
-    private static LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> connectToServer(String ip, int port) {
-        var thread = new ClientServerConnection();
+    private static LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> connectToServer(String ip, int port, Mensagens.PedidoDeLigar pedido) {
+        var thread = new ClientServerConnection(pedido);
         thread.start();
         onSpinWait();
         return thread.servers;

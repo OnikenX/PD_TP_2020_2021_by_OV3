@@ -33,7 +33,7 @@ public class Server {
         servidores = new Servidores();
 
         //data
-        serverData = new ServerData();
+        serverData = new ServerData(server_number);
 
         //multicast
          udpMultiCast = new UdpMultiCast(this);
