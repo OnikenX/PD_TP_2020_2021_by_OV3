@@ -50,9 +50,8 @@ public class UdpMultiCast extends Thread {
             System.out.println("UdpMultiCast activado iniciado...");
         try {
             while (running) {
-                packet = new DatagramPacket(
-                        new byte[Utils.Consts.MAX_SIZE_PER_PACKET], Utils.Consts.MAX_SIZE_PER_PACKET);
-                DatagramPacket(new byte[objectToBytes(new Mensagens.PedidoDeLigar()).length], 0, Mensagens.PedidoDeLigar.SIZE);
+                packet = new DatagramPacket();
+
                 multicastSocket.receive(packet);
                 if (Utils.Consts.DEBUG)
                     System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação UdpMulticast");

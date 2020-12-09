@@ -8,6 +8,8 @@
       <sourceFolder url="file://$MODULE_DIR$/lib" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/notas/extras" />
       <excludeFolder url="file://$MODULE_DIR$/notas/extras/trabalho-passado" />
+      <excludeFolder url="file://$MODULE_DIR$/src/pt/isec/LEI/PD/TP20_21/Client" />
+      <excludeFolder url="file://$MODULE_DIR$/src/pt/isec/LEI/PD/TP20_21/Server" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

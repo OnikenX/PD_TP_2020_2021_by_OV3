@@ -3,11 +3,11 @@ SET GLOBAL time_zone = '+0:00'; /* Necessario porque temos uma coluna do tipo ti
 CREATE DATABASE IF NOT EXISTS messager_db_1;
 USE messager_db_1;
 
-# serve para resetar a base de dados
-# DROP TABLE IF EXISTS mensagens;
-# DROP TABLE IF EXISTS canais;
-# DROP TABLE IF EXISTS utilizadores;
-# drop table if exists ficheiros;
+
+DROP TABLE IF EXISTS mensagens;
+DROP TABLE IF EXISTS canais;
+DROP TABLE IF EXISTS utilizadores;
+drop table if exists ficheiros;
 
 
 create table if not exists ficheiros
