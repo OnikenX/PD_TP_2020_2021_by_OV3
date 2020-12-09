@@ -15,27 +15,20 @@ public class CriaBaseDeDados {
             System.out.println("É preciso de um numero no ultimo argumento.");
             return;
         }
-
-
-
     }
 
-    //brincar com a database
     static void sql(String user, String password, int numero) {
         Connection conn = null;//connecao à base de dados
         Statement stmt = null;//mesagem a enviar
-        ResultSet rs = null;//resultado
-
+        ResultSet rs = null; //resultado
         int id = -1;
         try {
             Class.forName(JDBC_DRIVER);
 
-//STEP 2: Open a connection
             System.out.println("Connecting to database...");
 
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
-//STEP 3: Execute a query
             System.out.println("Creating statement...");
             stmt = conn.createStatement();
             rs = stmt.executeQuery("SELECT * FROM utilizadores;");
