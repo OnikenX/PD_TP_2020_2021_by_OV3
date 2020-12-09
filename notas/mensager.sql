@@ -10,12 +10,7 @@ DROP TABLE IF EXISTS utilizadores;
 drop table if exists ficheiros;
 
 
-create table if not exists ficheiros
-(
-    id   int  not null auto_increment unique,
-    nome text not null,
-    PRIMARY KEY (id)
-);
+
 create table if not exists utilizadores
 (
     id           int         not null auto_increment unique,
@@ -47,11 +42,9 @@ create table if not exists mensagens
 
     isAFile       bool                                not null,
     mensagem      text,
-    fileId        int,
     PRIMARY KEY (id),
     FOREIGN KEY (authorId) REFERENCES utilizadores (id),
-    foreign key (canalId) references canais (id),
-    foreign key (fileId) references ficheiros(id)
+    foreign key (canalId) references canais (id)
 
 );
 
