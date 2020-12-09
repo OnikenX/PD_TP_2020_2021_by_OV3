@@ -12,7 +12,7 @@ public class MaqEstadosObservavel {
 
     public MaqEstadosObservavel(MaqEstados jogoMaqEstados) {
         this.MaqEstados = jogoMaqEstados;
-        propertyChangeSupport = new PropertyChangeSupport(jogoMaqEstados);
+        propertyChangeSupport = new PropertyChangeSupport(MaqEstados);
     }
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
