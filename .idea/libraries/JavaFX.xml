@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="JavaFX">
+    <CLASSES>
+      <root url="file:///usr/lib/jvm/java-14-openjdk/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <NATIVE>
+      <root url="file:///usr/lib/jvm/java-14-openjdk/lib" />
+    </NATIVE>
+    <SOURCES />
+    <jarDirectory url="file:///usr/lib/jvm/java-14-openjdk/lib" recursive="false" />
+  </library>
+</component>

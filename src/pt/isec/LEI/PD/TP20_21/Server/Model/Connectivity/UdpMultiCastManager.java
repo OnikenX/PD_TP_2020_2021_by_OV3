@@ -77,13 +77,14 @@ public class UdpMultiCastManager extends Thread {
                     //TODO: file receiver
                 } else if (classType == Pedido.Ping.class) {
                     Pedido.Ping ping = (Pedido.Ping) mensagem;
-
+                    if(Utils.Consts.DEBUG)
+                        System.out.println("[Ping] recebido...");
                 }
             }
         } catch (NumberFormatException e) {
             System.err.println("O porto de escuta deve ser um inteiro positivo.");
         } catch (SocketException e) {
-            System.err.println("Ocorreu um erro ao nivel do socket UDP:\n\t" + e);
+            System.err.println("Ocorreu um erro alive templateo nivel do socket UDP:\n\t" + e);
         } catch (IOException e) {
             System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
         } finally {
