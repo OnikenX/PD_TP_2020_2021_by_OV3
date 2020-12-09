@@ -26,7 +26,7 @@ public class Main extends Application {
         MaqEstados maqEstados = new MaqEstados();
         MaqEstadosObservavel maqEstadosObservavel = new MaqEstadosObservavel(maqEstados);
 
-        Scene scene = new Scene(new Gui(maqEstadosObservavel), 1200, 720);
+        Scene scene = new Scene(new Gui(maqEstadosObservavel), 1200, 720);//gui sendo root
         stage.setTitle("Cliente");
         stage.setScene(scene);
         stage.setResizable(false);
