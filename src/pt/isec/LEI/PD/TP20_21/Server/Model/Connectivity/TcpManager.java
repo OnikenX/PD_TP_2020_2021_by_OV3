@@ -107,7 +107,7 @@ public class TcpManager {
                     input = Utils.bytesToObject(iS.readAllBytes());
                     if(input.getClass() == Mensagem.class){
                         var mensagem = (Mensagem)input;
-                        System.out.println(mensagem.getConteudo());
+                        System.out.println(mensagem.getMensagem());
                     }
                 }
             } catch (IOException e) {
