@@ -7,15 +7,11 @@ import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.LinkedList;
 
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.*;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.bytesToObject;
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.getTimeStamp;
 
 
 /**
@@ -102,7 +98,11 @@ public class UdpMultiCastManager extends Thread {
      * @param mensagem       a enviar
      * @param recebeResposta se deve esperar por uma resposta ou não, returna null se nao receber uma.
      */
-    synchronized public Object enviaMulticast(Object mensagem, boolean recebeResposta) {
+    synchronized public Object enviaMulticast(Object mensagem, boolean recebeResposta) throws UnknownHostException{
+        InetAddress group = InetAddress.getByName(UDP_MULTICAST_GROUP);
+        var buf = objectToBytes(mensagem);
+        new DatagramPacket(buf, buf.length, group, UDP_MULTICAST_PORT);
+        socket.send(packet);
         //TODO: nao sei o que isto faz mas pode ser preciso mais tarde
         return null;
     }
