@@ -1,7 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
-import pt.isec.LEI.PD.TP20_21.shared.Mensagem;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;

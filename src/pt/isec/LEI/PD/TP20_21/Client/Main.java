@@ -17,7 +17,7 @@ public class Main extends Application {
 
         ClientServerConnection connection = new ClientServerConnection(pedido);
         connection.start();
-//        launch(args);
+        launch(args);
 
     }
 
