@@ -29,7 +29,7 @@ public class UdpMultiCastManager extends Thread {
 
     public UdpMultiCastManager(Server server) throws IOException {
         servidores = new Servidores();
-        this.multicastSocket = new MulticastSocket();
+        this.multicastSocket = new MulticastSocket(UDP_MULTICAST_PORT);
         multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
 
         this.server = server;
@@ -98,13 +98,16 @@ public class UdpMultiCastManager extends Thread {
      * @param mensagem       a enviar
      * @param recebeResposta se deve esperar por uma resposta ou não, returna null se nao receber uma.
      */
-    synchronized public Object enviaMulticast(Object mensagem, boolean recebeResposta) throws UnknownHostException{
+    synchronized public void enviaMulticast(Object mensagem, boolean recebeResposta) throws Exception {
         InetAddress group = InetAddress.getByName(UDP_MULTICAST_GROUP);
         var buf = objectToBytes(mensagem);
-        new DatagramPacket(buf, buf.length, group, UDP_MULTICAST_PORT);
-        socket.send(packet);
+        if(buf==null){
+            throw new Exception("Class com problemas.");
+        }
+        var packet = new DatagramPacket(buf, buf.length, group, UDP_MULTICAST_PORT);
+        multicastSocket.send(packet);
         //TODO: nao sei o que isto faz mas pode ser preciso mais tarde
-        return null;
+//        return null;
     }
 
     /**
@@ -159,7 +162,11 @@ public class UdpMultiCastManager extends Thread {
             Pedido.Ping ping = new Pedido.Ping();
             while (true) {
                 ping.setLotacao(server.getTcpConnections_size());
-                enviaMulticast((Object) ping, false);
+                try {
+                    enviaMulticast(ping, false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (DEBUG)
                     System.out.println("[Ping] enviado...");
                 try {
