@@ -1,33 +1,46 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data;
 
-import java.util.Calendar;
+import java.sql.Timestamp;
 
 abstract public class Mensagem {
+    private final int id ;
+    private final Timestamp dataHoraEnvio ;
+    private final int authorId;
+    private final int canalId;
+    private final boolean isAFile;
+    private final String mensagem;
 
-
-    protected Mensagem(int destinatarioId, int remetenteId, Calendar dataHoraEnvio, String conteudo) {
-        this.destinatarioId = destinatarioId;
-        this.remetenteId = remetenteId;
+    protected Mensagem(int id, Timestamp dataHoraEnvio, int authorId, int canalId, boolean isAFile, String mensagem) {
+        this.id = id;
         this.dataHoraEnvio = dataHoraEnvio;
-        if(conteudo.length() > 255)
-            throw new StringIndexOutOfBoundsException("String demasiado grande, escreve mensagens com menos characters.");
-        this.conteudo = conteudo;
+        this.authorId = authorId;
+        this.canalId = canalId;
+        this.isAFile = isAFile;
+        this.mensagem = mensagem;
     }
 
-    public int getDestinatarioId() {
-        return destinatarioId;
+    public int getId() {
+        return id;
     }
 
-    public int getRemetenteId() {
-        return remetenteId;
-    }
-
-    public Calendar getDataHoraEnvio() {
+    public Timestamp getDataHoraEnvio() {
         return dataHoraEnvio;
     }
 
-    public String getConteudo() {
-        return conteudo;
+    public int getAuthorId() {
+        return authorId;
+    }
+
+    public int getCanalId() {
+        return canalId;
+    }
+
+    public boolean isAFile() {
+        return isAFile;
+    }
+
+    public String getMensagem() {
+        return mensagem;
     }
 }
 
