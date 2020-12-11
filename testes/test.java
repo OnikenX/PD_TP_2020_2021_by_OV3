@@ -1,6 +1,9 @@
-import pt.isec.LEI.PD.TP20_21.shared.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
 
@@ -8,7 +11,37 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class test {
+    static
     public static void main(String[] args) {
+        testFileTypes();
+        //buscar o caminho do system
+
+        System.out.println(new File("/cona").mkdirs());
+    }
+
+    static void testFileTypes() {
+        try (FileInputStream file = new FileInputStream("/home/onikenx/IdeaProjects/PD_TP_2020_2021_by_OV3/files_server/testfile")) {
+            byte[] bytes = new byte[1];int nbytes;
+            System.out.println("what");
+            System.out.println(file.available());
+            System.out.println("what?");
+            if (file.available() > 3) {
+                file.skip(2);
+                nbytes = file.read(bytes);
+                if (nbytes > 0)
+                    System.out.println(new String(bytes));
+                file.skip(-2);
+                nbytes = file.read(bytes);
+                if (nbytes > 0)
+                    System.out.println(new String(bytes));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    static void somethingDontKnowLol() {
         String lol = "00000000000000000000000000000000000000000000000000000000000000";
         System.out.println(Objects.requireNonNull(Objects.requireNonNull(objectToBytes(new Pedido.Conectar()))).length);
         createThread();
@@ -16,17 +49,16 @@ public class test {
         try {
             Thread.sleep(3000);
 
-        System.out.println("finishing program...");
-        Thread.sleep(600);
+            System.out.println("finishing program...");
+            Thread.sleep(600);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    static public void createThread(){
+    static public void createThread() {
         new thread();
     }
-
 
 
     //testar o password hashing
@@ -69,7 +101,7 @@ public class test {
             rs = stmt.executeQuery("SELECT * FROM utilizadores;");
             int i = 0;
             while (rs.next())
-                System.out.println("utilizador "+ (++i) +":" + rs.getString("username") + ", hash da password:" + rs.getString("hash"));
+                System.out.println("utilizador " + (++i) + ":" + rs.getString("username") + ", hash da password:" + rs.getString("hash"));
             if (i == 0)
                 System.out.println("nao existem users");
         } catch (SQLException | ClassNotFoundException e) {
@@ -106,21 +138,22 @@ public class test {
 
     static class thread extends Thread {
         public static int conas = 1;
-        public thread(){
+
+        public thread() {
             setDaemon(true);
             start();
         }
 
         @Override
         public void run() {
-           while(true){
-               System.out.println("ping...");
-               try {
-                   sleep(500);
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-               }
-           }
+            while (true) {
+                System.out.println("ping...");
+                try {
+                    sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

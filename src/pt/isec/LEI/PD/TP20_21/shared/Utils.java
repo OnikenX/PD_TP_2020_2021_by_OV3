@@ -106,16 +106,27 @@ public  class Utils {
          */
         public static final String UDP_MULTICAST_GROUP = "224.0.0.169";
 
-
-
-
-
-        public static final String SERVER_ADDRESS = "localhost";
+        //ainda nao tenho nocao se vou precisar disto
+        /**
+         * porta para enviar ficheiros e receber
+         */
+        public final static int FILE_SENDER_PORT = 45567;
 
         /**
-         * maximo de users existente num servidor
+         *  groupo para o gerenciador de ficheiros
          */
-        public static final int MAX_LOTACAO = 5;
+        public final static String FILE_SENDER_GROUP ="224.0.0.167";
+
+
+        /**
+         * nome do servidor principal
+         */
+        public static final String SERVER_ADDRESS = "localhost";
+
+//        /**
+//         * maximo de users existente num servidor
+//         */
+//        public static final int MAX_LOTACAO = 5;
 
 
         /**
@@ -139,6 +150,8 @@ public  class Utils {
          * Intervalo entre pings
          */
         public static final int PING_INTERVAL = 5;
+
+        public static final int PIPE_BUFFER_SIZE_LIMIT = 1000;
 
         /**
          * Variavel para um modo de debug

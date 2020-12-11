@@ -2,8 +2,7 @@ package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
-import pt.isec.LEI.PD.TP20_21.shared.Pedido;
-import pt.isec.LEI.PD.TP20_21.shared.Respostas;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class UdpServerClientPreConnection extends Thread {
             Pedido.Conectar conectar;
             byte[] conectarBytes = objectToBytes(new Pedido.Conectar());
 
-            Respostas.PedidoDeLigar resposta;
+            Comunicacoes.PedidoDeLigar resposta;
             boolean registar;
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpServerClientPreConnection iniciado...");
@@ -74,7 +73,7 @@ public class UdpServerClientPreConnection extends Thread {
                     if (!conectar.isRegistado()) {//registar utilizador
                         //verificar se existe o username
                         if (server.getServerData().userExist(conectar.getUsername())) {
-                            resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_USER_ALREADY_EXISTS, server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new Comunicacoes.PedidoDeLigar(Utils.Consts.ERROR_USER_ALREADY_EXISTS, server.udpMultiCastManager.getServidoresForClient());
                             if (Utils.Consts.DEBUG)
                                 System.out.println("[registo]O utilizador ja existe...");
                         } else //addicionar user
@@ -83,7 +82,7 @@ public class UdpServerClientPreConnection extends Thread {
                         }
                     } else//verifica login
                         if (!server.getServerData().verifyUser(conectar.getUsername(), conectar.getPassword())) {
-                            resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new Comunicacoes.PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
                         }
                 }
 
@@ -105,11 +104,11 @@ public class UdpServerClientPreConnection extends Thread {
                                     e.printStackTrace();
                                 }
                             }
-                            resposta = new Respostas.PedidoDeLigar(server.getTcpPort(), server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new Comunicacoes.PedidoDeLigar(server.getTcpPort(), server.udpMultiCastManager.getServidoresForClient());
                         } else {
                             if (Utils.Consts.DEBUG)
                                 System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
-                            resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_SERVER_FULL, server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new Comunicacoes.PedidoDeLigar(Utils.Consts.ERROR_SERVER_FULL, server.udpMultiCastManager.getServidoresForClient());
                         }
                 }
 

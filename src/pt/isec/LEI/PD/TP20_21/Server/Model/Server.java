@@ -19,14 +19,18 @@ public class Server {
     public UdpMultiCastManager udpMultiCastManager;
     private UdpServerClientPreConnection udpServerClientPreConnection;
     private ServerDB serverDB;
+    public final int server_number;
 
+    public String getServerName(){
+        return "server_"+server_number;
+    }
 
     public int getTcpPort() { return tcpManager.getPort(); }
     public int getTcpConnections_size(){
         return tcpManager.getTcpServerClientConnections().size();
     }
     public Server(int server_number) throws SQLException, ClassNotFoundException, IOException, InterruptedException {
-
+        this.server_number = server_number;
         //criar a lista de servidores
 
         //data

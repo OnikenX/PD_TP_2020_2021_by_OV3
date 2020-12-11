@@ -1,4 +1,4 @@
-package pt.isec.LEI.PD.TP20_21.shared;
+package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -6,7 +6,6 @@ import java.util.Objects;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class Pedido implements Serializable {
-
     /**
      * pedido para se ligar ao servidor, é um registo se {isRegistado} é falso caso contrario é um login
      */
@@ -78,4 +77,5 @@ public class Pedido implements Serializable {
             this.lotacao = lotacao;
         }
     }
+
 }

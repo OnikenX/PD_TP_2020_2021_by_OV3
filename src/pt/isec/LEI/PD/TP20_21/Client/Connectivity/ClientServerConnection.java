@@ -1,8 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
-import pt.isec.LEI.PD.TP20_21.shared.Pedido;
-import pt.isec.LEI.PD.TP20_21.shared.Respostas;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class ClientServerConnection extends Thread {
     private final LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> servers = new LinkedList<>();
     private int tries;
     private int retries;
-    private Respostas.PedidoDeLigar resposta = null;
+    private Comunicacoes.PedidoDeLigar resposta = null;
     private Pedido.Conectar pedido;
     public ClientServerConnection(Pedido.Conectar pedido){
         this.pedido = pedido;
@@ -38,8 +37,10 @@ public class ClientServerConnection extends Thread {
                 //Caso ocorra erro a ligar a um server ele cancela a coneçao.
                 break;
             }
+
             if (Utils.Consts.DEBUG)
                 System.out.println("Recebido resposta de : " + server + "; port:" + resposta.TcpPort + "; servers: " + resposta.servers);
+
             if (resposta.TcpPort != -1) {
                 try {
                     connectTcp(server);
@@ -98,7 +99,7 @@ public class ClientServerConnection extends Thread {
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
             socket.receive(packet);
-            resposta = (Respostas.PedidoDeLigar) Utils.bytesToObject(packet.getData());
+            resposta = (Comunicacoes.PedidoDeLigar) Utils.bytesToObject(packet.getData());
             retries = 0;
             tries = 0;
             return packet.getAddress();

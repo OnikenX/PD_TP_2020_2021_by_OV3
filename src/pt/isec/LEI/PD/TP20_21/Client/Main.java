@@ -5,7 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import pt.isec.LEI.PD.TP20_21.Client.Connectivity.ClientServerConnection;
 import pt.isec.LEI.PD.TP20_21.Client.gui.Gui;
-import pt.isec.LEI.PD.TP20_21.shared.Pedido;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 public class Main extends Application {

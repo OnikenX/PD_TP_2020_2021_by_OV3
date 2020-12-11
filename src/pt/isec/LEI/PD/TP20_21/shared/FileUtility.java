@@ -9,10 +9,8 @@ public class FileUtility {
         ObjectOutputStream oout = null;
 
         try{
-
             oout = new ObjectOutputStream(new FileOutputStream(file));
             oout.writeObject(o);
-
         }finally{
             if(oout != null)
                 oout.close();

@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.shared;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Guarda um par ip/port para depois serem usados
@@ -14,4 +15,17 @@ public class IpPort implements Serializable, Cloneable{
         this.ip = ip;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IpPort ipPort = (IpPort) o;
+        return port == ipPort.port &&
+                ip.equals(ipPort.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ip, port);
+    }
 }
