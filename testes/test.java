@@ -11,7 +11,6 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class test {
-    static
     public static void main(String[] args) {
         testFileTypes();
         //buscar o caminho do system

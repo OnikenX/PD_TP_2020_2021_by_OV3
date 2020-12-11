@@ -384,9 +384,9 @@ public class UdpMultiCastManager extends Thread {
                         }
                     } else {//caso tenhao recebido exatamente onde deve começar
                         file.write(filePacket.getContent());
-                        if (filePacket.setComplete()) {
-                            completed();
-                        }
+                        //if (filePacket.setComplete()) {
+                            //completed();
+                        //}
                     }
 
 
@@ -398,8 +398,6 @@ public class UdpMultiCastManager extends Thread {
                 ioException.printStackTrace();
             } catch (Exception exception) {
                 exception.printStackTrace();
-            } catch ( Exception e) {
-                e.printStackTrace();
             } finally {
                 try {
                     pipeIn.close();

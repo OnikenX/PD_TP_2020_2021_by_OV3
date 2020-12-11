@@ -1,5 +1,6 @@
 package pt.isec.LEI.PD.TP20_21.Client.Connectivity;
 
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
@@ -14,7 +15,7 @@ public class ClientServerConnection extends Thread {
     private final LinkedList<pt.isec.LEI.PD.TP20_21.shared.IpPort> servers = new LinkedList<>();
     private int tries;
     private int retries;
-    private Comunicacoes.PedidoDeLigar resposta = null;
+    private Respostas.PedidoDeLigar resposta = null;
     private Pedido.Conectar pedido;
     public ClientServerConnection(Pedido.Conectar pedido){
         this.pedido = pedido;
@@ -99,7 +100,7 @@ public class ClientServerConnection extends Thread {
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
             socket.receive(packet);
-            resposta = (Comunicacoes.PedidoDeLigar) Utils.bytesToObject(packet.getData());
+            resposta = (Respostas.PedidoDeLigar) Utils.bytesToObject(packet.getData());
             retries = 0;
             tries = 0;
             return packet.getAddress();

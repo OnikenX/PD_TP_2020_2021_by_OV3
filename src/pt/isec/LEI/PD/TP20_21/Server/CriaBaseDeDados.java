@@ -34,7 +34,7 @@ public class CriaBaseDeDados {
 
         try {
             Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection("jdbc:mysql://" + DB_ADDRESS + ":" + DB_PORT, args[0], args[1]);
+            conn = DriverManager.getConnection("jdbc:mysql://" + DB_ADDRESS + ":" + DB_PORT + "?useTimezone=true&serverTimezone=UTC", args[0], args[1]);
             stmt = conn.createStatement();
 
         } catch (Exception e) {
