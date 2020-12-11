@@ -56,7 +56,7 @@ public class CriaBaseDeDados {
         try {
             stmt.execute("CREATE DATABASE IF NOT EXISTS messager_db_" + i + ";");
             stmt.execute("USE messager_db_" + i + ";");
-            if (false) {
+            if (resetar) {
                 stmt.execute(
                         "DROP TABLE IF EXISTS mensagens;\n" +
                                 "DROP TABLE IF EXISTS canais;\n" +

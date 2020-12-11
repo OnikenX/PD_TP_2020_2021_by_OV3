@@ -13,7 +13,7 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
  */
 public class ServerDB {
     //sql vars
-    Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
+    //Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
     Connection conn;
     Statement stmt;
     Server server;
@@ -26,7 +26,7 @@ public class ServerDB {
 //STEP 2: Open a connection
         if (DEBUG)
             System.out.println("Connecting to database...");
-        conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        conn = DriverManager.getConnection(DB_URL + server_number, "server_" + server_number, "W-pass-123");
         conn.setAutoCommit(true);
          stmt = conn.createStatement();
 //STEP 3: Execute a query
