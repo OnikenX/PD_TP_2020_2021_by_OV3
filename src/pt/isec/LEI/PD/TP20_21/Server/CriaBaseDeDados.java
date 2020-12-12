@@ -46,23 +46,17 @@ public class CriaBaseDeDados {
 
 
         for (int i = 0; i < numeros; ++i)
-            sql(i, resetar);
+            sql(i+1, resetar);
 
     }
 
 
     void sql(int i, boolean resetar) {
-
         try {
+            if (resetar)
+                stmt.execute("DROP schema if exists messager_db_" + i + ";");
             stmt.execute("CREATE DATABASE IF NOT EXISTS messager_db_" + i + ";");
             stmt.execute("USE messager_db_" + i + ";");
-            if (resetar) {
-                stmt.execute(
-                        "DROP TABLE IF EXISTS mensagens;\n" +
-                                "DROP TABLE IF EXISTS canais;\n" +
-                                "DROP TABLE IF EXISTS utilizadores;\n" +
-                                "drop table if exists ficheiros;\n");
-            }
             stmt.execute("create table if not exists canais\n" +
                     "(\n" +
                     "    id int not NULL unique auto_increment,\n" +

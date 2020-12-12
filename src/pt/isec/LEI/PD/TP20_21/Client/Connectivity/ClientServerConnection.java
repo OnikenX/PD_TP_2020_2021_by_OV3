@@ -19,7 +19,7 @@ public class ClientServerConnection extends Thread {
     private Pedido.Conectar pedido;
     public ClientServerConnection(Pedido.Conectar pedido){
         this.pedido = pedido;
-
+        start();
     }
 
     /**
@@ -33,12 +33,11 @@ public class ClientServerConnection extends Thread {
         InetAddress server = null;
         while (true) {//condição para que o servidor esteja sempre a conectar
             try {
-                while ((server = connectUdp(pedido)) == null) ;
+                while ((server = connectUdp(pedido)) == null);
             } catch (Error e) {
                 //Caso ocorra erro a ligar a um server ele cancela a coneçao.
                 break;
             }
-
             if (Utils.Consts.DEBUG)
                 System.out.println("Recebido resposta de : " + server + "; port:" + resposta.TcpPort + "; servers: " + resposta.servers);
 

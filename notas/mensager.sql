@@ -4,11 +4,12 @@ drop database if exists messager_db_1;
 CREATE DATABASE IF NOT EXISTS messager_db_1;
 USE messager_db_1;
 
-
+#reset das tables
 DROP TABLE IF EXISTS mensagens;
-DROP TABLE IF EXISTS canais;
+DROP TABLE IF EXISTS canaisDM;
+DROP TABLE IF EXISTS canaisGrupo;
 DROP TABLE IF EXISTS utilizadores;
-drop table if exists ficheiros;
+DROP TABLE IF EXISTS canais;
 
 
 create table if not exists canais
@@ -67,3 +68,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON * TO `server_1`@`localhost`;
 FLUSH PRIVILEGES;
 
 COMMIT;
+
+use messager_db_0;
+DROP TABLE IF EXISTS mensagens;

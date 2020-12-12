@@ -8,13 +8,8 @@ import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.SocketException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.net.*;
+import java.util.*;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.*;
@@ -38,10 +33,10 @@ public class UdpMultiCastManager extends Thread {
     public UdpMultiCastManager(Server server) throws IOException {
         fileSenders = Collections.synchronizedCollection(new LinkedList<FicheiroSender>());
         fileReceivers = Collections.synchronizedCollection(new LinkedList<FicheiroReceiver>());
-        servidores = (Servidores) Collections.synchronizedCollection(new Servidores());
+        servidores = new Servidores();
         this.multicastSocket = new MulticastSocket(UDP_MULTICAST_PORT);
         multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
-
+        multicastSocket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
         this.server = server;
         setDaemon(true);
 
@@ -71,7 +66,7 @@ public class UdpMultiCastManager extends Thread {
                 packet = new DatagramPacket(bytes, bytes.length);
                 multicastSocket.receive(packet);
                 if (DEBUG)
-                    System.out.println("Mensagem recebida por " + packet.getAddress() + ":" + packet.getPort() + " com tamanho de " + packet.getLength() + " bytes");
+                    System.out.println("Mensagem recebida por " + packet.getAddress() + ":" + packet.getPort() + ": server_"+server.server_number+ ": com tamanho de " + packet.getLength() + " bytes");
                 mensagem = bytesToObject(packet.getData());
                 if (mensagem == null) {
                     if (DEBUG)
@@ -207,9 +202,15 @@ public class UdpMultiCastManager extends Thread {
     /**
      * Guarda a lista de servidores para o Server
      */
-    private class Servidores extends LinkedList<Servidores.ServidorExterno> implements Serializable {
+    private class Servidores implements Serializable, Iterable<Servidores.ServidorExterno> {
+        List<ServidorExterno> servidoresList;
+
+        Servidores(){
+            servidoresList = Collections.synchronizedList(new LinkedList<ServidorExterno>());
+        }
+
         public void removeTimedOut() {
-            var it = this.listIterator();
+            var it = this.iterator();
             while (it.hasNext()) {
                 if ((Utils.getTimeStamp() - it.next().getActualizado()) > TIMEOUT_PINGS)
                     it.remove();
@@ -217,24 +218,34 @@ public class UdpMultiCastManager extends Thread {
             }
         }
 
-        @Override
         public boolean add(ServidorExterno servidorExterno) {
             for (var i : this)
                 if (i.equals(servidorExterno)) {
                     i.setLotacao(servidorExterno.getLotacao());
                     return true;
                 }
-            return super.add(servidorExterno);
+            return servidoresList.add(servidorExterno);
         }
 
         public LinkedList<IpPort> getServidoresForClient() {
             LinkedList<IpPort> toReturn = new LinkedList<>();
             int max;
-            this.sort(ServidorExterno::compareTo);
-            max = Math.min(size(), 300);
+
+            Collections.sort(servidoresList);
+            max = Math.min(servidoresList.size(), 300);
             for (int i = 0; i < max; ++i)
-                toReturn.add(this.get(i));
+                toReturn.add(servidoresList.get(i));
             return toReturn;
+        }
+
+        public ServidorExterno get(int index) {
+            return servidoresList.get(index);
+        }
+
+
+        @Override
+        public Iterator<ServidorExterno> iterator() {
+            return servidoresList.iterator();
         }
 
 
@@ -417,7 +428,7 @@ public class UdpMultiCastManager extends Thread {
             }
         }
         private void completed() {
-            try {
+            try{
                 file.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -432,6 +443,7 @@ public class UdpMultiCastManager extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             interrupt();
         }
 

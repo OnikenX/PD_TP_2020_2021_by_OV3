@@ -16,13 +16,10 @@ public class Main extends Application {
         var pedido = new Pedido.Conectar("lol", "password", false);
 
         ClientServerConnection connection = new ClientServerConnection(pedido);
-        connection.start();
-        launch(args);
-
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         MaqEstados maqEstados = new MaqEstados();
         MaqEstadosObservavel maqEstadosObservavel = new MaqEstadosObservavel(maqEstados);
 
