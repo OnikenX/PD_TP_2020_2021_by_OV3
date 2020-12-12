@@ -3,6 +3,7 @@ package pt.isec.LEI.PD.TP20_21.Client;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import pt.isec.LEI.PD.TP20_21.Client.Model.ClientModel;
 import pt.isec.LEI.PD.TP20_21.Client.cli.TextUserInterface;
 import pt.isec.LEI.PD.TP20_21.Client.gui.Gui;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;

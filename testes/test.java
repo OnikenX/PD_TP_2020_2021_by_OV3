@@ -17,6 +17,10 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class test {
     public static void main(String[] args) throws IOException, InterruptedException {
+        //Connection conn =
+    }
+
+    static void testSender() throws IOException {
         new Thread(() -> {
             try {//envia coisas
                 InetAddress group = InetAddress.getByName("228.0.0.1");
@@ -32,7 +36,9 @@ public class test {
             } catch (Exception ignored) {
             }
         }).start();
+    }
 
+    static void testReceive() throws IOException {
         new Thread(() -> {
             try {//recebe mensagens
                 InetAddress group = InetAddress.getByName("228.0.0.1");
@@ -47,16 +53,6 @@ public class test {
             } catch (Exception ignored) {
             }
         }).start();
-    }
-}
-
-    static void testSender() throws IOException {
-
-
-    }
-
-    static void testReceive() throws IOException {
-
 
     }
 

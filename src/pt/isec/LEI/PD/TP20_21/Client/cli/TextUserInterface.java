@@ -1,6 +1,6 @@
 package pt.isec.LEI.PD.TP20_21.Client.cli;
 
-import pt.isec.LEI.PD.TP20_21.Client.ClientModel;
+import pt.isec.LEI.PD.TP20_21.Client.Model.ClientModel;
 import pt.isec.LEI.PD.TP20_21.Client.ClientObservavel;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
@@ -72,7 +72,7 @@ public class TextUserInterface {
                 default:
                     System.out.println("connectado com o servidor [" + connectionreturn + "]");
             }
-            clientObservavel.
+            clientObservavel.setPedido(pedido);
             mainMenu();
         } while (exit);
     }
@@ -105,22 +105,22 @@ public class TextUserInterface {
                 adicinarPessoa();
                 break;
             case 1:
-                listarConversasComPessoas();
+//                listarConversasComPessoas();
                 break;
             case 2:
-                gerirCanais();
+//                gerirCanais();
                 break;
             case 3:
-                apresentarDadosEstatisticosDeCanais();
+//                apresentarDadosEstatisticosDeCanais();
                 break;
             case 4:
-                listarCanaisEntrados();
+//                listarCanaisEntrados();
                 break;
             case 5:
-                listarUtilizadoresNoSistema();
+//                listarUtilizadoresNoSistema();
                 break;
             case 6:
-                listarMensagens();
+//                listarMensagens();
                 break;
             default:
                 return;

@@ -35,6 +35,7 @@ public class ClientModel {
             if (user.getUsername().equals(username)) {
                 new Pedido.MensagemDM(pedido.getUsername(), user.getUsername(), pedido.getNome() + " adicionou " + user.getNome());
             }
+        return true;
     }
 
     public List<Utilizador> getListUsers() {

@@ -57,15 +57,6 @@ public class CriaBaseDeDados {
                 stmt.execute("DROP schema if exists messager_db_" + i + ";");
             stmt.execute("CREATE DATABASE IF NOT EXISTS messager_db_" + i + ";");
             stmt.execute("USE messager_db_" + i + ";");
-            stmt.execute("create table if not exists canais\n" +
-                    "(\n" +
-                    "    id int not NULL unique auto_increment,\n" +
-                    "    nome        text not null,\n" +
-                    "    descricao   text,\n" +
-                    "    primary key (id)\n" +
-                    ");\n" +
-                    "\n" +
-                    "\n");
             stmt.execute("create table if not exists utilizadores\n" +
                     "(\n" +
                     "    id       int         not null auto_increment unique,\n" +
@@ -75,25 +66,32 @@ public class CriaBaseDeDados {
                     "    PRIMARY KEY (id)\n" +
                     ");\n" +
                     "\n");
+            stmt.execute("create table if not exists canais\n" +
+                    "(\n" +
+                    "    id int not NULL unique auto_increment,\n" +
+                    "    pessoaCria   int  not null,\n" +
+                    "    primary key (id),\n" +
+                    "    foreign key (pessoaCria) references utilizadores (id)\n" +
+                    ");\n" +
+                    "\n" +
+                    "\n");
             stmt.execute("create table if not exists canaisGrupo\n" +
                     "(\n" +
+                    "    nome        text not null,\n" +
+                    "    descricao   text,\n" +
                     "    canal_id    int not null,\n" +
                     "    password    text not null,\n" +
-                    "    moderadorId int  not null,\n" +
-                    "    foreign key (canal_id) references canais (id),\n" +
-                    "    foreign key (moderadorId) references utilizadores (id)\n" +
-                    ");\n" +
-                    "\n");
+                    "    foreign key (canal_id) references canais (id)\n" +
+                    ");");
+
+            //criar canais, para saber de que para quem e a mensagem
             stmt.execute("create table if not exists canaisDM\n" +
                     "(\n" +
                     "    canal_id    int not null,\n" +
-                    "    pessoa1   int  not null,\n" +
-                    "    pessoa2   int  not null,\n" +
+                    "    pessoaDest   int  not null,\n" +
                     "    foreign key (canal_id) references canais (id),\n" +
-                    "    foreign key (pessoa1) references utilizadores (id),\n" +
-                    "    foreign key (pessoa2) references utilizadores (id)\n" +
-                    ");\n" +
-                    "\n");
+                    "    foreign key (pessoaDest) references utilizadores (id)\n" +
+                    ");");
             stmt.execute("create table if not exists mensagens\n" +
                     "(\n" +
                     "    id            int                                 not null auto_increment unique,\n" +
@@ -101,7 +99,7 @@ public class CriaBaseDeDados {
                     "    authorId      int                                 not null,\n" +
                     "    canalId       int                                 not null,\n" +
                     "    isAFile       bool                                not null,\n" +
-                    "    mensagem      varchar(255),\n" +
+                    "    mensagem      varchar(900),\n" +
                     "    PRIMARY KEY (id),\n" +
                     "    FOREIGN KEY (authorId) REFERENCES utilizadores (id),\n" +
                     "    foreign key (canalId) references canais (id)\n" +
@@ -117,6 +115,4 @@ public class CriaBaseDeDados {
             e.printStackTrace();
         }
     }
-
-
 }
