@@ -19,12 +19,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        ClientModel maqEstados = new ClientModel();
-        ClientObservavel clientObservavel = new ClientObservavel(maqEstados);
+        //ClientModel maqEstados = new ClientModel();
+        //ClientObservavel clientObservavel = new ClientObservavel(maqEstados);
 
-        Scene scene = new Scene(new Gui(clientObservavel), 1200, 720);//gui sendo root
+        //Scene scene = new Scene(new Gui(clientObservavel), 1200, 720);//gui sendo root
         stage.setTitle("Cliente");
-        stage.setScene(scene);
+        //stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
     }

@@ -2,7 +2,7 @@ package pt.isec.LEI.PD.TP20_21.Client;
 
 import pt.isec.LEI.PD.TP20_21.Client.Model.ClientModel;
 import pt.isec.LEI.PD.TP20_21.Client.Model.Connectivity.ClientServerConnection;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.Canal;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.Utilizador;
@@ -17,10 +17,10 @@ public class ClientObservavel {
     private ClientModel clientModel;
     private ClientServerConnection clientServerConnection;
 
-    public ClientObservavel(ClientModel clientModel) {
-        this.clientModel = clientModel;
+    public ClientObservavel() {
+        clientServerConnection = new ClientServerConnection(this);
+        clientModel = new ClientModel(clientServerConnection);
         propertyChangeSupport = new PropertyChangeSupport(this.clientModel);
-        clientServerConnection = new ClientServerConnection();
     }
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
@@ -30,11 +30,11 @@ public class ClientObservavel {
     /// DELEGATED CLIENT MODEL
 
 
-    public Pedido.Conectar getPedido() {
+    public Conectar getPedido() {
         return clientModel.getPedido();
     }
 
-    public void setPedido(Pedido.Conectar pedido) {
+    public void setPedido(Conectar pedido) {
         clientModel.setPedido(pedido);
     }
 
@@ -56,7 +56,7 @@ public class ClientObservavel {
 
     /// DELEGATED CLIENTSERVERCONNECTION
 
-    public int connectToServer(Pedido.Conectar pedido) {
+    public int connectToServer(Conectar pedido) {
         return clientServerConnection.connectToServer(pedido);
     }
 

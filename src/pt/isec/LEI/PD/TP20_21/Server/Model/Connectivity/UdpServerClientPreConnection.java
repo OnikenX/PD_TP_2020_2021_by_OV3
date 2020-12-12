@@ -1,9 +1,9 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.PedidoDeLigar;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -39,10 +39,10 @@ public class UdpServerClientPreConnection extends Thread {
                 System.out.println("Erro a ligar, a port " + Utils.Consts.UDP_CLIENT_REQUEST_PORT + "a tentar conectar outra porta do sistema aleatoria.");
                 socket = new DatagramSocket();
             }
-            Pedido.Conectar conectar = null;
-            byte[] conectarBytes = objectToBytes(new Pedido.Conectar());
+            Conectar conectar = null;
+            byte[] conectarBytes = objectToBytes(new Conectar());
 
-            Respostas.PedidoDeLigar resposta = null;
+            PedidoDeLigar resposta = null;
             boolean registar = false;
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpServerClientPreConnection iniciado...");
@@ -57,7 +57,7 @@ public class UdpServerClientPreConnection extends Thread {
                     resposta = null;
                     if (Utils.Consts.DEBUG)
                         System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação tcp");
-                    conectar = (Pedido.Conectar) Utils.bytesToObject(packet.getData());
+                    conectar = (Conectar) Utils.bytesToObject(packet.getData());
                     //verifica se foi bem convertido para objecto
                     if (conectar == null) {
                         if (Utils.Consts.DEBUG)
@@ -87,7 +87,7 @@ public class UdpServerClientPreConnection extends Thread {
                         }
                     } else//verifica login
                         if (!server.getServerData().verifyUser(conectar.getUsername(), conectar.getPassword())) {
-                            resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
                         }
                 } catch (Exception e) {
                     new Exception("Erros na verificaçao").printStackTrace();
@@ -112,11 +112,11 @@ public class UdpServerClientPreConnection extends Thread {
                                     e.printStackTrace();
                                 }
                             }
-                            resposta = new Respostas.PedidoDeLigar(server.getTcpPort(), server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new PedidoDeLigar(server.getTcpPort(), server.udpMultiCastManager.getServidoresForClient());
                         } else {
                             if (Utils.Consts.DEBUG)
                                 System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
-                            resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_SERVER_FULL, server.udpMultiCastManager.getServidoresForClient());
+                            resposta = new PedidoDeLigar(Utils.Consts.ERROR_SERVER_FULL, server.udpMultiCastManager.getServidoresForClient());
                         }
                 } catch (Exception e) {
                     new Exception("Erro na verificação da lotação").printStackTrace();

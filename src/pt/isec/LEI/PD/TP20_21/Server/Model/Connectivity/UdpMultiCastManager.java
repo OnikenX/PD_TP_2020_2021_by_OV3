@@ -1,11 +1,11 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.FileOutOfSync;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.MulticastPacket;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Ping;
 import pt.isec.LEI.PD.TP20_21.shared.FileTransfer.FilePacket;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.*;
@@ -99,8 +99,8 @@ public class UdpMultiCastManager extends Thread {
                             break;
                         }
                     }
-                } else if (classType == Pedido.Ping.class) {
-                    Pedido.Ping ping = (Pedido.Ping) mensagem;
+                } else if (classType == Ping.class) {
+                    Ping ping = (Ping) mensagem;
                     if (Utils.Consts.DEBUG)
                         System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
                     servidores.add(servidores.new ServidorExterno(packet.getAddress().toString(), packet.getPort(), ping.getLotacao()));
@@ -191,7 +191,7 @@ public class UdpMultiCastManager extends Thread {
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpMultiCast activado iniciado...");
 
-            Pedido.Ping ping = new Pedido.Ping();
+            Ping ping = new Ping();
             while (true) {
                 ping.setLotacao(server.getTcpConnections_size());
                 try {
@@ -393,13 +393,13 @@ public class UdpMultiCastManager extends Thread {
                         throw new Error("Not received a complete FilePacket to a receiver.");
                     }
                     if (filePacket.getStart() > read) {//quer dizer que se perdeu um pacote
-                        enviaMulticast(new Respostas.FileOutOfSync(fileId, fileType, read), false);
+                        enviaMulticast(new FileOutOfSync(fileId, fileType, read), false);
                     } else if (filePacket.getStart() < read) {//quer dizer começou antes
                         if (read < 0) {//wtf
                             if (DEBUG) {
                                 new Exception("Recebi um read menor que 0?").printStackTrace();
                             }
-                            enviaMulticast(new Respostas.FileOutOfSync(fileId, fileType, read), false);
+                            enviaMulticast(new FileOutOfSync(fileId, fileType, read), false);
 
                         } else {//vai buscar o que falta
                             //getStarted() - read - finalConteudo |

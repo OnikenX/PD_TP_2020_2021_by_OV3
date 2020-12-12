@@ -1,14 +1,13 @@
 package pt.isec.LEI.PD.TP20_21.Client.Model.Connectivity;
 
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
+import pt.isec.LEI.PD.TP20_21.Client.ClientObservavel;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.PedidoDeLigar;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.*;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -22,15 +21,27 @@ public class ClientServerConnection extends Thread {
     private final List<IpPort> servers = Collections.synchronizedList(new LinkedList<>());
     private int tries = 0;
     private int retries = 0;
-    private Respostas.PedidoDeLigar resposta = null;
-    private Pedido.Conectar pedido = null;
+    private PedidoDeLigar resposta = null;
+    private Conectar pedido = null;
     private InetAddress serverAdd = null;
     private Socket socket = null;
-    private InputStream iS = null;
-    private OutputStream oS = null;
+    private InputStream isTCP = null;
+    private OutputStream osTCP = null;
+    private PipedOutputStream outputPipe;
+    private PipedInputStream inputPipe;
+    private ClientObservavel co;
 
 
-    public ClientServerConnection() {
+    public ClientServerConnection(ClientObservavel co) {
+        this.co = co;
+    }
+
+    public PipedInputStream getInputPipe() {
+        return inputPipe;
+    }
+
+    public synchronized OutputStream getOtputStreamTCP() {
+        return osTCP;
     }
 
     /**
@@ -42,7 +53,7 @@ public class ClientServerConnection extends Thread {
      * @return code for the tcpConnection
      * if it returns 0 means there is a problem connnecting to tcp
      */
-    public int connectToServer(Pedido.Conectar pedido) {
+    public int connectToServer(Conectar pedido) {
         this.pedido = pedido;
         while (true) {//condição para que o servidor esteja sempre a conectar
             try {
@@ -72,7 +83,7 @@ public class ClientServerConnection extends Thread {
     public void updateServer(Object enviar) {
 
         try {
-            oS.write(Objects.requireNonNull(objectToBytes(enviar)));
+            osTCP.write(Objects.requireNonNull(objectToBytes(enviar)));
         } catch (IOException e) {
             if (Utils.Consts.DEBUG) {
                 System.out.println("Disconectado do server, a tentar reconnectar a um servidor...");
@@ -93,7 +104,7 @@ public class ClientServerConnection extends Thread {
         Object receivedObject;
         try {
             while (true) {
-                receivedBytes = iS.readAllBytes();
+                receivedBytes = isTCP.readAllBytes();
                 receivedObject = bytesToObject(receivedBytes);
                 if (receivedObject == null) {
                     if (Utils.Consts.DEBUG)
@@ -104,7 +115,8 @@ public class ClientServerConnection extends Thread {
                     System.out.println("Recebido um objeto");
 
                 if (receivedObject.getClass() == Mensagem.class) {
-                    //TODO: trigger um metodo no observavel para enviar uma mensagem ao utilizador
+                    outputPipe.write(receivedBytes);
+                    outputPipe.flush();
                 } else {
                     //TODO: adicionar os outros casos
                 }
@@ -141,7 +153,7 @@ public class ClientServerConnection extends Thread {
      *
      * @return o ip do servidor em caso de se fazer uma resposta com sucesso, caso contrario returna null
      */
-    private InetAddress connectUdp(Pedido.Conectar pedido) {
+    private InetAddress connectUdp(Conectar pedido) {
         try {
             IpPort ipPort = getIpPort();
             var pedidoBytes = objectToBytes(pedido);
@@ -160,7 +172,7 @@ public class ClientServerConnection extends Thread {
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
             socket.receive(packet);
-            resposta = (Respostas.PedidoDeLigar) Utils.bytesToObject(packet.getData());
+            resposta = (PedidoDeLigar) Utils.bytesToObject(packet.getData());
             retries = 0;
             tries = 0;
             return packet.getAddress();
@@ -180,7 +192,7 @@ public class ClientServerConnection extends Thread {
      */
     private void connectTcp(InetAddress ip) throws Exception {
         socket = new Socket(ip, resposta.TcpPort);
-        iS = socket.getInputStream();
-        oS = socket.getOutputStream();
+        isTCP = socket.getInputStream();
+        osTCP = socket.getOutputStream();
     }
 }

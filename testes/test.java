@@ -1,4 +1,4 @@
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
 import java.io.FileInputStream;
@@ -81,7 +81,7 @@ public class test {
 
     static void somethingDontKnowLol() {
         String lol = "00000000000000000000000000000000000000000000000000000000000000";
-        System.out.println(Objects.requireNonNull(Objects.requireNonNull(objectToBytes(new Pedido.Conectar()))).length);
+        System.out.println(Objects.requireNonNull(Objects.requireNonNull(objectToBytes(new Conectar()))).length);
         createThread();
         System.out.println("started thread");
         try {

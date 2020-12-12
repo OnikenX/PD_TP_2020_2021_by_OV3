@@ -1,7 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -106,8 +106,8 @@ public class TcpManager {
                 oS = s.getOutputStream();
                 while (!stop) {
                     input = Utils.bytesToObject(iS.readAllBytes());
-                    if(input.getClass() == Pedido.Conectar.class){
-                        var mensagem = (Pedido.Conectar)input;
+                    if(input.getClass() == Conectar.class){
+                        var mensagem = (Conectar)input;
                         //adicinar coluna do canal normal e dm if not exist
 
 

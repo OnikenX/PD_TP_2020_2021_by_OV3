@@ -1,8 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.cli;
 
-import pt.isec.LEI.PD.TP20_21.Client.Model.ClientModel;
 import pt.isec.LEI.PD.TP20_21.Client.ClientObservavel;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.util.LinkedList;
@@ -13,11 +12,11 @@ public class TextUserInterface {
 
     private Scanner s;
     private boolean exit;
-    private Pedido.Conectar pedido;
+    private Conectar pedido;
     private ClientObservavel clientObservavel;
 
     public TextUserInterface() {
-        ClientObservavel clientObservavel = new ClientObservavel(new ClientModel());
+        ClientObservavel clientObservavel = new ClientObservavel();
         s = new Scanner(System.in);
         exit = false;
         UI();
@@ -55,7 +54,7 @@ public class TextUserInterface {
             name = getInput("Name");
             pass = getInput("Pass");
             username = getInput("Username");
-            pedido = new Pedido.Conectar(username, name, pass, isRegistado);
+            pedido = new Conectar(username, name, pass, isRegistado);
             connectionreturn = clientObservavel.connectToServer(pedido);
             switch (connectionreturn) {
                 case Utils.Consts.ERROR_SERVER_FULL:
