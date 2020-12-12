@@ -28,7 +28,7 @@ public class ServerDB {
             System.out.println("Connecting to database...");
         conn = DriverManager.getConnection(DB_URL + server_number, "server_" + server_number, "W-pass-123");
         conn.setAutoCommit(true);
-         stmt = conn.createStatement();
+        stmt = conn.createStatement();
 //STEP 3: Execute a query
 
 //                rs = stmt.executeQuery("SELECT * FROM utilizadores where id = 0;");
@@ -36,15 +36,15 @@ public class ServerDB {
 //                System.out.println("utilizador 0:"+rs.getString("username")+", hash da password:"+rs.getString("hash"));
     }
 
-    public boolean verifyUser(String username,String password) {
+    public boolean verifyUser(String username, String password) {
         String hash;
         boolean return_value;
         ResultSet rs = null;
         try {
-            rs = executeQuery("SELECT * FROM utilizadores where username =" + username+";");
-            if((return_value = rs.next())){
+            rs = executeQuery("SELECT * FROM utilizadores where username =" + username + ";");
+            if ((return_value = rs.next())) {
                 hash = rs.getString("hash");
-            }else {
+            } else {
                 return false;
             }
             Password.check(password, hash);
@@ -58,47 +58,30 @@ public class ServerDB {
         }
         return return_value;
     }
-    
-    public boolean userExist(String username) {
-        String hash;
-        boolean return_value = false;
-        ResultSet rs = null;
-        try {
-            rs = stmt.executeQuery("SELECT * FROM utilizadores where username =" + username + ";");
-            return_value = rs.next();
-            rs.close();
-        } catch (SQLException throwables) {
-            //throwables.printStackTrace();
-            //throw new Error("Error em execução do sql.");
-            System.out.println("merda aquiiiii");
-        }
-        return return_value;
+
+    public boolean userExist(String username) throws SQLException {
+        var rs = stmt.executeQuery("SELECT * FROM utilizadores where username =\"" + username + "\";");
+        return rs.next();
     }
 
     public synchronized ResultSet executeQuery(String sqlcommand) throws SQLException {
         var result = stmt.executeQuery(sqlcommand);
-        conn.commit();
         return result;
     }
+    public synchronized int executeUpdate(String sqlcommand) throws SQLException {
+        return stmt.executeUpdate(sqlcommand);
+    }
 
-    public  boolean verifyExistenceOf(String table, String condition) throws SQLException {
-        ResultSet rs = executeQuery("SELECT * FROM "+table+" where "+condition+";");
+    public boolean verifyExistenceOf(String table, String condition) throws SQLException {
+        ResultSet rs = executeQuery("SELECT * FROM " + table + " where " + condition + ";");
         var exists = rs.next();
         rs.close();
         return exists;
     }
 
-    public void addUser(String username, String hash){
-        ResultSet rs;
-        try {
-            rs = stmt.executeQuery("INSERT INTO utilizadores (username, hash)\n" +
-                    "VALUES ('"+username+"', '"+hash+"');");
-            rs.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            throw new Error("Error em execução do sql.");
-        }
-
+    public int addUser(String username, String name, String hash) throws SQLException {
+            return stmt.executeUpdate("INSERT INTO utilizadores (username,nome, hash)\n" +
+                    "VALUES ('" + username + "', '"+name+"', '" + hash + "');");
     }
 }
 

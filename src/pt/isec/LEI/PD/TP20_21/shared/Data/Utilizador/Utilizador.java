@@ -1,17 +1,17 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
 public class Utilizador {
+    protected String username;
     protected String nome;
-    protected String foto;
-    public Utilizador(String nome, String foto){
+    public Utilizador(String username, String nome){
+        this.username = username;
         this.nome = nome;
-        this.foto = foto;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public String getFoto() {
-        return foto;
+    public String getUsername() {
+        return username;
     }
 }

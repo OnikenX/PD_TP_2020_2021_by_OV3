@@ -1,8 +1,9 @@
 package pt.isec.LEI.PD.TP20_21.shared.FileTransfer;
 
 
-public class FilePacket {
+import java.io.Serializable;
 
+public class FilePacket implements Serializable {
 
     public enum FileType {profilePic, message;}
 

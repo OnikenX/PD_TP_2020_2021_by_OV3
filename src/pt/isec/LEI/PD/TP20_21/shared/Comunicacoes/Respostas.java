@@ -14,9 +14,16 @@ public class Respostas implements Serializable {
     /**
      * Resposta para para o cliente quando se esta a pedir coneção tcp ao servidor.
      * Se a variavel TcpPort -1 quer dizer que o servidor não aceitou a ligação.
+     * Verificar a tcpport para saber a resposta do servidor.
      */
     public static class PedidoDeLigar implements Serializable{
         public final LinkedList<IpPort> servers;
+        /**
+         * Returns the port for the tcp or an error:<br/>
+         * <b>ERROR_USER_INFO_NOT_MATCH</b><br/>
+         * or<br/>
+         * <b>ERROR_SERVER_FULL</b><br/>
+         */
         public final int TcpPort;
 
         public PedidoDeLigar(int TcpPort, LinkedList<IpPort> servers) {

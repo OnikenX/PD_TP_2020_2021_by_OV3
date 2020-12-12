@@ -1,11 +1,10 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
 
 class UtilizadorServer extends Utilizador {
-    private String hash, username;
+    private String hash;
     private int profilepicId;//guarda a imagem do utilizador, default é 0, o id de uma mensagem sem nada
     public UtilizadorServer(String nome, String foto, String username, String password){
-        super(nome, foto);
-        this.username = username;
+        super(username, nome, foto);
         createHash(password);
     }
 

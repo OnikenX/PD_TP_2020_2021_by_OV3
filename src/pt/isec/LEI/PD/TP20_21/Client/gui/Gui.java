@@ -1,19 +1,17 @@
 package pt.isec.LEI.PD.TP20_21.Client.gui;
 
 import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import pt.isec.LEI.PD.TP20_21.Client.MaqEstadosObservavel;
+import pt.isec.LEI.PD.TP20_21.Client.ClientObservavel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class Gui extends BorderPane {
-    private MaqEstadosObservavel modeloObs;
+    private ClientObservavel modeloObs;
 
-    public Gui(MaqEstadosObservavel modelo) {
+    public Gui(ClientObservavel modelo) {
         this.modeloObs = modelo;
         this.modeloObs.addPropertyChangeListener(
                 new PropertyChangeListener() {

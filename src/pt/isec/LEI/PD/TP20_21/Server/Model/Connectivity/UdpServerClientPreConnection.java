@@ -30,7 +30,7 @@ public class UdpServerClientPreConnection extends Thread {
     public void run() {
         int listeningPort;
         DatagramSocket socket = null;
-        DatagramPacket packet; //para receber os pedidos e enviar as respostas
+        DatagramPacket packet = null; //para receber os pedidos e enviar as respostas
         String receivedMsg;
         try {
             try {
@@ -39,16 +39,16 @@ public class UdpServerClientPreConnection extends Thread {
                 System.out.println("Erro a ligar, a port " + Utils.Consts.UDP_CLIENT_REQUEST_PORT + "a tentar conectar outra porta do sistema aleatoria.");
                 socket = new DatagramSocket();
             }
-            Pedido.Conectar conectar;
+            Pedido.Conectar conectar = null;
             byte[] conectarBytes = objectToBytes(new Pedido.Conectar());
 
-            Respostas.PedidoDeLigar resposta;
-            boolean registar;
+            Respostas.PedidoDeLigar resposta = null;
+            boolean registar = false;
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpServerClientPreConnection iniciado...");
             while (true) {
                 //rececao de dados
-                {
+                try{
                     packet = new DatagramPacket(conectarBytes, conectarBytes.length);
                     resposta = null;
                     registar = false;
@@ -67,10 +67,14 @@ public class UdpServerClientPreConnection extends Thread {
                     if (Utils.Consts.DEBUG)
                         System.out.println("Recebido \"" + conectar + "\" de " +
                                 packet.getAddress().getHostAddress() + ":" + packet.getPort());
+                }catch(Exception e){
+                    new Exception("Erro na rececao de dados.").printStackTrace();
+                    e.printStackTrace();
+                    continue;
                 }
 
                 //verificação do pedido
-                {
+                try {
                     if (!conectar.isRegistado()) {//registar utilizador
                         //verificar se existe o username
                         if (server.getServerData().userExist(conectar.getUsername())) {
@@ -85,10 +89,14 @@ public class UdpServerClientPreConnection extends Thread {
                         if (!server.getServerData().verifyUser(conectar.getUsername(), conectar.getPassword())) {
                             resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
                         }
+                } catch (Exception e) {
+                    new Exception("Erros na verificaçao").printStackTrace();
+                    e.printStackTrace();
+                    continue;
                 }
 
                 //verificação da lotação
-                {
+                try {
 
                     //caso nao tenha hado erros na verificacao do login/registo
                     if (resposta == null)
@@ -96,11 +104,10 @@ public class UdpServerClientPreConnection extends Thread {
                             if (Utils.Consts.DEBUG)
                                 System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
                             if (registar) {
-                                if (Utils.Consts.DEBUG)
-                                    System.out.println("[registo] um novo user foi adicionado");
                                 try {
-
-                                    server.getServerData().addUser(conectar.getUsername(), Password.getSaltedHash(conectar.getPassword()));
+                                    server.getServerData().addUser(conectar.getUsername(), conectar.getUsername(), Password.getSaltedHash(conectar.getPassword()));
+                                    if (Utils.Consts.DEBUG)
+                                        System.out.println("[registo] um novo user foi adicionado");
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -111,6 +118,10 @@ public class UdpServerClientPreConnection extends Thread {
                                 System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
                             resposta = new Respostas.PedidoDeLigar(Utils.Consts.ERROR_SERVER_FULL, server.udpMultiCastManager.getServidoresForClient());
                         }
+                } catch (Exception e) {
+                    new Exception("Erro na verificação da lotação").printStackTrace();
+                    e.printStackTrace();
+                    continue;
                 }
 
                 //enviar a resposta
@@ -122,18 +133,11 @@ public class UdpServerClientPreConnection extends Thread {
                 socket.send(packet);
             }
 
-        } catch (
-                NumberFormatException e) {
-            System.out.println("O porto de escuta deve ser um inteiro positivo.");
-        } catch (
-                SocketException e) {
-            System.out.println("Ocorreu um erro ao nivel do socket UDP:\n\t" + e);
-        } catch (
-                IOException e) {
-            System.out.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
-        } catch (
-                Exception throwables) {
-            throwables.printStackTrace();
+
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             if (socket != null) {
                 socket.close();

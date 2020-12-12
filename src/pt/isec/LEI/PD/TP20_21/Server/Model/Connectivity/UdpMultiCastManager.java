@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.MulticastPacket;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.FileTransfer.FilePacket;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
@@ -25,18 +26,20 @@ public class UdpMultiCastManager extends Thread {
     protected Server server;
     int port;
     PingSender ping;
+    final int serverMulticastId;
     VerificaServers verificaServers;
     Collection<FicheiroSender> fileSenders;
     Collection<FicheiroReceiver> fileReceivers;
-
+    MulticastPacket multicastPacketToSend;
 
     public UdpMultiCastManager(Server server) throws IOException {
         fileSenders = Collections.synchronizedCollection(new LinkedList<FicheiroSender>());
         fileReceivers = Collections.synchronizedCollection(new LinkedList<FicheiroReceiver>());
         servidores = new Servidores();
+        serverMulticastId = new Random(System.nanoTime()).nextInt();
+        multicastPacketToSend = new MulticastPacket(serverMulticastId);
         this.multicastSocket = new MulticastSocket(UDP_MULTICAST_PORT);
         multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
-        multicastSocket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
         this.server = server;
         setDaemon(true);
 
@@ -54,20 +57,34 @@ public class UdpMultiCastManager extends Thread {
     //recebe uma mensagem multicast
     @Override
     public void run() {
+
         super.run();
-        Object mensagem;
+        MulticastSocket multicastSocketReceiver = null;
+        Object mensagem = null;
+        MulticastPacket multicastPacket = null;
         Class<?> classType = null;
         DatagramPacket packet;
-        if (Utils.Consts.DEBUG)
-            System.out.println("UdpMultiCast receiver iniciado...");
         try {
+            multicastSocketReceiver = new MulticastSocket(UDP_MULTICAST_PORT);
+            multicastSocketReceiver.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
+            if (Utils.Consts.DEBUG)
+                System.out.println("UdpMultiCast receiver iniciado...");
             byte[] bytes = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             while (true) {
-                packet = new DatagramPacket(bytes, bytes.length);
-                multicastSocket.receive(packet);
+                packet = new DatagramPacket(bytes, bytes.length, InetAddress.getByName(UDP_MULTICAST_GROUP), UDP_MULTICAST_PORT);
+                multicastSocketReceiver.receive(packet);
                 if (DEBUG)
                     System.out.println("Mensagem recebida por " + packet.getAddress() + ":" + packet.getPort() + ": server_"+server.server_number+ ": com tamanho de " + packet.getLength() + " bytes");
-                mensagem = bytesToObject(packet.getData());
+                multicastPacket =(MulticastPacket) bytesToObject(packet.getData());
+                if(multicastPacket.getMulticastId() == serverMulticastId){
+                    if(DEBUG)
+                        System.out.println("E do mesmo servidor...");
+                    continue;
+                }else{
+                    if(DEBUG)
+                        System.out.println("sao diferentes servidores");
+                }
+                mensagem = multicastPacket.getData();
                 if (mensagem == null) {
                     if (DEBUG)
                         System.out.println("Mensagem corrupta recebida...");
@@ -84,7 +101,6 @@ public class UdpMultiCastManager extends Thread {
                     }
                 } else if (classType == Pedido.Ping.class) {
                     Pedido.Ping ping = (Pedido.Ping) mensagem;
-
                     if (Utils.Consts.DEBUG)
                         System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
                     servidores.add(servidores.new ServidorExterno(packet.getAddress().toString(), packet.getPort(), ping.getLotacao()));
@@ -100,8 +116,8 @@ public class UdpMultiCastManager extends Thread {
         } catch (IOException e) {
             System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
         } finally {
-            if (multicastSocket != null) {
-                multicastSocket.close();
+            if (multicastSocketReceiver != null) {
+                multicastSocketReceiver.close();
             }
         }
     }
@@ -116,7 +132,8 @@ public class UdpMultiCastManager extends Thread {
      */
     synchronized public void enviaMulticast(Object mensagem, boolean recebeResposta) throws Exception {
         InetAddress group = InetAddress.getByName(UDP_MULTICAST_GROUP);
-        var buf = objectToBytes(mensagem);
+        multicastPacketToSend.setData(mensagem);
+        var buf = objectToBytes(multicastPacketToSend);
         if (buf == null) {
             throw new Exception("Class com problemas.");
         }
@@ -155,8 +172,7 @@ public class UdpMultiCastManager extends Thread {
                 servidores.removeTimedOut();
                 try {
                     sleep(SERVER_VERIFY_SERVERS_TIMER * 1000);
-                } catch (InterruptedException ignored) {
-                }
+                } catch (InterruptedException ignored) {}
             }
         }
     }
@@ -212,9 +228,9 @@ public class UdpMultiCastManager extends Thread {
         public void removeTimedOut() {
             var it = this.iterator();
             while (it.hasNext()) {
+                it.next();
                 if ((Utils.getTimeStamp() - it.next().getActualizado()) > TIMEOUT_PINGS)
                     it.remove();
-                it.next();
             }
         }
 

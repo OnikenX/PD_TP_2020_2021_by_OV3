@@ -1,26 +1,69 @@
-import pt.isec.LEI.PD.TP20_21.shared.Password;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
+import pt.isec.LEI.PD.TP20_21.shared.Password;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Objects;
 
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.JDBC_DRIVER;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 public class test {
-    public static void main(String[] args) {
-        testFileTypes();
-        //buscar o caminho do system
+    public static void main(String[] args) throws IOException, InterruptedException {
+        new Thread(() -> {
+            try {//envia coisas
+                InetAddress group = InetAddress.getByName("228.0.0.1");
+                MulticastSocket so = new MulticastSocket(2345);
+                so.joinGroup(group);
+                var str = new String("lol");
+                var buff = str.getBytes();
+                while (true) {
+                    Thread.sleep(1000);
+                    so.send(new DatagramPacket(buff, buff.length, group, 8888));
+                    System.out.println("Sent \"lol\"...");
+                }
+            } catch (Exception ignored) {
+            }
+        }).start();
 
-        System.out.println(new File("/cona").mkdirs());
+        new Thread(() -> {
+            try {//recebe mensagens
+                InetAddress group = InetAddress.getByName("228.0.0.1");
+                MulticastSocket s = new MulticastSocket(8888);
+                s.joinGroup(group);
+                var buff = new byte[100];
+                while (true) {
+                    var pack = new DatagramPacket(buff, buff.length, group, 8888);
+                    s.receive(pack);
+                    System.out.println("Received " + new String(pack.getData()));
+                }
+            } catch (Exception ignored) {
+            }
+        }).start();
+    }
+}
+
+    static void testSender() throws IOException {
+
+
+    }
+
+    static void testReceive() throws IOException {
+
+
     }
 
     static void testFileTypes() {
         try (FileInputStream file = new FileInputStream("/home/onikenx/IdeaProjects/PD_TP_2020_2021_by_OV3/files_server/testfile")) {
-            byte[] bytes = new byte[1];int nbytes;
+            byte[] bytes = new byte[1];
+            int nbytes;
             System.out.println("what");
             System.out.println(file.available());
             System.out.println("what?");

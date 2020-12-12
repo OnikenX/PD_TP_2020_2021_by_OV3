@@ -85,7 +85,7 @@ public  class Utils {
         /**
          * Erro quando existem outras servers menos lotados do que este
          */
-        public static final int ERROR_SERVER_FULL = -3;
+        public static final int ERROR_SERVER_FULL = -4;
 
 
 
@@ -99,13 +99,12 @@ public  class Utils {
         /**
          * Porta a ser partilhada a todos os server para fazer multicast
          */
-        public static final int UDP_MULTICAST_PORT = 5432;
+        public static final int UDP_MULTICAST_PORT = 8888;
 
         /**
          * grupo de multicast para se ligar
          */
-        public static final String UDP_MULTICAST_GROUP = "224.0.0.169";
-
+        public static final String UDP_MULTICAST_GROUP = "228.0.0.1";
         //ainda nao tenho nocao se vou precisar disto
         /**
          * porta para enviar ficheiros e receber
@@ -115,7 +114,7 @@ public  class Utils {
         /**
          *  groupo para o gerenciador de ficheiros
          */
-        public final static String FILE_SENDER_GROUP ="224.0.0.167";
+        public final static String FILE_SENDER_GROUP ="225";
 
 
         /**
@@ -161,7 +160,7 @@ public  class Utils {
         /**
          * Porta e endereço do servidor par coneção de default para o client se ligar ao servidor
          */
-        public static int UDP_CLIENT_REQUEST_PORT = 6969;
+        public static int UDP_CLIENT_REQUEST_PORT = 5555;
 
 
         //DATABASE STUFF

@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
@@ -9,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -105,9 +107,17 @@ public class TcpManager {
                 oS = s.getOutputStream();
                 while (!stop) {
                     input = Utils.bytesToObject(iS.readAllBytes());
-                    if(input.getClass() == Mensagem.class){
-                        var mensagem = (Mensagem)input;
-                        System.out.println(mensagem.getMensagem());
+                    if(input.getClass() == Pedido.Conectar.class){
+                        var mensagem = (Pedido.Conectar)input;
+                        //adicinar coluna if not exist
+                        //
+
+                        try {
+                            //
+                            server.getServerData().executeUpdate("")
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
                     }
                 }
             } catch (IOException e) {
