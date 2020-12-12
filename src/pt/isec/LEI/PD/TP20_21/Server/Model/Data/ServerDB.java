@@ -61,15 +61,16 @@ public class ServerDB {
     
     public boolean userExist(String username) {
         String hash;
-        boolean return_value;
+        boolean return_value = false;
         ResultSet rs = null;
         try {
-            rs = stmt.executeQuery("SELECT * FROM utilizadores where username ="+username+";");
-        return_value = rs.next();
-        rs.close();
+            rs = stmt.executeQuery("SELECT * FROM utilizadores where username =" + username + ";");
+            return_value = rs.next();
+            rs.close();
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            throw new Error("Error em execução do sql.");
+            //throwables.printStackTrace();
+            //throw new Error("Error em execução do sql.");
+            System.out.println("merda aquiiiii");
         }
         return return_value;
     }

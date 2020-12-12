@@ -9,6 +9,8 @@ import pt.isec.LEI.PD.TP20_21.shared.Utils;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Main class do servidor, vai guardar tudo o que o servidor precisa e gerar, da se a referencia desta class para as outras classes para chamar funções para que seja possivel fazer varias funções simultaniamente.
  * Tem sobre responsablidade direta todas as coneções do servidor
@@ -53,7 +55,8 @@ public class Server {
         //thread que fica a receber mensagens de outros servidores
 
 //        tcpManager. = new LinkedList<>();
-        udpMultiCastManager.join();
+        //udpMultiCastManager.join();
+        sleep(1000000000);
 
     }
 
