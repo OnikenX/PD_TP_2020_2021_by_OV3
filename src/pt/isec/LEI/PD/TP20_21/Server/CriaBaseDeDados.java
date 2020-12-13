@@ -1,11 +1,11 @@
 package pt.isec.LEI.PD.TP20_21.Server;
 
+import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
 
 public class CriaBaseDeDados {
     Connection conn = null;//connecao à base de dados
@@ -33,8 +33,8 @@ public class CriaBaseDeDados {
         }
 
         try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection("jdbc:mysql://" + DB_ADDRESS + ":" + DB_PORT + "?useTimezone=true&serverTimezone=UTC", args[0], args[1]);
+            Class.forName(ServerDB.JDBC_DRIVER);
+            conn = DriverManager.getConnection("jdbc:mysql://" + ServerDB.DB_ADDRESS + ":" + ServerDB.DB_PORT + "?useTimezone=true&serverTimezone=UTC", args[0], args[1]);
             stmt = conn.createStatement();
 
         } catch (Exception e) {
@@ -77,19 +77,19 @@ public class CriaBaseDeDados {
                     "\n");
             stmt.execute("create table if not exists canaisGrupo\n" +
                     "(\n" +
+                    "    id    int not null,\n" +
                     "    nome        text not null,\n" +
                     "    descricao   text,\n" +
-                    "    canal_id    int not null,\n" +
                     "    password    text not null,\n" +
-                    "    foreign key (canal_id) references canais (id)\n" +
+                    "    foreign key (id) references canais (id)\n" +
                     ");");
 
             //criar canais, para saber de que para quem e a mensagem
             stmt.execute("create table if not exists canaisDM\n" +
                     "(\n" +
-                    "    canal_id    int not null,\n" +
+                    "    id    int not null,\n" +
                     "    pessoaDest   int  not null,\n" +
-                    "    foreign key (canal_id) references canais (id),\n" +
+                    "    foreign key (id) references canais (id),\n" +
                     "    foreign key (pessoaDest) references utilizadores (id)\n" +
                     ");");
             stmt.execute("create table if not exists mensagens\n" +

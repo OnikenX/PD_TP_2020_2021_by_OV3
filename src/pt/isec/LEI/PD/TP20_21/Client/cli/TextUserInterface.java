@@ -13,23 +13,43 @@ public class TextUserInterface {
     private Scanner s;
     private boolean exit;
     private Conectar pedido;
-    private ClientObservavel clientObservavel;
 
     public TextUserInterface() {
-        ClientObservavel clientObservavel = new ClientObservavel();
         s = new Scanner(System.in);
         exit = false;
         UI();
     }
 
-    public void run() {
-        while (!exit) {
 
-        }
+    int menuPrincipal() {
+        int op;
+        System.out.println("\n\n1 - Login");
+        System.out.println("2 - Registo");
+        System.out.println("3 - Sair");
+        do {
+            System.out.print("Escolha uma opcao: ");
+            op = s.nextInt();
+        } while(op < 1 || op > 3);
+        return op;
     }
 
 
     private void UI() {
+        do {
+            int i = menuPrincipal();
+            switch (i) {
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+        } while(!exit);
+    }
+
+
+
+
+    private void UIh() {
         int value;
         boolean isRegistado;
         boolean exit = false;

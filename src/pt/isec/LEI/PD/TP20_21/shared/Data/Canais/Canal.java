@@ -2,24 +2,20 @@ package pt.isec.LEI.PD.TP20_21.shared.Data.Canais;
 
 public abstract class Canal {
     private final int id;
-    private final String nome;
-    private final String descricao;
+    private final int pessoaCria;
 
-    public Canal(int id, String nome, String descricao) {
+    public Canal(int id, int pessoaCria) {
         this.id = id;
-        this.nome = nome;
-        this.descricao = descricao;
+        this.pessoaCria = pessoaCria;
     }
+
 
     public int getId() {
         return id;
     }
 
-    public String getNome() {
-        return nome;
+    public int getPessoaCria() {
+        return pessoaCria;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
 }

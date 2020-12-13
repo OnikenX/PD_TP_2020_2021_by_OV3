@@ -2,7 +2,7 @@ package pt.isec.LEI.PD.TP20_21.shared.Data;
 
 import java.sql.Timestamp;
 
-abstract public class Mensagem {
+public class Mensagem {
     private final int id ;
     private final Timestamp dataHoraEnvio ;
     private final int authorId;
@@ -10,7 +10,7 @@ abstract public class Mensagem {
     private final boolean isAFile;
     private final String mensagem;
 
-    protected Mensagem(int id, Timestamp dataHoraEnvio, int authorId, int canalId, boolean isAFile, String mensagem) {
+    public Mensagem(int id, Timestamp dataHoraEnvio, int authorId, int canalId, boolean isAFile, String mensagem) {
         this.id = id;
         this.dataHoraEnvio = dataHoraEnvio;
         this.authorId = authorId;
