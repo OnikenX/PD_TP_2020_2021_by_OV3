@@ -39,7 +39,7 @@ public class ClientObservavel {
     }
 
     public boolean adicionaPessoa(String username) {
-        return clientModel.adicionaPessoa(username);
+        return clientModel.mandaMensPessoal(username);
     }
 
     public List<Utilizador> getListUsers() {

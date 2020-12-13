@@ -73,7 +73,7 @@ public class ServerDB {
     }
 
     public boolean verifyExistenceOf(String table, String condition) throws SQLException {
-        ResultSet rs = executeQuery("SELECT * FROM " + table + " where " + condition + ";");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + " where " + condition + ";");
         var exists = rs.next();
         rs.close();
         return exists;
@@ -82,6 +82,23 @@ public class ServerDB {
     public int addUser(String username, String name, String hash) throws SQLException {
             return stmt.executeUpdate("INSERT INTO utilizadores (username,nome, hash)\n" +
                     "VALUES ('" + username + "', '"+name+"', '" + hash + "');");
+    }
+
+    /**
+     * Verfica se o canal dm com a pessoa1 e 2 existem
+     */
+    public int verifyDMExists(String pessoa1, String pessoa2) throws SQLException {
+        var rs =stmt.executeQuery("select * from canaisDM where (pessoaDest = '"+pessoa1+"' and pessoaDest = '"+pessoa2+"') or  (pessoaDest = pessoa2  and pessoaDest = lol)");
+        if(rs.next())
+            return rs.getInt("canal_id");
+        return -1;
+    }
+
+
+
+    public synchronized ResultSet addDmUser(String username) throws SQLException {
+        ResultSet rs = executeQuery("SELECT * FROM " + "utilizadores WHERE nome=" + username);
+        return rs;
     }
 }
 

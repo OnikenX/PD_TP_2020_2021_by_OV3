@@ -2,6 +2,9 @@ package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemDM;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemGrupo;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -9,7 +12,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -101,9 +107,13 @@ public class TcpManager {
             byte[] bytes;
             Object input;
             try {
+                Connection conn = null;//connecao à base de dados
+                Statement stmt = null;//mesagem a enviar
+                ResultSet rs = null;//resultado
                 s = serverSocket.accept();
                 iS = s.getInputStream();
                 oS = s.getOutputStream();
+                var serverDB = server.getServerData();
                 while (!stop) {
                     input = Utils.bytesToObject(iS.readAllBytes());
                     if(input.getClass() == Conectar.class){
@@ -119,8 +129,21 @@ public class TcpManager {
                             throwables.printStackTrace();
                         }
                     }
+                    if(input.getClass() == MensagemDM.class) {
+                        MensagemDM msg = (MensagemDM) input;
+
+                        //serverDB.addUser(msg.getUserEnvia())
+                        Object res = null; //que vem da bd
+                        oS.write(Utils.objectToBytes(res));
+                    }
+                    else if(input.getClass() == MensagemGrupo.class) {
+                        MensagemGrupo msg = (MensagemGrupo) input;
+                        // cenas
+                        Object res = null; //que vem da bd
+                        oS.write(Utils.objectToBytes(res));
+                    }
                 }
-            } catch (IOException e) {
+            } catch (IOException /*SQLException*/ e) {
                 e.printStackTrace();
                 try {
                     s.close();
