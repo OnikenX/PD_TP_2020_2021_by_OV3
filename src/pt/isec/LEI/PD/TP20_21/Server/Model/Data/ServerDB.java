@@ -152,7 +152,6 @@ public class ServerDB {
     //canaldm
     public int addCanalDM(int pessoaCria, int pessoaDest) throws SQLException {
         return addCanalDM(-1, pessoaCria, pessoaDest);
-
     }
 
     synchronized public int addCanalDM(int canal_id, int pessoaCria, int pessoaDest) throws SQLException {
@@ -166,10 +165,10 @@ public class ServerDB {
                     "INSERT INTO " + table_canais + " (id, pessoaCria) VALUES (" + canal_id + ", " + pessoaCria + ");"
             );
         }
-        canal_id = getTableLastMax(table_canais);
         getStatement().executeUpdate(
                 "INSERT INTO " + table_canaisDM + " (canal_id) VALUES (" + canal_id + ", " + pessoaDest + ");"
         );
+        canal_id = getTableLastMax(table_canais);
         return canal_id;
     }
 
@@ -232,6 +231,74 @@ public class ServerDB {
         }
         return ll;
     }
+
+
+    public int canalDmExists(int pessoaEnvia, int pessoaRecebe)
+            throws SQLException {
+          var rs = conn.createStatement().executeQuery("SELECT canais.id, pessoaCria, pessoaDest " +
+                "FROM canais INNER JOIN canaisDM cD on canais.id = cD.id " +
+                "where " +
+                "(pessoaDest = "+pessoaEnvia+" and pessoaCria = "+pessoaRecebe+") " +
+                "or " +
+                "(pessoaDest = "+pessoaRecebe+" and pessoaCria = "+pessoaEnvia+") ;\n");
+                if(rs.next())
+                    return rs.getInt("id");
+                else return -1;
+
+    }
+
+    public int mensagemGrupo(Timestamp timestamp, int pessoaEnvia, int canal_id,boolean isAFile , String conteudo) throws SQLException {
+        return mensagemDM(-1,timestamp, pessoaEnvia,  canal_id, isAFile , conteudo);
+    }
+
+    synchronized public int mensagemGrupo(int id, Timestamp timestamp, int pessoaEnvia, int canal_id,boolean isAFile , String conteudo) throws SQLException {
+        if(id == -1){
+            getStatement().executeUpdate("" +
+                    "insert into " +
+                    "mensagens(dataHoraEnvio, authorId, canalId, isAFile, mensagem) " +
+                    "values " +
+                    "("+timestamp+", "+pessoaEnvia+", "+canal_id+", "+
+                    (isAFile? 1:0)+", "+conteudo+")");
+        }else{
+            getStatement().executeUpdate("" +
+                    "insert into " +
+                    "mensagens(id, dataHoraEnvio, authorId, canalId, isAFile, mensagem) " +
+                    "values " +
+                    "("+id+", "+timestamp+", "+pessoaEnvia+", "+canal_id+", "+
+                    (isAFile? 1:0)+", "+conteudo+")");
+        }
+        return getTableLastMax(table_mensagens);
+    }
+
+    public int mensagemDM(Timestamp timestamp, int pessoaEnvia, int pessoaRecebe,boolean isAFile , String conteudo) throws SQLException {
+        return mensagemDM(-1,timestamp, pessoaEnvia,  pessoaRecebe, isAFile , conteudo);
+    }
+
+    synchronized public int mensagemDM(int id, Timestamp timestamp, int pessoaEnvia, int pessoaRecebe,boolean isAFile , String conteudo) throws SQLException {
+        int canal_id;
+        if(-1==(canal_id = canalDmExists(pessoaEnvia, pessoaRecebe))) {
+            canal_id  = addCanalDM(pessoaEnvia, pessoaRecebe);
+        }
+
+        if(id == -1){
+            getStatement().executeUpdate("" +
+                    "insert into " +
+                    "mensagens(dataHoraEnvio, authorId, canalId, isAFile, mensagem) " +
+                    "values " +
+                    "("+timestamp+", "+pessoaEnvia+", "+canal_id+", "+
+                    (isAFile? 1:0)+", "+conteudo+")");
+        }else{
+
+            getStatement().executeUpdate("" +
+                    "insert into " +
+                    "mensagens(id, dataHoraEnvio, authorId, canalId, isAFile, mensagem) " +
+                    "values " +
+                    "("+id+", "+timestamp+", "+pessoaEnvia+", "+canal_id+", "+
+                    (isAFile? 1:0)+", "+conteudo+")");
+        }
+        return getTableLastMax(table_mensagens);
+    }
+
 }
 
 

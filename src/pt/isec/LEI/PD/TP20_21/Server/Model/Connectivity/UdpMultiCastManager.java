@@ -5,6 +5,7 @@ import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.MulticastPacket;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Ping;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.PingPai;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.TabelaCorrecao;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.FileOutOfSync;
 import pt.isec.LEI.PD.TP20_21.shared.FileTransfer.FilePacket;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
@@ -597,10 +598,14 @@ public class UdpMultiCastManager extends Thread {
         setServerUpdated(false);
         if(DEBUG)
             System.out.println("nao esta updetado no "+tabela);
-
-        //enviar o pedido para rever a tabela
-
+        try {
+            enviaMulticast(new TabelaCorrecao(tabela), false);
+        } catch (Exception e) {
+            System.err.println("Problemas a enviar mensagem multicast");
+            e.printStackTrace();
+        }
     }
+
     //TODO: testar a transferencia de ficheiros
 
     /**
