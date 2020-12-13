@@ -310,7 +310,6 @@ public class ServerDB {
         var statment = getConn().createStatement();
         var statmenttemp = getConn().createStatement();
         var rs = statment.executeQuery("select * from " + tabela + ";");
-        List<Object> ll = new LinkedList<>();
         int id;
         ResultSet rstemp = null;
         while (rs.next()) {
@@ -320,6 +319,7 @@ public class ServerDB {
                     rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
                     rstemp.next();
                     ll.add(new CanalDM(id, rs.getInt(2), rstemp.getInt(2)));
+                    if()
                     break;
                 case table_canaisGrupo:
                     id = rs.getInt(1);
