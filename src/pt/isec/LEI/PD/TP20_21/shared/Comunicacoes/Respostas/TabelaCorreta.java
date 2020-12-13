@@ -2,6 +2,9 @@ package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
 
 import java.util.ArrayList;
 
+/**
+ * Tem uma lista de elementos que foram pedidos
+ */
 public class TabelaCorreta implements Respostas{
     private final String tabela;
     private final ArrayList<Object> items;

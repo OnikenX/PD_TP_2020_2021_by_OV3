@@ -9,6 +9,7 @@ import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.UtilizadorServer;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,11 @@ public class ServerDB {
     //DATABASE STUFF
     private final Statement statement;
     private final Server server;
+
+    synchronized private Connection getConn() {
+        return conn;
+    }
+
     private final Connection conn;
     //table names
     public final static String table_canais = "canais";
@@ -197,45 +203,10 @@ public class ServerDB {
         return canal_id;
     }
 
-    public List<Object> getListaTabela(String tabela) throws Exception {
-        var statment = conn.createStatement();
-        var statmenttemp = conn.createStatement();
-        var rs = statment.executeQuery("select * from " + tabela + ";");
-
-        List<Object> ll = new LinkedList<Object>();
-        int id;
-        ResultSet rstemp;
-        while (rs.next()) {
-            switch (tabela) {
-                case table_canaisDM:
-                    id = rs.getInt(1);
-                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
-                    rstemp.next();
-                    ll.add(new CanalDM(id, rs.getInt(2), rstemp.getInt(2)));
-                    break;
-                case table_canaisGrupo:
-                    id = rs.getInt(1);
-                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
-                    rstemp.next();
-                    ll.add(new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
-                    break;
-                case table_mensagens:
-                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
-                    break;
-                case table_utilizadores:
-                    ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
-                    break;
-                default:
-                    throw new Exception("Tabela nao existe.");
-            }
-        }
-        return ll;
-    }
-
 
     public int canalDmExists(int pessoaEnvia, int pessoaRecebe)
             throws SQLException {
-          var rs = conn.createStatement().executeQuery("SELECT canais.id, pessoaCria, pessoaDest " +
+          var rs = getConn().createStatement().executeQuery("SELECT canais.id, pessoaCria, pessoaDest " +
                 "FROM canais INNER JOIN canaisDM cD on canais.id = cD.id " +
                 "where " +
                 "(pessoaDest = "+pessoaEnvia+" and pessoaCria = "+pessoaRecebe+") " +
@@ -297,6 +268,110 @@ public class ServerDB {
                     (isAFile? 1:0)+", "+conteudo+")");
         }
         return getTableLastMax(table_mensagens);
+    }
+
+
+    public List<Object> getListaTabela(String tabela) throws Exception {
+        var statment = getConn().createStatement();
+        var statmenttemp = getConn().createStatement();
+        var rs = statment.executeQuery("select * from " + tabela + ";");
+
+        List<Object> ll = new LinkedList<>();
+        int id;
+        ResultSet rstemp;
+        while (rs.next()) {
+            switch (tabela) {
+                case table_canaisDM:
+                    id = rs.getInt(1);
+                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp.next();
+                    ll.add(new CanalDM(id, rs.getInt(2), rstemp.getInt(2)));
+                    break;
+                case table_canaisGrupo:
+                    id = rs.getInt(1);
+                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp.next();
+                    ll.add(new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
+                    break;
+                case table_mensagens:
+                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
+                    break;
+                case table_utilizadores:
+                    ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
+                    break;
+                default:
+                    throw new Exception("Tabela nao existe.");
+            }
+        }
+        return ll;
+    }
+
+    public void verificaMudancas(ArrayList<Object> lista, String tabela) throws Exception {
+        var statment = getConn().createStatement();
+        var statmenttemp = getConn().createStatement();
+        var rs = statment.executeQuery("select * from " + tabela + ";");
+        List<Object> ll = new LinkedList<>();
+        int id;
+        ResultSet rstemp = null;
+        while (rs.next()) {
+            switch (tabela) {
+                case table_canaisDM:
+                    id = rs.getInt(1);
+                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp.next();
+                    ll.add(new CanalDM(id, rs.getInt(2), rstemp.getInt(2)));
+                    break;
+                case table_canaisGrupo:
+                    id = rs.getInt(1);
+                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp.next();
+                    ll.add(new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
+                    break;
+                case table_mensagens:
+                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
+                    break;
+                case table_utilizadores:
+                    ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
+                    break;
+                default:
+                    throw new Exception("Tabela nao existe.");
+            }
+        }
+        if(rstemp != null)
+            rstemp.close();
+        rs.close();
+        statement.close();
+
+    }
+
+
+    public void ListaParaUser(String tabela) throws Exception {
+        var st = getConn().createStatement();
+        ResultSet rs = null;
+        if(tabela.equals(table_mensagens)) {
+            rs = st.executeQuery("select * from "+table_mensagens+";");
+        } else if(tabela.equals(table_utilizadores)) {
+            rs = st.executeQuery("select * from "+ table_utilizadores+";");
+        } else if(tabela.equals(table_canaisDM)) {
+            st.executeQuery("SELECT canais.id, pessoaCria, pessoaDest " +
+                    "FROM canais INNER JOIN canaisDM cD on canais.id = cD.id;");
+        } else if(tabela.equals(table_canaisGrupo)) {
+            rs = st.executeQuery("SELECT canais.id ,pessoaCria, nome, descricao, password  " +
+                    "FROM canais INNER JOIN canaisGrupo cD on canais.id = cD.id;");
+        }else throw new Exception("tabela nao supportada");
+        while(rs.next()) {
+            if(tabela.equals(table_mensagens)) {//int Timestamp int int tinyint/bool String
+                rs.getInt()
+            } else if(tabela.equals(table_utilizadores)) {//int String String
+
+            } else if(tabela.equals(table_canaisDM)) {//int int int
+
+            } else if(tabela.equals(table_canaisGrupo)) {//int int String String String
+
+            }
+        }
+        rs.close();
+        st.close();
     }
 
 }
