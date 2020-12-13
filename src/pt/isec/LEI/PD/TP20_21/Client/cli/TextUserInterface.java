@@ -13,10 +13,12 @@ public class TextUserInterface {
     private Scanner s;
     private boolean exit;
     private Conectar pedido;
+    private final ClientObservavel clientObservavel;
 
-    public TextUserInterface() {
+    public TextUserInterface(ClientObservavel clientObservavel) {
         s = new Scanner(System.in);
         exit = false;
+        this.clientObservavel = clientObservavel;
         UI();
     }
 
@@ -139,7 +141,7 @@ public class TextUserInterface {
                 adicinarPessoa();
                 break;
             case 1:
-//                listarConversasComPessoas();
+               listarConversasComPessoas();
                 break;
             case 2:
 //                gerirCanais();
@@ -160,6 +162,11 @@ public class TextUserInterface {
                 return;
 
         }
+    }
+
+    private void listarConversasComPessoas() {
+        var list = clientObservavel.getClientModel().getListUsers();
+        print
     }
 
     private void adicinarPessoa() {
@@ -195,12 +202,5 @@ public class TextUserInterface {
         return s.nextLine();
     }
 
-
-    private void UIRegisto() {
-        System.out.println("Id: ");
-        String user = s.nextLine();
-        System.out.println("Pass: ");
-        String pass = s.nextLine();
-    }
 
 }

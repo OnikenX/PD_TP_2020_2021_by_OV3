@@ -207,6 +207,8 @@ public class UdpMultiCastManager extends Thread {
                     server.getServerDB().verificaMudancas( ((TabelaCorreta) mensagem).getItems() , ((TabelaCorreta) mensagem).getTabela());
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }).start();
         }

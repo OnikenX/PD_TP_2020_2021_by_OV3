@@ -312,6 +312,7 @@ public class ServerDB {
         var rs = statment.executeQuery("select * from " + tabela + " order by id;");
         int id;
         ResultSet rstemp = null;
+
         while (rs.next()) {
             switch (tabela) {
                 case table_canaisDM:
@@ -319,7 +320,7 @@ public class ServerDB {
                     rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
                     rstemp.next();
                     id, rs.getInt(2), rstemp.getInt(2)
-                    if(id == )
+
                     break;
                 case table_canaisGrupo:
                     id = rs.getInt(1);
