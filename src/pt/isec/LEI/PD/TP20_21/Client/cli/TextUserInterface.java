@@ -20,8 +20,19 @@ public class TextUserInterface {
         UI();
     }
 
-    public void registar() {
+    public Conectar registar() {
+        System.out.print("Nome próprio: ");
+        var nome = s.nextLine();
 
+        var username = getInput("Username: ");
+        var pass = getInput("Pass: ");
+        return new Conectar(nome, username, pass, false);
+    }
+
+    public Conectar login() {
+        var username = getInput("Username: ");
+        var pass = getInput("Pass: ");
+        return new Conectar(nome, username, pass, true);
     }
 
 

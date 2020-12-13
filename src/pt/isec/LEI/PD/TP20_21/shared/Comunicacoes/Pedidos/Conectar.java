@@ -58,5 +58,11 @@ public class Conectar implements Serializable, Pedido {
         setAll(username, nome, password, registado);
     }
 
+    public Conectar(String username, String password) {
+        this.username = username;
+        this.password = password;
+        registado = true;
+    }
+
 
 }
