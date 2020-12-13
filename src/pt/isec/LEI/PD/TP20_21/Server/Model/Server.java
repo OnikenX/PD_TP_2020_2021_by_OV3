@@ -24,6 +24,11 @@ public class Server {
     public String getServerName(){
         return "server_"+server_number;
     }
+    public final static String table_canais = "canais";
+    public final static String table_utilizadores = "utilizadores";
+    public final static String table_canaisDM = "canaisDM";
+    public final static String table_canaisGrupo = "canaisGrupo";
+    public final static String table_mensagens = "mensagens";
 
     public int getTcpPort() { return tcpManager.getPort(); }
     public int getTcpConnections_size(){

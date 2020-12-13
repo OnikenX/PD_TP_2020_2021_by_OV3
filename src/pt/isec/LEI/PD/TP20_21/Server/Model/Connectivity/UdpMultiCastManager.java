@@ -1,15 +1,21 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.PingPai;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.FileOutOfSync;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.MulticastPacket;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Ping;
 import pt.isec.LEI.PD.TP20_21.shared.FileTransfer.FilePacket;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.*;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.SocketException;
+import java.sql.SQLException;
 import java.util.*;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
@@ -31,12 +37,13 @@ public class UdpMultiCastManager extends Thread {
     Collection<FicheiroSender> fileSenders;
     Collection<FicheiroReceiver> fileReceivers;
     MulticastPacket multicastPacketToSend;
+    public final long serverStartTimestamp = System.nanoTime();
 
     public UdpMultiCastManager(Server server) throws IOException {
         fileSenders = Collections.synchronizedCollection(new LinkedList<FicheiroSender>());
         fileReceivers = Collections.synchronizedCollection(new LinkedList<FicheiroReceiver>());
         servidores = new Servidores();
-        serverMulticastId = new Random(System.nanoTime()).nextInt();
+        serverMulticastId = new Random(serverStartTimestamp).nextInt();
         multicastPacketToSend = new MulticastPacket(serverMulticastId);
         this.multicastSocket = new MulticastSocket(UDP_MULTICAST_PORT);
         multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
@@ -103,8 +110,8 @@ public class UdpMultiCastManager extends Thread {
                     Ping ping = (Ping) mensagem;
                     if (Utils.Consts.DEBUG)
                         System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
-                    servidores.add(servidores.new ServidorExterno(packet.getAddress().toString(), packet.getPort(), ping.getLotacao()));
 
+                    servidores.verifyPing((Pedido.Ping)mensagem, packet);
                 } else {
                     System.err.println("Undefined object detected");
                 }
@@ -193,7 +200,14 @@ public class UdpMultiCastManager extends Thread {
 
             Ping ping = new Ping();
             while (true) {
-                ping.setLotacao(server.getTcpConnections_size());
+                try {
+                    ping = new Pedido.Ping(server.getTcpConnections_size(),server.getServerData().getChecksum("canais") ,server.getServerData().getChecksum("canaisDM"),server.getServerData().getChecksum("canaisGrupo"),server.getServerData().getChecksum("mensagens"),server.getServerData().getChecksum("utilizadores"), server.getServerData().isUpdated());
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                    if(DEBUG)
+                        System.err.println("erro no criar um ping");
+                    continue;
+                }
                 try {
                     enviaMulticast(ping, false);
                 } catch (Exception e) {
@@ -234,15 +248,6 @@ public class UdpMultiCastManager extends Thread {
             }
         }
 
-        public boolean add(ServidorExterno servidorExterno) {
-            for (var i : this)
-                if (i.equals(servidorExterno)) {
-                    i.setLotacao(servidorExterno.getLotacao());
-                    return true;
-                }
-            return servidoresList.add(servidorExterno);
-        }
-
         public LinkedList<IpPort> getServidoresForClient() {
             LinkedList<IpPort> toReturn = new LinkedList<>();
             int max;
@@ -264,6 +269,33 @@ public class UdpMultiCastManager extends Thread {
             return servidoresList.iterator();
         }
 
+        //TODO: completar a verificicaçao de ping
+        public void verifyPing(Ping mensagem, DatagramPacket packet) {
+            if(mensagem instanceof PingPai){
+                //verifica checksums
+            }
+            try {
+                if(mensagem.)
+                if (mensagem.getCanaisChecksum() != server.getServerData().getChecksum(server.table_canais))
+
+                  if(mensagem.getMensagensChecksum() != server.getServerData().getChecksum(server.table_mensagens)
+
+                )
+
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+//            new ServidorExterno(packet.getAddress(), packet.getPort(), ((Pedido.Ping)mensagem).getLotacao());
+            for (var i : this)
+                if (i.equals(servidorExterno)) {
+                    i.setLotacao(servidorExterno.getLotacao());
+                    return true;
+                }
+            return servidoresList.add(servidorExterno);
+        }
+
 
         /**
          * Guarda as informações de um servidor externo
@@ -271,6 +303,11 @@ public class UdpMultiCastManager extends Thread {
         public class ServidorExterno extends IpPort implements Comparable<ServidorExterno>, Serializable, Cloneable {
 
             private int lotacao;
+            private long canaisChecksum;
+            private long canaisDMChecksum;
+            private long canaisGroupoChecksum;
+            private long mensagensChecksum;
+            private long utilizadoresChecksum;
 
             /**
              * ultima vez que o server foi actualizado
@@ -319,9 +356,57 @@ public class UdpMultiCastManager extends Thread {
             public int compareTo(ServidorExterno ipss) {
                 return lotacao - ipss.getLotacao();
             }
-        }
-    }
 
+
+
+            public long getCanaisChecksum() {
+                return canaisChecksum;
+            }
+
+            public void setCanaisChecksum(long canaisChecksum) {
+                this.canaisChecksum = canaisChecksum;
+            }
+
+            public long getCanaisDMChecksum() {
+                return canaisDMChecksum;
+            }
+
+            public void setCanaisDMChecksum(long canaisDMChecksum) {
+                this.canaisDMChecksum = canaisDMChecksum;
+            }
+
+            public long getCanaisGroupoChecksum() {
+                return canaisGroupoChecksum;
+            }
+
+            public void setCanaisGroupoChecksum(long canaisGroupoChecksum) {
+                this.canaisGroupoChecksum = canaisGroupoChecksum;
+            }
+
+            public long getMensagensChecksum() {
+                return mensagensChecksum;
+            }
+
+            public void setMensagensChecksum(long mensagensChecksum) {
+                this.mensagensChecksum = mensagensChecksum;
+            }
+
+            public long getUtilizadoresChecksum() {
+                return utilizadoresChecksum;
+            }
+
+            public void setUtilizadoresChecksum(long utilizadoresChecksum) {
+                this.utilizadoresChecksum = utilizadoresChecksum;
+            }
+
+            public void setActualizado(long actualizado) {
+                this.actualizado = actualizado;
+            }
+
+        }
+
+    }
+    //TODO: testar a transferencia de ficheiros
     /**
      * Recebe fichieros por udp
      */
