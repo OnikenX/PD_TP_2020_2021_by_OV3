@@ -66,7 +66,7 @@ public class Server {
 
 
 
-    public ServerDB getServerData() {
+    public ServerDB getServerDB() {
         return serverDB;
     }
 }

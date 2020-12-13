@@ -15,8 +15,6 @@ DROP TABLE IF EXISTS canais;
 create table if not exists canais
 (
     id int not NULL unique auto_increment,
-    nome        text not null,
-    descricao   text,
     primary key (id)
 );
 
@@ -32,6 +30,8 @@ create table if not exists utilizadores
 
 create table if not exists canaisGrupo
 (
+    nome        text not null,
+    descricao   text,
     canal_id    int not null,
     password    text not null,
     moderadorId int  not null,

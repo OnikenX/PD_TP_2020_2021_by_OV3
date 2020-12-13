@@ -1,25 +1,21 @@
 package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos;
 
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Pedido;
-
 import java.io.Serializable;
 
 public class Ping implements Serializable, Pedido {
-    private int lotacao;
+    private final int lotacao;
 //        public static int SIZE = (Objects.requireNonNull(objectToBytes(new Ping())).length);
+    private final long serverStartTimestamp;
 
-    public Ping(int lotacao) {
-        this.lotacao = lotacao;
-    }
-
-    public Ping() {
+    public Ping(int lotacao,long serverStartTimestamp) {
+        this.lotacao = lotacao;this.serverStartTimestamp = serverStartTimestamp;
     }
 
     public int getLotacao() {
         return lotacao;
     }
-
-    public void setLotacao(int lotacao) {
-        this.lotacao = lotacao;
+    public long getServerStartTimestamp() {
+        return serverStartTimestamp;
     }
+
 }

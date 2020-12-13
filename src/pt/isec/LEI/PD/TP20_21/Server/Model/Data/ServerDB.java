@@ -12,11 +12,27 @@ import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
  * Faz manegamento dos objectos na memoria, toma conta dos dados e mexe na database
  */
 public class ServerDB {
-    //sql vars
-    //Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
-    Connection conn;
-    Statement stmt;
-    Server server;
+    //DATABASE STUFF
+    private final Statement statement;
+    private final Server server;
+    private final Connection conn;
+    //table names
+    public final static String table_canais = "canais";
+    public final static String table_utilizadores = "utilizadores";
+    public final static String table_canaisDM = "canaisDM";
+    public final static String table_canaisGrupo = "canaisGrupo";
+    public final static String table_mensagens = "mensagens";
+    //connections
+    public static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    public static final int DB_PORT = 3306;
+    public static final String DB_ADDRESS = "localhost";
+    public static final String DB_TABLE = "messager_db_";
+    public static final String DB_URL = "jdbc:mysql://" + DB_ADDRESS + ":" + DB_PORT + "/" + DB_TABLE;
+
+    public int canal_id_max;
+    public int mensagem_id_max;
+    public int utilizador_id_max;
+
 
     public ServerDB(Server server, int server_number) throws SQLException, ClassNotFoundException {
         //sql configs
@@ -26,9 +42,12 @@ public class ServerDB {
 //STEP 2: Open a connection
         if (DEBUG)
             System.out.println("Connecting to database...");
+        //sql vars
+        //Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
         conn = DriverManager.getConnection(DB_URL + server_number, "server_" + server_number, "W-pass-123");
         conn.setAutoCommit(true);
-        stmt = conn.createStatement();
+
+        statement = conn.createStatement();
 //STEP 3: Execute a query
 
 //                rs = stmt.executeQuery("SELECT * FROM utilizadores where id = 0;");
@@ -36,12 +55,25 @@ public class ServerDB {
 //                System.out.println("utilizador 0:"+rs.getString("username")+", hash da password:"+rs.getString("hash"));
     }
 
+    private synchronized Statement getStatement() {
+        return statement;
+    }
+
+    public long getChecksum(String tabela) throws SQLException {
+        long returned = -1;
+        var rs = getStatement().executeQuery("checksum table " + DB_TABLE + server.server_number + "." + tabela + ";");
+        if (rs.next())
+            returned = rs.getLong(2);
+        rs.close();
+        return returned;
+    }
+
     public boolean verifyUser(String username, String password) {
         String hash;
         boolean return_value;
         ResultSet rs = null;
         try {
-            rs = executeQuery("SELECT * FROM utilizadores where username =" + username + ";");
+            rs = getStatement().executeQuery("SELECT * FROM utilizadores where username =" + username + ";");
             if ((return_value = rs.next())) {
                 hash = rs.getString("hash");
             } else {
@@ -60,46 +92,80 @@ public class ServerDB {
     }
 
     public boolean userExist(String username) throws SQLException {
-        var rs = stmt.executeQuery("SELECT * FROM utilizadores where username =\"" + username + "\";");
-        return rs.next();
+        return getStatement().executeQuery("SELECT * FROM utilizadores where username =\"" + username + "\";").next();
     }
 
-    public synchronized ResultSet executeQuery(String sqlcommand) throws SQLException {
-        var result = stmt.executeQuery(sqlcommand);
-        return result;
-    }
-    public synchronized int executeUpdate(String sqlcommand) throws SQLException {
-        return stmt.executeUpdate(sqlcommand);
-    }
 
-    public boolean verifyExistenceOf(String table, String condition) throws SQLException {
-        ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + " where " + condition + ";");
+    private boolean verifyExistenceOf(String table, String condition) throws SQLException {
+        ResultSet rs = getStatement().executeQuery(
+                "SELECT * FROM " + table + " where " + condition + ";"
+        );
         var exists = rs.next();
         rs.close();
         return exists;
     }
 
+    private boolean verifyItemInTable(int id, String table) throws SQLException {
+        return verifyExistenceOf(table, "id = "+id);
+    }
+
+    private boolean deleteItem(String table, int id) throws SQLException {
+               if(!verifyItemInTable(id, table))
+                   return false;
+               //todo: acabar isto
+               return true;
+               //getStatement().executeUpdate();
+    }
+
+    public int getTableLastMax(String tablename) throws SQLException {
+        var rs = getStatement().executeQuery("SELECT MAX(id) FROM " + tablename);
+        int idmax;
+        rs.next();
+        return rs.getInt(0);
+    }
+
+    //users
     public int addUser(String username, String name, String hash) throws SQLException {
-            return stmt.executeUpdate("INSERT INTO utilizadores (username,nome, hash)\n" +
-                    "VALUES ('" + username + "', '"+name+"', '" + hash + "');");
+        return addUser(-1, username, name, hash);
     }
 
-    /**
-     * Verfica se o canal dm com a pessoa1 e 2 existem
-     */
-    public int verifyDMExists(String pessoa1, String pessoa2) throws SQLException {
-        var rs =stmt.executeQuery("select * from canaisDM where (pessoaDest = '"+pessoa1+"' and pessoaDest = '"+pessoa2+"') or  (pessoaDest = pessoa2  and pessoaDest = lol)");
-        if(rs.next())
-            return rs.getInt("canal_id");
-        return -1;
+    synchronized public int addUser(int id, String username, String name, String hash) throws SQLException {
+        if (id == -1) {
+
+
+            getStatement().executeUpdate("INSERT INTO utilizadores (username,nome, hash)\n" +
+                    "VALUES ('" + username + "', '" + name + "', '" + hash + "');");
+        } else {
+            //TODO: verificar se a tabela existe
+            getStatement().executeUpdate("INSERT INTO utilizadores (id, username,nome, hash)\n" +
+                    "VALUES ( " + id + " , '" + username + "', '" + name + "', '" + hash + "');");
+        }
+        return getTableLastMax(table_utilizadores);
     }
 
-
-
-    public synchronized ResultSet addDmUser(String username) throws SQLException {
-        ResultSet rs = executeQuery("SELECT * FROM " + "utilizadores WHERE nome=" + username);
-        return rs;
+    //canaldm
+    public int addCanalDM(int pessoaCria, int pessoaDest) throws SQLException {
+        return addCanalDM(-1, pessoaCria, pessoaDest);
     }
+
+    synchronized public int addCanalDM(int canal_id, int pessoaCria, int pessoaDest) throws SQLException {
+        if (canal_id == -1)
+            getStatement().executeUpdate(
+                    "INSERT INTO " + table_canais + " (pessoaCria) VALUES (" + pessoaCria + ");"
+            );
+        else {
+            //TODO: verificar se a tabela existe
+            getStatement().executeUpdate(
+                    "INSERT INTO " + table_canais + " (id, pessoaCria) VALUES (" + canal_id + ", " + pessoaCria + ");"
+            );
+        }
+        canal_id = getTableLastMax(table_canais);
+        getStatement().executeUpdate(
+                "INSERT INTO " + table_canaisDM + " (canal_id) VALUES (" + canal_id + ", " + pessoaDest + ");"
+        );
+        return canal_id;
+    }
+
 }
 
 

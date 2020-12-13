@@ -7,7 +7,6 @@ package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
 //        super(username, nome, foto);
 //        createHash(password);
 //    }
-//
 //    public boolean verifyUser(String username, String password){
 //        if (!this.username.equals(username))
 //            return false;

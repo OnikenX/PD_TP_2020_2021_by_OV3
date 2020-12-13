@@ -1,16 +1,23 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
+import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.FileOutOfSync;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.MulticastPacket;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Ping;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.PingPai;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.FileOutOfSync;
 import pt.isec.LEI.PD.TP20_21.shared.FileTransfer.FilePacket;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.*;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.SocketException;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.*;
@@ -24,28 +31,48 @@ public class UdpMultiCastManager extends Thread {
     //    protected String username;
     protected MulticastSocket multicastSocket;
     protected Server server;
-    int port;
-    PingSender ping;
+    PingSender pingSender;
+    /**
+     * o id aleatorio que identifica o servidor quando faz chamadas multicast
+     */
     final int serverMulticastId;
     VerificaServers verificaServers;
-    Collection<FicheiroSender> fileSenders;
-    Collection<FicheiroReceiver> fileReceivers;
+    /**
+     * Lista de @{@link FicheiroSender}s
+     */
+    List<FicheiroSender> fileSenders;
+    /**
+     * Lista de @{@link FicheiroReceiver}s
+     */
+    List<FicheiroReceiver> fileReceivers;
     MulticastPacket multicastPacketToSend;
+    public final long serverStartTimestamp = System.nanoTime();
+
+
+    /**
+     * Um server esta updated quando tem os mesmos a mesma checksum que o server pai
+     */
+    private boolean serverUpdated = false;
+
+    /**
+     * e um server pai quando e' o server mais antigo
+     */
+    private boolean serverDad = false;
 
     public UdpMultiCastManager(Server server) throws IOException {
-        fileSenders = Collections.synchronizedCollection(new LinkedList<FicheiroSender>());
-        fileReceivers = Collections.synchronizedCollection(new LinkedList<FicheiroReceiver>());
+        fileSenders = Collections.synchronizedList(new LinkedList<>());
+        fileReceivers = Collections.synchronizedList(new LinkedList<>());
         servidores = new Servidores();
-        serverMulticastId = new Random(System.nanoTime()).nextInt();
+        serverMulticastId = new Random(serverStartTimestamp).nextInt();
         multicastPacketToSend = new MulticastPacket(serverMulticastId);
-        this.multicastSocket = new MulticastSocket(UDP_MULTICAST_PORT);
+        this.multicastSocket = new MulticastSocket();
         multicastSocket.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
         this.server = server;
-        setDaemon(true);
 
         //threads
+        setDaemon(true);
         start();
-        ping = new PingSender();
+        pingSender = new PingSender();
         verificaServers = new VerificaServers();
     }
 
@@ -54,10 +81,27 @@ public class UdpMultiCastManager extends Thread {
         return servidores;
     }
 
+
+    public boolean isServerDad() {
+        return serverDad;
+    }
+
+    public void setServerDad(boolean serverDad) {
+        this.serverDad = serverDad;
+    }
+
+
+    public boolean isServerUpdated() {
+        return serverUpdated;
+    }
+
+    public void setServerUpdated(boolean serverUpdated) {
+        this.serverUpdated = serverUpdated;
+    }
+
     //recebe uma mensagem multicast
     @Override
     public void run() {
-
         super.run();
         MulticastSocket multicastSocketReceiver = null;
         Object mensagem = null;
@@ -65,32 +109,44 @@ public class UdpMultiCastManager extends Thread {
         Class<?> classType = null;
         DatagramPacket packet;
         try {
+            //ciar o socket para receber pedidos
             multicastSocketReceiver = new MulticastSocket(UDP_MULTICAST_PORT);
             multicastSocketReceiver.joinGroup(InetAddress.getByName(Utils.Consts.UDP_MULTICAST_GROUP));
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpMultiCast receiver iniciado...");
             byte[] bytes = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
+
             while (true) {
-                packet = new DatagramPacket(bytes, bytes.length, InetAddress.getByName(UDP_MULTICAST_GROUP), UDP_MULTICAST_PORT);
+                packet = new DatagramPacket(
+                        bytes,
+                        bytes.length,
+                        InetAddress.getByName(UDP_MULTICAST_GROUP),
+                        UDP_MULTICAST_PORT
+                );
+
                 multicastSocketReceiver.receive(packet);
                 if (DEBUG)
-                    System.out.println("Mensagem recebida por " + packet.getAddress() + ":" + packet.getPort() + ": server_"+server.server_number+ ": com tamanho de " + packet.getLength() + " bytes");
-                multicastPacket =(MulticastPacket) bytesToObject(packet.getData());
-                if(multicastPacket.getMulticastId() == serverMulticastId){
-                    if(DEBUG)
-                        System.out.println("E do mesmo servidor...");
-                    continue;
-                }else{
-                    if(DEBUG)
-                        System.out.println("sao diferentes servidores");
-                }
-                mensagem = multicastPacket.getData();
-                if (mensagem == null) {
+                    System.out.println("Mensagem recebida por " + packet.getAddress() + ":" +
+                            packet.getPort() + ": server_" + server.server_number + ":" +
+                            " com tamanho de " + packet.getLength() + " bytes");
+                multicastPacket = (MulticastPacket) bytesToObject(packet.getData());
+
+                //verificaçao de erros e author
+                if (multicastPacket == null) {
                     if (DEBUG)
                         System.out.println("Mensagem corrupta recebida...");
                     continue;
                 }
+                if (multicastPacket.getMulticastId() == serverMulticastId) {
+                    if (DEBUG) {
+                        System.out.println("E do mesmo servidor, a ignorar...");
+                    }
+                    continue;
+                }
+                mensagem = multicastPacket.getData();
                 classType = mensagem.getClass();
+
+                //verfica o que fazer com o pacote
                 if (classType == FilePacket.class) {
                     FilePacket m = (FilePacket) mensagem;
                     for (var i : fileSenders) {
@@ -103,8 +159,7 @@ public class UdpMultiCastManager extends Thread {
                     Ping ping = (Ping) mensagem;
                     if (Utils.Consts.DEBUG)
                         System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
-                    servidores.add(servidores.new ServidorExterno(packet.getAddress().toString(), packet.getPort(), ping.getLotacao()));
-
+                    servidores.verifyPing((Ping) mensagem, packet);
                 } else {
                     System.err.println("Undefined object detected");
                 }
@@ -115,6 +170,8 @@ public class UdpMultiCastManager extends Thread {
             System.err.println("Ocorreu um erro alive templateo nivel do socket UDP:\n\t" + e);
         } catch (IOException e) {
             System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         } finally {
             if (multicastSocketReceiver != null) {
                 multicastSocketReceiver.close();
@@ -139,7 +196,7 @@ public class UdpMultiCastManager extends Thread {
         }
         var packet = new DatagramPacket(buf, buf.length, group, UDP_MULTICAST_PORT);
         multicastSocket.send(packet);
-        //TODO: nao sei o que isto faz mas pode ser preciso mais tarde
+        //TODO: nao sei o que isto pode fazer mas pode ser preciso mais tarde rever
 //        return null;
     }
 
@@ -172,7 +229,8 @@ public class UdpMultiCastManager extends Thread {
                 servidores.removeTimedOut();
                 try {
                     sleep(SERVER_VERIFY_SERVERS_TIMER * 1000);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
         }
     }
@@ -186,14 +244,34 @@ public class UdpMultiCastManager extends Thread {
             start();
         }
 
+        private Ping createPing() throws SQLException {
+            if (isServerDad())
+                return new PingPai(server.getTcpConnections_size(), serverStartTimestamp,
+                        server.getServerDB().getChecksum(ServerDB.table_canais),
+                        server.getServerDB().getChecksum(ServerDB.table_canaisDM),
+                        server.getServerDB().getChecksum(ServerDB.table_canaisGrupo),
+                        server.getServerDB().getChecksum(ServerDB.table_mensagens),
+                        server.getServerDB().getChecksum(ServerDB.table_utilizadores)
+                );
+            else
+                return new Ping(server.getTcpConnections_size(), serverStartTimestamp);
+        }
+
         @Override
         public void run() {
             if (Utils.Consts.DEBUG)
                 System.out.println("UdpMultiCast activado iniciado...");
 
-            Ping ping = new Ping();
+            Ping ping;
             while (true) {
-                ping.setLotacao(server.getTcpConnections_size());
+                try {
+                    ping = createPing();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                    if (DEBUG)
+                        System.err.println("erro no criar um ping por causa da base de dados");
+                    continue;
+                }
                 try {
                     enviaMulticast(ping, false);
                 } catch (Exception e) {
@@ -218,29 +296,272 @@ public class UdpMultiCastManager extends Thread {
     /**
      * Guarda a lista de servidores para o Server
      */
-    private class Servidores implements Serializable, Iterable<Servidores.ServidorExterno> {
+    private class Servidores implements Serializable, Iterable<Servidores.ServidorExterno>, List<Servidores.ServidorExterno> {
         List<ServidorExterno> servidoresList;
 
-        Servidores(){
-            servidoresList = Collections.synchronizedList(new LinkedList<ServidorExterno>());
+
+        public void verifyPing(Ping mensagem, DatagramPacket packet) throws SQLException {
+            if (isServerDad())
+                if (mensagem.getServerStartTimestamp() < serverStartTimestamp)
+                    setServerDad(false);
+            if (!isServerDad())
+                if (mensagem instanceof PingPai) {//verifica se esta updated
+                    var mensagemPai = (PingPai) mensagem;
+                    //verifica erros de checksum
+                    if (mensagemPai.getCanaisChecksum() != server.getServerDB().getChecksum(ServerDB.table_canais))
+                        notUpdated(ServerDB.table_canais);
+                    else if (mensagemPai.getCanaisDMChecksum() != server.getServerDB().getChecksum(ServerDB.table_canaisDM))
+                        notUpdated(ServerDB.table_canaisDM);
+                    else if (mensagemPai.getCanaisGroupoChecksum() != server.getServerDB().getChecksum(ServerDB.table_canaisGrupo))
+                        notUpdated(ServerDB.table_canaisGrupo);
+                    else if (mensagemPai.getMensagensChecksum() != server.getServerDB().getChecksum(ServerDB.table_mensagens))
+                        notUpdated(ServerDB.table_mensagens);
+                    else if (mensagemPai.getUtilizadoresChecksum() != server.getServerDB().getChecksum(ServerDB.table_utilizadores))
+                        notUpdated(ServerDB.table_utilizadores);
+                    else setServerUpdated(true);
+                }
+
+            var servidorExterno = new ServidorExterno(packet.getAddress().toString(), packet.getPort(), mensagem.getLotacao(), mensagem.getServerStartTimestamp());
+
+            boolean updated = false;
+            for (ServidorExterno i : this) {
+                if (i.equals(servidorExterno)) {
+                    i.setLotacao(servidorExterno.lotacao);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated)
+                add(servidorExterno);
         }
 
-        public void removeTimedOut() {
-            var it = this.iterator();
-            while (it.hasNext()) {
-                it.next();
-                if ((Utils.getTimeStamp() - it.next().getActualizado()) > TIMEOUT_PINGS)
-                    it.remove();
+
+        /**
+         * Guarda as informações de um servidor externo
+         */
+        public class ServidorExterno extends IpPort implements Comparable<ServidorExterno>, Serializable, Cloneable {
+
+            private int lotacao;
+
+            /**
+             * ultima vez que o server foi verificado
+             */
+            private long verificado;
+
+            private final long serverStartTimestamp;
+
+            public ServidorExterno(String ip, int port, int lotacao, long serverStartTimeStamp) {
+                super(ip, port);
+                this.lotacao = lotacao;
+                this.serverStartTimestamp = serverStartTimeStamp;
+                setActualizado();
+            }
+
+            public IpPort getForClient() {
+                try {
+                    return (IpPort) super.clone();
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+
+            public long getServerStartTimestamp() {
+                return serverStartTimestamp;
+            }
+
+            public int getLotacao() {
+                return lotacao;
+            }
+
+            public void setLotacao(int lotacao) {
+                if (lotacao >= 0)
+                    this.lotacao = lotacao;
+                setActualizado();
+            }
+
+            public long getVerificado() {
+                return verificado;
+            }
+
+            public void setActualizado() {
+                this.verificado = getTimeStamp();
+            }
+
+            /**
+             * @param ipss do tipo {@link ServidorExterno}
+             * @return diferença de locação
+             */
+            @Override
+            public int compareTo(ServidorExterno ipss) {
+                return lotacao - ipss.getLotacao();
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                if (!super.equals(o)) return false;
+                ServidorExterno that = (ServidorExterno) o;
+                return serverStartTimestamp == that.serverStartTimestamp;
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(super.hashCode(), lotacao, verificado, serverStartTimestamp);
             }
         }
 
+
+        @Override
+        public int size() {
+            return servidoresList.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return servidoresList.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return servidoresList.contains(o);
+        }
+
+        @Override
+        public Object[] toArray() {
+            return servidoresList.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return servidoresList.toArray(a);
+        }
+
+        @Override
         public boolean add(ServidorExterno servidorExterno) {
-            for (var i : this)
-                if (i.equals(servidorExterno)) {
-                    i.setLotacao(servidorExterno.getLotacao());
-                    return true;
-                }
             return servidoresList.add(servidorExterno);
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return servidoresList.remove(o);
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return servidoresList.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends ServidorExterno> c) {
+            return servidoresList.addAll(c);
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends ServidorExterno> c) {
+            return servidoresList.addAll(index, c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return servidoresList.removeAll(c);
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return servidoresList.retainAll(c);
+        }
+
+        @Override
+        public void replaceAll(UnaryOperator<ServidorExterno> operator) {
+            servidoresList.replaceAll(operator);
+        }
+
+        @Override
+        public void sort(Comparator<? super ServidorExterno> c) {
+            servidoresList.sort(c);
+        }
+
+        @Override
+        public void clear() {
+            servidoresList.clear();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return servidoresList.equals(o);
+        }
+
+        @Override
+        public int hashCode() {
+            return servidoresList.hashCode();
+        }
+
+        @Override
+        public ServidorExterno set(int index, ServidorExterno element) {
+            return servidoresList.set(index, element);
+        }
+
+        @Override
+        public void add(int index, ServidorExterno element) {
+            servidoresList.add(index, element);
+        }
+
+        @Override
+        public ServidorExterno remove(int index) {
+            return servidoresList.remove(index);
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return servidoresList.indexOf(o);
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return servidoresList.lastIndexOf(o);
+        }
+
+        @Override
+        public ListIterator<ServidorExterno> listIterator() {
+            return servidoresList.listIterator();
+        }
+
+        @Override
+        public ListIterator<ServidorExterno> listIterator(int index) {
+            return servidoresList.listIterator(index);
+        }
+
+        @Override
+        public List<ServidorExterno> subList(int fromIndex, int toIndex) {
+            return servidoresList.subList(fromIndex, toIndex);
+        }
+
+        Servidores() {
+            servidoresList = Collections.synchronizedList(new LinkedList<ServidorExterno>());
+        }
+
+        /**
+         * Verifica aqueles que estao em timeout e se este e' o server pai
+         */
+        public void removeTimedOut() {
+            var it = this.iterator();
+            ServidorExterno se;
+            long lowestTime = serverStartTimestamp;
+            while (it.hasNext()) {
+                se = it.next();
+                if ((Utils.getTimeStamp() - se.getVerificado()) > TIMEOUT_PINGS)
+                    it.remove();
+                else {
+                    if (se.serverStartTimestamp < lowestTime)
+                        lowestTime = se.serverStartTimestamp;
+                }
+            }
+            //faz ser o pai
+            if (lowestTime >= serverStartTimestamp)
+                setServerDad(true);
         }
 
         public LinkedList<IpPort> getServidoresForClient() {
@@ -265,62 +586,19 @@ public class UdpMultiCastManager extends Thread {
         }
 
 
-        /**
-         * Guarda as informações de um servidor externo
-         */
-        public class ServidorExterno extends IpPort implements Comparable<ServidorExterno>, Serializable, Cloneable {
-
-            private int lotacao;
-
-            /**
-             * ultima vez que o server foi actualizado
-             */
-            private long actualizado;
-
-            ServidorExterno(String ip, int port, int lotacao) {
-                super(ip, port);
-                this.lotacao = lotacao;
-                setActualizado();
-            }
-
-            public IpPort getForClient() {
-                try {
-                    return (IpPort) super.clone();
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-
-            public int getLotacao() {
-                return lotacao;
-            }
-
-            public void setLotacao(int lotacao) {
-                if (lotacao >= 0)
-                    this.lotacao = lotacao;
-                setActualizado();
-            }
-
-            public long getActualizado() {
-                return actualizado;
-            }
-
-            public void setActualizado() {
-                this.actualizado = getTimeStamp();
-            }
-
-            /**
-             * @param ipss do tipo {@link ServidorExterno}
-             * @return diferença de locação
-             */
-            @Override
-            public int compareTo(ServidorExterno ipss) {
-                return lotacao - ipss.getLotacao();
-            }
-        }
     }
+
+    /**
+     * Muda o estado para nao updated, o que quer dizer que os outros servidores tem de tirar lo da lista e so adicionam quando ele assim estiver updated
+     *
+     * @param tabela que nao esta actualizada
+     */
+    private void notUpdated(String tabela) {
+        setServerUpdated(false);
+        //enviar o pedido para rever a tabela
+
+    }
+    //TODO: testar a transferencia de ficheiros
 
     /**
      * Recebe fichieros por udp
@@ -412,7 +690,7 @@ public class UdpMultiCastManager extends Thread {
                     } else {//caso tenhao recebido exatamente onde deve começar
                         file.write(filePacket.getContent());
                         //if (filePacket.setComplete()) {
-                            //completed();
+                        //completed();
                         //}
                     }
 
@@ -443,8 +721,9 @@ public class UdpMultiCastManager extends Thread {
                 }
             }
         }
+
         private void completed() {
-            try{
+            try {
                 file.close();
             } catch (IOException e) {
                 e.printStackTrace();
