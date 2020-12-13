@@ -50,7 +50,6 @@ public class CriaBaseDeDados {
 
     }
 
-
     void sql(int i, boolean resetar) {
         try {
             if (resetar)
@@ -71,7 +70,7 @@ public class CriaBaseDeDados {
                     "    id int not NULL unique auto_increment,\n" +
                     "    pessoaCria   int  not null,\n" +
                     "    primary key (id),\n" +
-                    "    foreign key (pessoaCria) references utilizadores (id)\n" +
+                    "    foreign key (pessoaCria) references utilizadores (id) ON DELETE CASCADE\n" +
                     ");\n" +
                     "\n" +
                     "\n");
@@ -81,7 +80,7 @@ public class CriaBaseDeDados {
                     "    nome        text not null,\n" +
                     "    descricao   text,\n" +
                     "    password    text not null,\n" +
-                    "    foreign key (id) references canais (id)\n" +
+                    "    foreign key (id) references canais (id) ON DELETE CASCADE\n" +
                     ");");
 
             //criar canais, para saber de que para quem e a mensagem
@@ -89,8 +88,8 @@ public class CriaBaseDeDados {
                     "(\n" +
                     "    id    int not null,\n" +
                     "    pessoaDest   int  not null,\n" +
-                    "    foreign key (id) references canais (id),\n" +
-                    "    foreign key (pessoaDest) references utilizadores (id)\n" +
+                    "    foreign key (id) references canais (id) ON DELETE CASCADE,\n" +
+                    "    foreign key (pessoaDest) references utilizadores (id) ON DELETE CASCADE\n" +
                     ");");
             stmt.execute("create table if not exists mensagens\n" +
                     "(\n" +
@@ -101,8 +100,8 @@ public class CriaBaseDeDados {
                     "    isAFile       bool                                not null,\n" +
                     "    mensagem      varchar(900),\n" +
                     "    PRIMARY KEY (id),\n" +
-                    "    FOREIGN KEY (authorId) REFERENCES utilizadores (id),\n" +
-                    "    foreign key (canalId) references canais (id)\n" +
+                    "    FOREIGN KEY (authorId) REFERENCES utilizadores (id) ON DELETE CASCADE,\n" +
+                    "    foreign key (canalId) references canais (id) ON DELETE CASCADE\n" +
                     ");");
             stmt.execute("CREATE USER IF NOT EXISTS `server_" + i + "`@`localhost` IDENTIFIED BY 'W-pass-123';\n");
             stmt.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON * TO `server_" + i + "`@`localhost`;\n");

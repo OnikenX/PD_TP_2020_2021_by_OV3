@@ -28,6 +28,7 @@ public class ServerDB {
     public final static String table_canaisDM = "canaisDM";
     public final static String table_canaisGrupo = "canaisGrupo";
     public final static String table_mensagens = "mensagens";
+
     //connections
     public static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final int DB_PORT = 3306;
@@ -115,13 +116,14 @@ public class ServerDB {
         return verifyExistenceOf(table, "id = " + id);
     }
 
-    private boolean deleteItem(String table, int id) throws SQLException {
-        if (!verifyItemInTable(id, table))
-            return false;
-        //todo: acabar isto
-        return true;
-        //getStatement().executeUpdate();
+    public int deleteCanal(int id) throws SQLException {
+        if (!verifyItemInTable(id, table_canais))
+            return 0;
+        return getStatement().executeUpdate("delete FROM canais where id = " + id + ";");
     }
+
+
+
 
     public int getTableLastMax(String tablename) throws SQLException {
         var rs = getStatement().executeQuery("SELECT MAX(id) FROM " + tablename);
@@ -150,6 +152,7 @@ public class ServerDB {
     //canaldm
     public int addCanalDM(int pessoaCria, int pessoaDest) throws SQLException {
         return addCanalDM(-1, pessoaCria, pessoaDest);
+
     }
 
     synchronized public int addCanalDM(int canal_id, int pessoaCria, int pessoaDest) throws SQLException {
@@ -169,6 +172,12 @@ public class ServerDB {
         );
         return canal_id;
     }
+
+    //canalgroup
+    synchronized public int addCanalGroup(int pessoaCria, int pessoaDest) throws SQLException {
+        return addCanalGroup(-1, pessoaCria, pessoaDest);
+    }
+
 
     synchronized public int addCanalGroup(int canal_id, int pessoaCria, int pessoaDest) throws SQLException {
         if (canal_id == -1)

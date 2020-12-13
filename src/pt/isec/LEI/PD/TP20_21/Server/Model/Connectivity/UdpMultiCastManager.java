@@ -155,7 +155,7 @@ public class UdpMultiCastManager extends Thread {
                             break;
                         }
                     }
-                } else if (classType == Ping.class) {
+                } else if (mensagem instanceof Ping) {
                     Ping ping = (Ping) mensagem;
                     if (Utils.Consts.DEBUG)
                         System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
@@ -595,6 +595,9 @@ public class UdpMultiCastManager extends Thread {
      */
     private void notUpdated(String tabela) {
         setServerUpdated(false);
+        if(DEBUG)
+            System.out.println("nao esta updetado no "+tabela);
+
         //enviar o pedido para rever a tabela
 
     }
