@@ -77,7 +77,7 @@ public class UdpServerClientPreConnection extends Thread {
                 try {
                     if (!conectar.isRegistado()) {//registar utilizador
                         //verificar se existe o username
-                        if (server.getServerData().userExist(conectar.getUsername())) {
+                        if (server.getServerDB().userExist(conectar.getUsername())) {
                             //resposta = new Comunicacoes.PedidoDeLigar(Utils.Consts.ERROR_USER_ALREADY_EXISTS, server.udpMultiCastManager.getServidoresForClient());
                             if (Utils.Consts.DEBUG)
                                 System.out.println("[registo]O utilizador ja existe...");
@@ -86,7 +86,7 @@ public class UdpServerClientPreConnection extends Thread {
                             registar = true;
                         }
                     } else//verifica login
-                        if (!server.getServerData().verifyUser(conectar.getUsername(), conectar.getPassword())) {
+                        if (!server.getServerDB().verifyUser(conectar.getUsername(), conectar.getPassword())) {
                             resposta = new PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
                         }
                 } catch (Exception e) {
@@ -105,7 +105,7 @@ public class UdpServerClientPreConnection extends Thread {
                                 System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");
                             if (registar) {
                                 try {
-                                    server.getServerData().addUser(conectar.getUsername(), conectar.getUsername(), Password.getSaltedHash(conectar.getPassword()));
+                                    server.getServerDB().addUser(conectar.getUsername(), conectar.getUsername(), Password.getSaltedHash(conectar.getPassword()));
                                     if (Utils.Consts.DEBUG)
                                         System.out.println("[registo] um novo user foi adicionado");
                                 } catch (Exception e) {

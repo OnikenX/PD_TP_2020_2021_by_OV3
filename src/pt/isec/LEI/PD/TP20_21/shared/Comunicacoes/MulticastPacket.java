@@ -2,6 +2,9 @@ package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes;
 
 import java.io.Serializable;
 
+/**
+ * Class que serve para enviar packotes em muliticast, serve como wrapper para mais informaçao
+ */
 public  class MulticastPacket implements Serializable {
     private int multicastId;
     private Object data;
@@ -22,8 +25,7 @@ public  class MulticastPacket implements Serializable {
         return multicastId;
     }
 
-    public MulticastPacket() {
-    }
+    public MulticastPacket() {}
 
     public MulticastPacket(int multicastId) {
         this.multicastId = multicastId;

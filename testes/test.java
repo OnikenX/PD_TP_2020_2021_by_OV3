@@ -1,23 +1,46 @@
+import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Objects;
 
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.JDBC_DRIVER;
+import static pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB.DB_URL;
+import static pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB.JDBC_DRIVER;
 import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
-public class test {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        //Connection conn =
+class supertest implements Serializable{}
+
+
+public class test extends supertest {
+    public static void main(String[] args) {
+        System.out.println(test.class instanceof Serializable);
+
+    }
+
+
+
+    static void someSqlTest() throws SQLException, InterruptedException {
+        Connection conn = conn = DriverManager.getConnection(DB_URL + 1, "server_1", "W-pass-123");
+        conn.setAutoCommit(true);
+        var stmt = conn.createStatement();
+        var rs = stmt.executeQuery("checksum table " + ServerDB.DB_TABLE + 1 + ".utilizadores;");
+        Thread.sleep(10);
+        System.out.println("vou imprimir:");
+        if (rs.next())
+            System.out.println(rs.getLong(2));
+        long returned=-1;
+        rs = stmt.executeQuery("checksum table " + ServerDB.DB_TABLE + 1 + ".mensagens;");
+        if(rs.next())
+            returned = rs.getLong(2);
+        rs.close();
+//        return returned;
     }
 
     static void testSender() throws IOException {

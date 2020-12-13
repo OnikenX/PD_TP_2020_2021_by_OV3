@@ -9,7 +9,8 @@ public class PingPai extends Ping {
     private final long utilizadoresChecksum;
 
 
-    public PingPai(long canaisChecksum, long canaisDMChecksum, long canaisGroupoChecksum, long mensagensChecksum, long utilizadoresChecksum) {
+    public PingPai(int lotacao, long serverStartTimestamp,  long canaisChecksum , long canaisDMChecksum, long canaisGroupoChecksum, long mensagensChecksum, long utilizadoresChecksum) {
+        super(lotacao, serverStartTimestamp);
         this.canaisChecksum = canaisChecksum;
         this.canaisDMChecksum = canaisDMChecksum;
         this.canaisGroupoChecksum = canaisGroupoChecksum;

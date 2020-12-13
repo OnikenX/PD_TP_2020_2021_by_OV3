@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -111,13 +110,6 @@ public class TcpManager {
                         //adicinar coluna do canal normal e dm if not exist
 
 
-                        try {
-                            //
-
-                            server.getServerData().executeUpdate("");
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
                     }
                 }
             } catch (IOException e) {

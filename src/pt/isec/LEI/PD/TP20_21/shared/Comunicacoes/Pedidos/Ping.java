@@ -3,27 +3,19 @@ package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos;
 import java.io.Serializable;
 
 public class Ping implements Serializable, Pedido {
-    private int lotacao;
+    private final int lotacao;
 //        public static int SIZE = (Objects.requireNonNull(objectToBytes(new Ping())).length);
-    private boolean updated;
+    private final long serverStartTimestamp;
 
-    public Ping(int lotacao, boolean updated) {
-        this.lotacao = lotacao;this.updated = updated;
+    public Ping(int lotacao,long serverStartTimestamp) {
+        this.lotacao = lotacao;this.serverStartTimestamp = serverStartTimestamp;
     }
 
     public int getLotacao() {
         return lotacao;
     }
-
-    public boolean isUpdated() {
-        return updated;
+    public long getServerStartTimestamp() {
+        return serverStartTimestamp;
     }
 
-    public void setUpdated(boolean updated) {
-        this.updated = updated;
-    }
-
-    public void setLotacao(int lotacao) {
-        this.lotacao = lotacao;
-    }
 }
