@@ -20,6 +20,10 @@ public class TextUserInterface {
         UI();
     }
 
+    public void registar() {
+
+    }
+
 
     int menuPrincipal() {
         int op;

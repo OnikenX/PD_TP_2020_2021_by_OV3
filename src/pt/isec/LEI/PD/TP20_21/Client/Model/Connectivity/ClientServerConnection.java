@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.Model.Connectivity;
 
 import pt.isec.LEI.PD.TP20_21.Client.ClientObservavel;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.ListasParaOClient;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.PedidoDeLigar;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
@@ -29,11 +30,11 @@ public class ClientServerConnection extends Thread {
     private OutputStream osTCP = null;
     private PipedOutputStream outputPipe;
     private PipedInputStream inputPipe;
-    private ClientObservavel co;
+    private ClientObservavel clientObservavel;
 
 
-    public ClientServerConnection(ClientObservavel co) {
-        this.co = co;
+    public ClientServerConnection(ClientObservavel clientObservavel) {
+        this.clientObservavel = clientObservavel;
     }
 
     public PipedInputStream getInputPipe() {
@@ -114,11 +115,15 @@ public class ClientServerConnection extends Thread {
                 if (Utils.Consts.DEBUG)
                     System.out.println("Recebido um objeto");
 
-                if (receivedObject.getClass() == Mensagem.class) {
+                if (receivedObject == Mensagem.class){
                     outputPipe.write(receivedBytes);
                     outputPipe.flush();
-                } else {
-                    //TODO: adicionar os outros casos
+                }else if(receivedObject.getClass() == ListasParaOClient.class) {
+                    clientObservavel.getClientModel().processListaParaOClient((ListasParaOClient) receivedObject);
+
+                }
+                else{
+                    System.err.println("Nao sei o que fazer com isto.");
                 }
             }
         } catch (IOException e) {

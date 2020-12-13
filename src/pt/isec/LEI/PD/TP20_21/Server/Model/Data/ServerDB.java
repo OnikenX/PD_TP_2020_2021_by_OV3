@@ -309,7 +309,7 @@ public class ServerDB {
     public void verificaMudancas(ArrayList<Object> lista, String tabela) throws Exception {
         var statment = getConn().createStatement();
         var statmenttemp = getConn().createStatement();
-        var rs = statment.executeQuery("select * from " + tabela + ";");
+        var rs = statment.executeQuery("select * from " + tabela + " order by id;");
         int id;
         ResultSet rstemp = null;
         while (rs.next()) {
@@ -318,8 +318,8 @@ public class ServerDB {
                     id = rs.getInt(1);
                     rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
                     rstemp.next();
-                    ll.add(new CanalDM(id, rs.getInt(2), rstemp.getInt(2)));
-                    if()
+                    id, rs.getInt(2), rstemp.getInt(2)
+                    if(id == )
                     break;
                 case table_canaisGrupo:
                     id = rs.getInt(1);
@@ -345,34 +345,7 @@ public class ServerDB {
     }
 
 
-    public void ListaParaUser(String tabela) throws Exception {
-        var st = getConn().createStatement();
-        ResultSet rs = null;
-        if(tabela.equals(table_mensagens)) {
-            rs = st.executeQuery("select * from "+table_mensagens+";");
-        } else if(tabela.equals(table_utilizadores)) {
-            rs = st.executeQuery("select * from "+ table_utilizadores+";");
-        } else if(tabela.equals(table_canaisDM)) {
-            st.executeQuery("SELECT canais.id, pessoaCria, pessoaDest " +
-                    "FROM canais INNER JOIN canaisDM cD on canais.id = cD.id;");
-        } else if(tabela.equals(table_canaisGrupo)) {
-            rs = st.executeQuery("SELECT canais.id ,pessoaCria, nome, descricao, password  " +
-                    "FROM canais INNER JOIN canaisGrupo cD on canais.id = cD.id;");
-        }else throw new Exception("tabela nao supportada");
-        while(rs.next()) {
-            if(tabela.equals(table_mensagens)) {//int Timestamp int int tinyint/bool String
-                rs.getInt()
-            } else if(tabela.equals(table_utilizadores)) {//int String String
 
-            } else if(tabela.equals(table_canaisDM)) {//int int int
-
-            } else if(tabela.equals(table_canaisGrupo)) {//int int String String String
-
-            }
-        }
-        rs.close();
-        st.close();
-    }
 
 }
 

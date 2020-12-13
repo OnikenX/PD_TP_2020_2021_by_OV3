@@ -17,6 +17,18 @@ public class ClientObservavel {
     private ClientModel clientModel;
     private ClientServerConnection clientServerConnection;
 
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        return propertyChangeSupport;
+    }
+
+    public ClientModel getClientModel() {
+        return clientModel;
+    }
+
+    public ClientServerConnection getClientServerConnection() {
+        return clientServerConnection;
+    }
+
     public ClientObservavel() {
         clientServerConnection = new ClientServerConnection(this);
         clientModel = new ClientModel(clientServerConnection);

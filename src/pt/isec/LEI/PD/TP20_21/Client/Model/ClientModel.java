@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.Model;
 
 import pt.isec.LEI.PD.TP20_21.Client.Model.Connectivity.ClientServerConnection;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.ListasParaOClient;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.*;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.Canal;
@@ -14,11 +15,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ClientModel {
-    private List<Utilizador> listUsers = Collections.synchronizedList(new LinkedList<>());
-    private List<Canal> listCanais = Collections.synchronizedList(new LinkedList<>());
-    private List<Mensagem> listMensagens = Collections.synchronizedList(new LinkedList<>());
+    private List<Utilizador> listUsers;
+    private List<Canal> listCanais;
+    private List<Mensagem> listMensagens;
     private Conectar pedido;
     private ClientServerConnection csc;
+
+    public void processListaParaOClient(ListasParaOClient lista){
+        lista.;
+
+    }
 
     public Conectar getPedido() {
         return pedido;
@@ -35,7 +41,6 @@ public class ClientModel {
     /**
      *
      */
-
     public boolean mandaMensPessoal(String usernameRemetente, String userQueManda, String conteudo) {
         try {
             csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemDM(userQueManda, usernameRemetente, conteudo)));
@@ -66,6 +71,7 @@ public class ClientModel {
     }
     public List<Canal> listadeTudo(String user) {
         try {
+
             csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
             byte[] input = csc.getInputPipe().readAllBytes();
             Object obj = Utils.bytesToObject(input);

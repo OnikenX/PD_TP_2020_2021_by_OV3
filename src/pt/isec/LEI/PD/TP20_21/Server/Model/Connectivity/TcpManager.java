@@ -1,10 +1,11 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 
+import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.ListasParaOClient;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemDM;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemGrupo;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Pedido;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
@@ -14,10 +15,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Objects;
+
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.objectToBytes;
 
 /**
  * Faz a connecção inicial do client
@@ -89,7 +91,7 @@ public class TcpManager {
 
         //Message sender
         public void sendMessage(Object o) throws IOException {
-            oS.write(Objects.requireNonNull(Utils.objectToBytes(o)));
+            oS.write(Objects.requireNonNull(objectToBytes(o)));
         }
 
 
@@ -113,7 +115,11 @@ public class TcpManager {
                 s = serverSocket.accept();
                 iS = s.getInputStream();
                 oS = s.getOutputStream();
-                var serverDB = server.getServerData();
+                var serverDB = server.getServerDB();
+                oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisDM), ServerDB.table_canaisDM))));
+                oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisGrupo), ServerDB.table_canaisGrupo))));
+                oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_utilizadores), ServerDB.table_utilizadores))));
+                oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_mensagens), ServerDB.table_mensagens))));
                 while (!stop) {
                     input = Utils.bytesToObject(iS.readAllBytes());
                     if(input.getClass() == Conectar.class){
@@ -121,26 +127,22 @@ public class TcpManager {
                         //adicinar coluna do canal normal e dm if not exist
 
 
-                        try {
-                            //
+                        //
 
-                            server.getServerData().executeUpdate("");
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
+                        server.getServerDB();
                     }
                     if(input.getClass() == MensagemDM.class) {
                         MensagemDM msg = (MensagemDM) input;
 
                         //serverDB.addUser(msg.getUserEnvia())
                         Object res = null; //que vem da bd
-                        oS.write(Utils.objectToBytes(res));
+                        oS.write(objectToBytes(res));
                     }
                     else if(input.getClass() == MensagemGrupo.class) {
                         MensagemGrupo msg = (MensagemGrupo) input;
                         // cenas
                         Object res = null; //que vem da bd
-                        oS.write(Utils.objectToBytes(res));
+                        oS.write(objectToBytes(res));
                     }
                 }
             } catch (IOException /*SQLException*/ e) {
@@ -150,6 +152,8 @@ public class TcpManager {
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
