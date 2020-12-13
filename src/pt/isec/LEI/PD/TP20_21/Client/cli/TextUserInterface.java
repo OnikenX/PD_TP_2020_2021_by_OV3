@@ -151,7 +151,6 @@ public class TextUserInterface {
         System.out.println("Digite o username da pessoa: ");
         String nomePessoa = getInput("username da pessoa");
 
-
     }
 
     /**

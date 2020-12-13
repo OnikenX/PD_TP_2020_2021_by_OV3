@@ -35,6 +35,7 @@ public class ClientModel {
     /**
      *
      */
+
     public boolean mandaMensPessoal(String usernameRemetente, String userQueManda, String conteudo) {
         try {
             csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemDM(userQueManda, usernameRemetente, conteudo)));
@@ -45,6 +46,7 @@ public class ClientModel {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
         return true;
     }
@@ -62,8 +64,7 @@ public class ClientModel {
         }
         return true;
     }
-
-    public List<Canal> listaCanais(String user) {
+    public List<Canal> listadeTudo(String user) {
         try {
             csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
             byte[] input = csc.getInputPipe().readAllBytes();
@@ -73,7 +74,23 @@ public class ClientModel {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
+        return
+    }
+    public List<Canal> listaUsers(String user) {
+        try {
+            csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
+            byte[] input = csc.getInputPipe().readAllBytes();
+            Object obj = Utils.bytesToObject(input);
+            if (obj instanceof Respostas) {
+                //sera que posso receber lista ou tem de ser 1 a 1?
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return
     }
 
     public List<Double> listaCanais(String canal) {

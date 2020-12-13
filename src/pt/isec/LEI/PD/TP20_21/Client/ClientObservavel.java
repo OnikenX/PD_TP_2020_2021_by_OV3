@@ -37,10 +37,10 @@ public class ClientObservavel {
     public void setPedido(Conectar pedido) {
         clientModel.setPedido(pedido);
     }
-
+/*
     public boolean adicionaPessoa(String username) {
         return clientModel.mandaMensPessoal(username);
-    }
+    }*/
 
     public List<Utilizador> getListUsers() {
         return clientModel.getListUsers();
