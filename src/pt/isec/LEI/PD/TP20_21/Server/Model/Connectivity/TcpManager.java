@@ -122,7 +122,6 @@ public class TcpManager {
                     }
                     if(input.getClass() == MensagemDM.class) {
                         MensagemDM msg = (MensagemDM) input;
-
                         //serverDB.addUser(msg.getUserEnvia())
 
                     }

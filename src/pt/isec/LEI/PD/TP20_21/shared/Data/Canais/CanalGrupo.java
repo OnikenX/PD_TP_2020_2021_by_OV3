@@ -1,20 +1,38 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Canais;
 
 public class CanalGrupo extends Canal {
-    private final int moderadorId;
-    private final  String password;
+    private String nome;
+    private String descricao;
+    private String password;
 
-    public CanalGrupo(int id, String nome, String descricao, int moderadorId, String password) {
-        super(id, nome, descricao);
-        this.moderadorId = moderadorId;
-        this.password = password;
+    public String getNome() {
+        return nome;
     }
 
-    public int getModeradorId() {
-        return moderadorId;
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public CanalGrupo(int id, int pessoaCria, String nome, String descricao, String password) {
+        super(id, pessoaCria);
+        this.nome = nome;
+        this.descricao = descricao;
+        this.password = password;
     }
 }
