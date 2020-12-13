@@ -51,6 +51,7 @@ public class ClientModel {
 
     public boolean mandaMensCanais(String grupoNome, String conteudo, String userQueEnvia) {
         try {
+
             csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemGrupo(userQueEnvia, grupoNome, conteudo)));
             byte[] input = csc.getInputPipe().readAllBytes();
             Object obj = Utils.bytesToObject(input);

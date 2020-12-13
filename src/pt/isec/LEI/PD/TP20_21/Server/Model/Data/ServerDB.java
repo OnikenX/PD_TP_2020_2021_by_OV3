@@ -2,11 +2,17 @@ package pt.isec.LEI.PD.TP20_21.Server.Model.Data;
 
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalDM;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.UtilizadorServer;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.*;
+import static pt.isec.LEI.PD.TP20_21.shared.Utils.Consts.DEBUG;
 
 /**
  * Faz manegamento dos objectos na memoria, toma conta dos dados e mexe na database
@@ -106,15 +112,15 @@ public class ServerDB {
     }
 
     private boolean verifyItemInTable(int id, String table) throws SQLException {
-        return verifyExistenceOf(table, "id = "+id);
+        return verifyExistenceOf(table, "id = " + id);
     }
 
     private boolean deleteItem(String table, int id) throws SQLException {
-               if(!verifyItemInTable(id, table))
-                   return false;
-               //todo: acabar isto
-               return true;
-               //getStatement().executeUpdate();
+        if (!verifyItemInTable(id, table))
+            return false;
+        //todo: acabar isto
+        return true;
+        //getStatement().executeUpdate();
     }
 
     public int getTableLastMax(String tablename) throws SQLException {
@@ -131,8 +137,6 @@ public class ServerDB {
 
     synchronized public int addUser(int id, String username, String name, String hash) throws SQLException {
         if (id == -1) {
-
-
             getStatement().executeUpdate("INSERT INTO utilizadores (username,nome, hash)\n" +
                     "VALUES ('" + username + "', '" + name + "', '" + hash + "');");
         } else {
@@ -166,6 +170,59 @@ public class ServerDB {
         return canal_id;
     }
 
+    synchronized public int addCanalGroup(int canal_id, int pessoaCria, int pessoaDest) throws SQLException {
+        if (canal_id == -1)
+            getStatement().executeUpdate(
+                    "INSERT INTO " + table_canais + " (pessoaCria) VALUES (" + pessoaCria + ");"
+            );
+        else {
+            //TODO: verificar se a tabela existe
+            getStatement().executeUpdate(
+                    "INSERT INTO " + table_canais + " (id, pessoaCria) VALUES (" + canal_id + ", " + pessoaCria + ");"
+            );
+        }
+
+        canal_id = getTableLastMax(table_canais);
+        getStatement().executeUpdate(
+                "INSERT INTO " + table_canaisDM + " (canal_id) VALUES (" + canal_id + ", " + pessoaDest + ");"
+        );
+        return canal_id;
+    }
+
+    public List<Object> getListaTabela(String tabela) throws Exception {
+        var statment = conn.createStatement();
+        var statmenttemp = conn.createStatement();
+        var rs = statment.executeQuery("select * from " + tabela + ";");
+
+        List<Object> ll = new LinkedList<Object>();
+        int id;
+        ResultSet rstemp;
+        while (rs.next()) {
+            switch (tabela) {
+                case table_canaisDM:
+                    id = rs.getInt(1);
+                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp.next();
+                    ll.add(new CanalDM(id, rs.getInt(2), rstemp.getInt(2)));
+                    break;
+                case table_canaisGrupo:
+                    id = rs.getInt(1);
+                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp.next();
+                    ll.add(new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
+                    break;
+                case table_mensagens:
+                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
+                    break;
+                case table_utilizadores:
+                    ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
+                    break;
+                default:
+                    throw new Exception("Tabela nao existe.");
+            }
+        }
+        return ll;
+    }
 }
 
 

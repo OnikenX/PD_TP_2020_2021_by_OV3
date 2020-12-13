@@ -1,17 +1,25 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
 public class Utilizador {
-    protected String username;
-    protected String nome;
-    public Utilizador(String username, String nome){
-        this.username = username;
-        this.nome = nome;
+    private final int id;
+    private final String username;
+    private final String nome;
+
+
+    public int getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public String getUsername() {
-        return username;
+    public Utilizador(int id, String username, String nome) {
+        this.id = id;
+        this.username = username;
+        this.nome = nome;
     }
 }
