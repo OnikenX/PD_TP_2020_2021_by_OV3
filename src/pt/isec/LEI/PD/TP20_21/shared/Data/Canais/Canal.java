@@ -1,6 +1,8 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Canais;
 
-public abstract class Canal {
+import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
+
+public abstract class Canal  implements DataBase {
     private final int id;
     private final int pessoaCria;
 

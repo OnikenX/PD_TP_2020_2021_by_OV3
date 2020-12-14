@@ -1,6 +1,8 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Canais;
 
-public class CanalGrupo extends Canal {
+import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
+
+public class CanalGrupo extends Canal  implements DataBase {
     private String nome;
     private String descricao;
     private String password;

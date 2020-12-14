@@ -2,7 +2,6 @@ package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos;
 
 public class PingPai extends Ping {
 
-    private final long canaisChecksum;
     private final long canaisDMChecksum;
     private final long canaisGroupoChecksum;
     private final long mensagensChecksum;
@@ -11,16 +10,12 @@ public class PingPai extends Ping {
 
     public PingPai(int lotacao, long serverStartTimestamp,  long canaisChecksum , long canaisDMChecksum, long canaisGroupoChecksum, long mensagensChecksum, long utilizadoresChecksum) {
         super(lotacao, serverStartTimestamp);
-        this.canaisChecksum = canaisChecksum;
         this.canaisDMChecksum = canaisDMChecksum;
         this.canaisGroupoChecksum = canaisGroupoChecksum;
         this.mensagensChecksum = mensagensChecksum;
         this.utilizadoresChecksum = utilizadoresChecksum;
     }
 
-    public long getCanaisChecksum() {
-        return canaisChecksum;
-    }
 
     public long getCanaisDMChecksum() {
         return canaisDMChecksum;

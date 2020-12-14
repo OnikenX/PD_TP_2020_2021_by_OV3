@@ -1,6 +1,6 @@
 package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes;
 
-import java.util.List;
+import java.util.*;
 
 public class ListasParaOClient {
     private final List<Object> list;

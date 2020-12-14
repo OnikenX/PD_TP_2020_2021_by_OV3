@@ -3,6 +3,7 @@ package pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.ListasParaOClient;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.ApagarGroupo;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemDM;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemGrupo;
@@ -82,7 +83,6 @@ public class TcpManager {
 
         //TODO: ver a sincronização de threads e proteção de dados em multithreads
 
-
         public void setStop(boolean stop) {
             this.stop = stop;
         }
@@ -90,6 +90,7 @@ public class TcpManager {
         public int getPort() {
             return port;
         }
+
 
 
         //Message sender
@@ -137,7 +138,7 @@ public class TcpManager {
                     if(input.getClass() == MensagemDM.class) {
                         MensagemDM msg = (MensagemDM) input;
 
-                        //serverDB.addUser(msg.getUserEnvia())
+                        server.getServerDB().mensagemDM(Timestamp.from(Instant.now()),  ((MensagemDM) input).getUserEnvia(), ((MensagemDM) input).getUserRecebe() , ((MensagemDM) input).isAFile(), ((MensagemDM) input).getConteudo());
                         Object res = null; //que vem da bd
                         oS.write(objectToBytes(res));
                     }
@@ -146,6 +147,8 @@ public class TcpManager {
                         // cenas
                         Object res = null; //que vem da bd
                         oS.write(objectToBytes(res));
+                    }else if (input.getClass() == ApagarGroupo.class){
+                        server.getServerDB().deleteCanal(((ApagarGroupo) input).getId());
                     }
                 }
             } catch (IOException /*SQLException*/ e) {

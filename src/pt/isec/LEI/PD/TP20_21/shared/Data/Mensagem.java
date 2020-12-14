@@ -1,8 +1,9 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data;
 
+import javax.xml.crypto.Data;
 import java.sql.Timestamp;
 
-public class Mensagem {
+public class Mensagem implements DataBase {
     private final int id ;
     private final Timestamp dataHoraEnvio ;
     private final int authorId;
@@ -18,7 +19,7 @@ public class Mensagem {
         this.isAFile = isAFile;
         this.mensagem = mensagem;
     }
-
+    @Override
     public int getId() {
         return id;
     }

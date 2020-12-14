@@ -77,7 +77,7 @@ public class CriaBaseDeDados {
             stmt.execute("create table if not exists canaisGrupo\n" +
                     "(\n" +
                     "    id    int not null,\n" +
-                    "    nome        text not null,\n" +
+                    "    nome        text not null unique,\n" +
                     "    descricao   text,\n" +
                     "    password    text not null,\n" +
                     "    foreign key (id) references canais (id) ON DELETE CASCADE\n" +

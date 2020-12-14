@@ -3,15 +3,16 @@ package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos;
 import java.io.Serializable;
 
 public class MensagemDM implements Serializable, Pedido {
-    private final String userEnvia;
-    private final String userRecebe;
+    private final int userEnvia;
+    private final int userRecebe;
     private final String conteudo;
+    private final boolean isAFile;
 
-    public String getUserEnvia() {
+    public int getUserEnvia() {
         return userEnvia;
     }
 
-    public String getUserRecebe() {
+    public int getUserRecebe() {
         return userRecebe;
     }
 
@@ -19,9 +20,12 @@ public class MensagemDM implements Serializable, Pedido {
         return conteudo;
     }
 
-    public MensagemDM(String userEnvia, String userRecebe, String conteudo) {
+    public boolean isAFile(){return isAFile;}
+
+    public MensagemDM(int userEnvia, int userRecebe, String conteudo, boolean isAFile) {
         this.userEnvia = userEnvia;
         this.userRecebe = userRecebe;
         this.conteudo = conteudo;
+        this.isAFile = isAFile;
     }
 }

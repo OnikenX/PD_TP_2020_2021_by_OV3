@@ -1,10 +1,14 @@
 package pt.isec.LEI.PD.TP20_21.Client.Model;
 
 import pt.isec.LEI.PD.TP20_21.Client.Model.Connectivity.ClientServerConnection;
+import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.ListasParaOClient;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.*;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.Canal;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalDM;
+import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.Utilizador;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
@@ -13,17 +17,37 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientModel {
-    private List<Utilizador> listUsers;
-    private List<Canal> listCanais;
-    private List<Mensagem> listMensagens;
-    private Conectar pedido;
-    private ClientServerConnection csc;
+    public  List<Utilizador> listUsers = null;
+    public List<CanalGrupo> listCanaisGrupos = null;
+    public List<CanalDM> listCanaisDM = null;
+    public List<Mensagem> listMensagens =null;
+    public Integer myID = null;
+    public Conectar pedido = null;
+    public ClientServerConnection csc = null;
 
     public void processListaParaOClient(ListasParaOClient lista){
-        lista.;
-
+        var tabela = lista.getTabela();
+        for(var i : lista.getList()){
+            switch(tabela){
+                case ServerDB.table_canaisDM:
+                    listCanaisDM.add((CanalDM)i);
+                    break;
+                case ServerDB.table_canaisGrupo:
+                    listCanaisGrupos.add((CanalGrupo)i);
+                    break;
+                case ServerDB.table_utilizadores:
+                    listUsers.add((Utilizador)i);
+                    break;
+                case ServerDB.table_mensagens:
+                    listMensagens.add((Mensagem)i);
+                    break;
+                default:
+                    throw new Error("Esse nao existe.");
+            }
+        }
     }
 
     public Conectar getPedido() {
@@ -35,20 +59,33 @@ public class ClientModel {
     }
 
     public ClientModel(ClientServerConnection csc) {
+
         this.csc = csc;
+        this.listUsers = new CopyOnWriteArrayList<>();
+        this.listCanaisDM = new CopyOnWriteArrayList<>();
+        this.listCanaisGrupos = new CopyOnWriteArrayList<>();
+        this.listMensagens = new CopyOnWriteArrayList<>();
+
+    }
+
+    public int getUserIdByName(String nome){
+        for (var i : listUsers)
+            if(i.getNome().equals(nome))
+                return i.getId();
+        return -1;
     }
 
     /**
      *
      */
-    public boolean mandaMensPessoal(String usernameRemetente, String userQueManda, String conteudo) {
+    public boolean mandaMensPessoal(int usernameRemetente, int userQueManda, String conteudo, boolean isAFile) {
         try {
-            csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemDM(userQueManda, usernameRemetente, conteudo)));
-            byte[] input = csc.getInputPipe().readAllBytes();
-            Object obj = Utils.bytesToObject(input);
-            if (obj instanceof Respostas) {
-                //duvida de classe de resposta
-            }
+            csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemDM(userQueManda, usernameRemetente, conteudo, isAFile)));
+//            byte[] input = csc.getInputPipe().readAllBytes();
+//            Object obj = Utils.bytesToObject(input);
+//            if (obj instanceof Respostas) {
+//                //duvida de classe de resposta
+//            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -56,9 +93,11 @@ public class ClientModel {
         return true;
     }
 
-    public boolean mandaMensCanais(String grupoNome, String conteudo, String userQueEnvia) {
+
+
+    public boolean mandaMensCanais( int userQueEnvia, int grupo, String conteudo, boolean isAFile) {
         try {
-            csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemGrupo(userQueEnvia, grupoNome, conteudo)));
+            csc.getOtputStreamTCP().write(Utils.objectToBytes(new MensagemGrupo(userQueEnvia, grupo, conteudo, isAFile)));
             byte[] input = csc.getInputPipe().readAllBytes();
             Object obj = Utils.bytesToObject(input);
             if (obj instanceof Respostas) {
@@ -69,58 +108,88 @@ public class ClientModel {
         }
         return true;
     }
-    public List<Canal> listadeTudo(String user) {
-        try {
-
-            csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
-            byte[] input = csc.getInputPipe().readAllBytes();
-            Object obj = Utils.bytesToObject(input);
-            if (obj instanceof Respostas) {
-                //sera que posso receber lista ou tem de ser 1 a 1?
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+    public int getMyId(){
+        if(myID == null)
+        {
+            for (var i : listUsers)
+                if (i.getUsername() == pedido.getUsername())
+                    myID = i.getId();
         }
-        return
+        return myID;
     }
-    public List<Canal> listaUsers(String user) {
-        try {
-            csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
-            byte[] input = csc.getInputPipe().readAllBytes();
-            Object obj = Utils.bytesToObject(input);
-            if (obj instanceof Respostas) {
-                //sera que posso receber lista ou tem de ser 1 a 1?
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+
+    public int registarOuLogin(Conectar con) {
+        return csc.connectToServer(con);
+    }
+
+
+    public <T extends DataBase> Object getObjectById(int id, List<T> list){
+        for(var l : list ){
+            if (l.getId() == id)
+                return l;
         }
-        return
+        return null;
     }
 
-    public List<Double> listaCanais(String canal) {
-        try {
-            csc.getOtputStreamTCP().write(Utils.objectToBytes(new Estatisticas(canal)));
-            byte[] input = csc.getInputPipe().readAllBytes();
-            Object obj = Utils.bytesToObject(input);
-            if (obj instanceof Respostas) {
-                //sera que posso receber lista ou tem de ser 1 a 1?
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    /**
+//     * Canais mais utilizadores
+//     * @param user
+//     * @return
+//     */
+//    public List<Canal> listadeTudo(String user) {
+//        try {
+//
+//
+//            csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
+//            byte[] input = csc.getInputPipe().readAllBytes();
+//            Object obj = Utils.bytesToObject(input);
+//            if (obj instanceof Respostas) {
+//                //sera que posso receber lista ou tem de ser 1 a 1?
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return
+//    }
 
-    public List<Utilizador> getListUsers() {
-        return listUsers;
-    }
+//    public List<Canal> listaUsers(String user) {
+//        try {
+//            csc.getOtputStreamTCP().write(Utils.objectToBytes(new ListaCanais(user)));
+//            byte[] input = csc.getInputPipe().readAllBytes();
+//            Object obj = Utils.bytesToObject(input);
+//            if (obj instanceof Respostas) {
+//                //sera que posso receber lista ou tem de ser 1 a 1?
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return
+//    }
 
-    public List<Canal> getListCanais() {
-        return listCanais;
-    }
+//    public List<Double> listaCanais(String canal) {
+//        try {
+//            csc.getOtputStreamTCP().write(Utils.objectToBytes(new Estatisticas(canal)));
+//            byte[] input = csc.getInputPipe().readAllBytes();
+//            Object obj = Utils.bytesToObject(input);
+//            if (obj instanceof Respostas) {
+//                //sera que posso receber lista ou tem de ser 1 a 1?
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    public List<Mensagem> getListMensagens() {
-        return listMensagens;
-    }
+//    public List<Utilizador> getListUsers() {
+//        return listUsers;
+//    }
+
+//    public List<Canal> getListCanais() {
+//        return listCanais;
+//    }
+
+//    public List<Mensagem> getListMensagens() {
+//        return listMensagens;
+//    }
 }

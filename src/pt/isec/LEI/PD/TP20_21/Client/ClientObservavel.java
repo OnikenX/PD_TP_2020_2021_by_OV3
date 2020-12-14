@@ -25,6 +25,8 @@ public class ClientObservavel {
         return clientModel;
     }
 
+
+
     public ClientServerConnection getClientServerConnection() {
         return clientServerConnection;
     }
@@ -53,18 +55,6 @@ public class ClientObservavel {
     public boolean adicionaPessoa(String username) {
         return clientModel.mandaMensPessoal(username);
     }*/
-
-    public List<Utilizador> getListUsers() {
-        return clientModel.getListUsers();
-    }
-
-    public List<Canal> getListCanais() {
-        return clientModel.getListCanais();
-    }
-
-    public List<Mensagem> getListMensagens() {
-        return clientModel.getListMensagens();
-    }
 
     /// DELEGATED CLIENTSERVERCONNECTION
 

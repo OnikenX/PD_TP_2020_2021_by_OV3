@@ -1,6 +1,6 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador;
-
-public class UtilizadorServer extends Utilizador {
+import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
+public class UtilizadorServer extends Utilizador  implements DataBase{
     private final String hash;
 
     public String getHash() {

@@ -157,8 +157,6 @@ public class UdpMultiCastManager extends Thread {
             System.err.println("Ocorreu um erro alive templateo nivel do socket UDP:\n\t" + e);
         } catch (IOException e) {
             System.err.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         } finally {
             if (multicastSocketReceiver != null) {
                 multicastSocketReceiver.close();
@@ -182,24 +180,26 @@ public class UdpMultiCastManager extends Thread {
                 System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
             servidores.verifyPing((Ping) mensagem, packet);
         } else if (classType == TabelaCorrecao.class) {
-            new Thread(() -> {
-                List<Object> items = null;
-                try {
-                    items = server.getServerDB().getListaTabela(((TabelaCorrecao) mensagem).getTabela());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (items != null) {
+            if(serverDad){
+                new Thread(() -> {
+                    List<Object> items = null;
                     try {
-                        enviaMulticast(items, false);
+                        items = server.getServerDB().getListaTabela(((TabelaCorrecao) mensagem).getTabela());
+
                     } catch (Exception e) {
-                        System.err.println("Enviada copia.");
                         e.printStackTrace();
                     }
-                }
+                    if (items != null) {
+                        try {
+                            enviaMulticast(items, false);
+                        } catch (Exception e) {
+                            System.err.println("Enviada copia.");
+                            e.printStackTrace();
+                        }
+                    }
 
-            }).start();
+                }).start();
+            }
         }else if (classType == TabelaCorreta.class){
 
             new Thread(()-> {
@@ -344,9 +344,7 @@ private class Servidores implements Serializable, Iterable<Servidores.ServidorEx
             if (mensagem instanceof PingPai) {//verifica se esta updated
                 var mensagemPai = (PingPai) mensagem;
                 //verifica erros de checksum
-                if (mensagemPai.getCanaisChecksum() != server.getServerDB().getChecksum(ServerDB.table_canais))
-                    notUpdated(ServerDB.table_canais);
-                else if (mensagemPai.getCanaisDMChecksum() != server.getServerDB().getChecksum(ServerDB.table_canaisDM))
+                if (mensagemPai.getCanaisDMChecksum() != server.getServerDB().getChecksum(ServerDB.table_canaisDM))
                     notUpdated(ServerDB.table_canaisDM);
                 else if (mensagemPai.getCanaisGroupoChecksum() != server.getServerDB().getChecksum(ServerDB.table_canaisGrupo))
                     notUpdated(ServerDB.table_canaisGrupo);
