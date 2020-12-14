@@ -1,13 +1,10 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Data;
 
 
-import jdk.jshell.execution.Util;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalDM;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
-import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
-import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.Utilizador;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.UtilizadorServer;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
@@ -89,7 +86,7 @@ public class ServerDB {
         boolean return_value;
         ResultSet rs = null;
         try {
-            rs = getStatement().executeQuery("SELECT * FROM utilizadores where username =" + username + ";");
+            rs = getStatement().executeQuery("SELECT * FROM utilizadores where username = " + username + ";");
             if ((return_value = rs.next())) {
                 hash = rs.getString("hash");
             } else {
@@ -108,7 +105,10 @@ public class ServerDB {
     }
 
     public boolean userExist(String username) throws SQLException {
-        return getStatement().executeQuery("SELECT * FROM utilizadores where username =\"" + username + "\";").next();
+         var rs = getStatement().executeQuery("SELECT * FROM utilizadores where username = \"" + username + "\" ;");
+         return (rs.next());
+
+
     }
 
 
@@ -137,8 +137,9 @@ public class ServerDB {
     public int getTableLastMax(String tablename) throws SQLException {
         var rs = getStatement().executeQuery("SELECT MAX(id) FROM " + tablename);
         int idmax;
-        rs.next();
-        return rs.getInt(0);
+        if(rs.next())
+            return rs.getInt(1);
+        return -1;
     }
 
     //users

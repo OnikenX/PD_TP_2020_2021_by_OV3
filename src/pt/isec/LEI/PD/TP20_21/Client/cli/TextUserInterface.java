@@ -2,14 +2,9 @@ package pt.isec.LEI.PD.TP20_21.Client.cli;
 
 import pt.isec.LEI.PD.TP20_21.Client.ClientObservavel;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemDM;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
-import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.Utilizador;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,11 +23,10 @@ public class TextUserInterface {
 
 
     private Conectar registar() {
-        System.out.println("Nome próprio: ");
-        var nome = s.nextLine();
+        var nome = getInput("Nome: ");
         var username = getInput("Username: ");
         var pass = getInput("Pass: ");
-        return new Conectar(nome, username, pass, false);
+        return new Conectar(username, nome, pass, false);
     }
 
     private Conectar login() {
@@ -361,8 +355,12 @@ public class TextUserInterface {
     }
 
     private String getInput(String info) {
+        String input;
         System.out.println(info + ": ");
-        return s.nextLine();
+        do {
+            input = s.nextLine();
+        }while(input.isEmpty());
+        return input;
     }
 
 
