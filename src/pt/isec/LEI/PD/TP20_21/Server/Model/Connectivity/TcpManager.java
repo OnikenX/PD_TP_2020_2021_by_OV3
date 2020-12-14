@@ -34,10 +34,10 @@ public class TcpManager {
     }
 
     private final TcpServerClientConnections tcpServerClientConnections = new TcpServerClientConnections();
+
     static public class TcpServerClientConnections extends LinkedList<TcpServerClientConnection> {
 
     }
-
 
 
     public TcpManager(Server server) {
@@ -90,7 +90,6 @@ public class TcpManager {
         }
 
 
-
         //Message sender
         public void sendMessage(Object o) throws IOException {
             oS.write(Objects.requireNonNull(objectToBytes(o)));
@@ -116,36 +115,38 @@ public class TcpManager {
                 oS = s.getOutputStream();
                 var serverDB = server.getServerDB();
                 input = new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisDM), ServerDB.table_canaisDM);
-                if(Utils.Consts.DEBUG)
-                    bytes = Objects.requireNonNull(objectToBytes(input));
+                if (Utils.Consts.DEBUG) {
                     System.out.println("[Client] connected");
+                }
+                bytes = Objects.requireNonNull(objectToBytes(input));
                 oS.write(bytes);
-if(Utils.Consts.DEBUG)
+                if (Utils.Consts.DEBUG)
                     System.out.println("enviado uma lista");
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisGrupo), ServerDB.table_canaisGrupo))));
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_utilizadores), ServerDB.table_utilizadores))));
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_mensagens), ServerDB.table_mensagens))));
                 while (!stop) {
+                    if(Utils.Consts.DEBUG)
+                        System.out.println("[TCPCliente em espera de mensagens]");
                     input = Utils.bytesToObject(iS.readAllBytes());
-                    if(input.getClass() == Conectar.class){
-                        var mensagem = (Conectar)input;
+                    if (input.getClass() == Conectar.class) {
+                        var mensagem = (Conectar) input;
                         //adicinar coluna do canal normal e dm if not exist
 
                         server.getServerDB();
                     }
-                    if(input.getClass() == MensagemDM.class) {
+                    if (input.getClass() == MensagemDM.class) {
                         MensagemDM msg = (MensagemDM) input;
 
-                        server.getServerDB().mensagemDM(Timestamp.from(Instant.now()),  ((MensagemDM) input).getUserEnvia(), ((MensagemDM) input).getUserRecebe() , ((MensagemDM) input).isAFile(), ((MensagemDM) input).getConteudo());
+                        server.getServerDB().mensagemDM(Timestamp.from(Instant.now()), ((MensagemDM) input).getUserEnvia(), ((MensagemDM) input).getUserRecebe(), ((MensagemDM) input).isAFile(), ((MensagemDM) input).getConteudo());
                         Object res = null; //que vem da bd
                         oS.write(objectToBytes(res));
-                    }
-                    else if(input.getClass() == MensagemGrupo.class) {
+                    } else if (input.getClass() == MensagemGrupo.class) {
                         MensagemGrupo msg = (MensagemGrupo) input;
                         // cenas
                         Object res = null; //que vem da bd
                         oS.write(objectToBytes(res));
-                    }else if (input.getClass() == ApagarGroupo.class){
+                    } else if (input.getClass() == ApagarGroupo.class) {
                         server.getServerDB().deleteCanal(((ApagarGroupo) input).getId());
                     }
 

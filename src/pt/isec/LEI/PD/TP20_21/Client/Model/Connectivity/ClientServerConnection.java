@@ -107,15 +107,19 @@ public class ClientServerConnection extends Thread {
         super.run();
         if(Utils.Consts.DEBUG)
             System.out.println("in thread");
-        byte[] receivedBytes = null;
+        byte[] receivedBytes = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
+        byte[] receivedBytes2 = null;
+        int size;
         Object receivedObject = null;
         try {
             while (true) {
                 try {
                     if(Utils.Consts.DEBUG)
                         System.out.println("a espera de bytes");
-                    receivedBytes = isTCP.readAllBytes();
-                    receivedObject = bytesToObject(receivedBytes);
+                    size = isTCP.read(receivedBytes);
+                    receivedBytes2 = new byte[size];
+                    System.arraycopy(receivedBytes, 0,receivedBytes2, 0, size);
+                    receivedObject = bytesToObject(receivedBytes2);
                     if(Utils.Consts.DEBUG)
                         System.out.println("[TCP] recebeu um objeto");
                 }catch (Exception e){
