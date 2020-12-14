@@ -331,6 +331,8 @@ public class ServerDB {
                     throw new Exception("Tabela nao existe.");
             }
         }
+        if(DEBUG)
+            System.out.println("[ServerDB]a returnar lista");
         return ll;
     }
 

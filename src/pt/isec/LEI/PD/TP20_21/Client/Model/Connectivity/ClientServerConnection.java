@@ -112,12 +112,15 @@ public class ClientServerConnection extends Thread {
         try {
             while (true) {
                 try {
+                    if(Utils.Consts.DEBUG)
+                        System.out.println("a espera de bytes");
                     receivedBytes = isTCP.readAllBytes();
                     receivedObject = bytesToObject(receivedBytes);
+                    if(Utils.Consts.DEBUG)
+                        System.out.println("[TCP] recebeu um objeto");
                 }catch (Exception e){
                     //TODO: tratar desta
                     e.printStackTrace();
-
                     interrupt();
                 }
                 if (receivedObject == null) {
@@ -218,7 +221,6 @@ public class ClientServerConnection extends Thread {
                         ++retries;
                 }else if(resposta.TcpPort == Utils.Consts.ERROR_USER_ALREADY_EXISTS){
                     throw new Error("Erro, o utilizador ja existe");
-
                 }else if(resposta.TcpPort == Utils.Consts.ERROR_USER_INFO_NOT_MATCH){
                     throw new Error("Informaçoes de login incorretas");
                 }

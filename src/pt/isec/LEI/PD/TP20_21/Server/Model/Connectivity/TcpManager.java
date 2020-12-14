@@ -108,17 +108,19 @@ public class TcpManager {
         @Override
         public void run() {
             super.run();
-            byte[] bytes;
-            Object input;
+            byte[] bytes = null;
+            Object input = null;
             try {
                 s = serverSocket.accept();
-                if(Utils.Consts.DEBUG)
-                    System.out.println("[Client] connected");
                 iS = s.getInputStream();
                 oS = s.getOutputStream();
                 var serverDB = server.getServerDB();
-                oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisDM), ServerDB.table_canaisDM))));
+                input = new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisDM), ServerDB.table_canaisDM);
                 if(Utils.Consts.DEBUG)
+                    bytes = Objects.requireNonNull(objectToBytes(input));
+                    System.out.println("[Client] connected");
+                oS.write(bytes);
+if(Utils.Consts.DEBUG)
                     System.out.println("enviado uma lista");
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisGrupo), ServerDB.table_canaisGrupo))));
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_utilizadores), ServerDB.table_utilizadores))));
