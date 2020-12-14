@@ -27,7 +27,7 @@ public class TextUserInterface {
     }
 
 
-    public Conectar registar() {
+    private Conectar registar() {
         System.out.print("Nome próprio: ");
         var nome = s.nextLine();
         var username = getInput("Username: ");
@@ -35,14 +35,14 @@ public class TextUserInterface {
         return new Conectar(nome, username, pass, false);
     }
 
-    public Conectar login() {
+    private Conectar login() {
         var username = getInput("Username: ");
         var pass = getInput("Pass: ");
-        return new Conectar(nome, username, pass, true);
+        return new Conectar(username, pass);
     }
 
 
-    int menuPrincipal() {
+    private int menuPrincipal() {//menu de login
         int op;
         System.out.println("\n\n1 - Login");
         System.out.println("2 - Registo");
@@ -53,6 +53,121 @@ public class TextUserInterface {
         } while(op < 1 || op > 3);
         return op;
     }
+    private void menu_ler_mensagens()
+    {
+        int op;
+        int carrega=999999;
+        listar_users();
+        listar_canais();
+        System.out.println("1- Ler mensagens de canal.");
+        System.out.println("2- Ler mensagens de utilizador.");
+        do {
+            System.out.print("Escolha uma opcao: ");
+            op = s.nextInt();
+        } while(op < 1 || op > 2);
+        System.out.println("Nome do cliente alvo ou canal.");
+        String nome= s.nextLine();
+        //verifica se existe tal canal ou utilizador e mostra as mensagens por orderm cronológica
+        var listUser = clientObservavel.getClientModel().listUsers;
+        var listGroups = clientObservavel.getClientModel().listCanaisGrupos;
+        var mensagens = clientObservavel.getClientModel().listMensagens;
+        System.out.println("Quantas mensagens deve carregar ?");
+        while ((carrega>mensagens.size()&&carrega<0))
+        {
+            carrega = s.nextInt();
+        }
+
+        if(op==1)
+        {
+            for(int i=0;i<listGroups.size();i++)
+            {
+                if (nome==listGroups.get(i).getNome())
+                {
+                    for(int j=0;j<carrega;j++)
+                    {
+                        if(mensagens.get(j).getId()==listGroups.get(i).getId())
+                        {
+                            System.out.println(listGroups.get(i).getNome()+" "+mensagens.get(j).getMensagem());
+                        }
+                    }
+                }
+            }
+        }
+        if(op==2)
+        {
+            for(int i=0;i<listUser.size();i++)
+            {
+                if (nome==listUser.get(i).getNome())
+                {
+                    for(int j=0;j<carrega;j++)
+                    {
+                        if(mensagens.get(j).getId()==listUser.get(i).getId())
+                        {
+                            System.out.println(listUser.get(i).getNome()+" "+mensagens.get(j).getMensagem());
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void menu_editar_canais()
+    {
+        int op;
+        String c;
+        listar_canais();
+        System.out.println("1- Criar canal");
+        System.out.println("2- Apagar canal");
+        do {
+            System.out.print("Escolha uma opcao: ");
+            op = s.nextInt();
+        } while(op < 1 || op > 3);
+       switch (op)
+       {
+           case 1:
+               System.out.println("Insira o nome do canal a criar.");
+               String nome= s.nextLine();
+               System.out.println("Insira a senha do canal.");
+               String password= s.nextLine();
+               System.out.println("Insira a descrição do canal.");
+               String desc= s.nextLine();
+               break;
+           case 4:
+               System.out.println("Insira o nome do canal a apagar.");
+               nome= s.nextLine();
+               //procura canal, se nao encontrar diz
+               do {
+                   System.out.print("Tem a certeza ? Y/N ");
+                   c= s.nextLine();
+               } while((c.substring(0,1)!= "Y") ||(c.substring(0,1)!= "N"));
+               if((c.substring(0,1)!= "Y"))
+               {
+                   //apaga canal
+               }
+               break;
+
+       }
+
+    }
+    private int menuLogado() {//chama isto depois do login
+        int op;
+        System.out.println("\n\n1- Listar Canais");
+        System.out.println("2- Listar Utilizadores");
+        System.out.println("3- Mandar mensagem privada");
+        System.out.println("4- Listar n ultimas mensagens");
+        System.out.println("5- Editar canais");
+        System.out.println("6- Enviar ficheiros");
+        System.out.println("7- Listar ficheiros recebidos");
+        System.out.println("8- Apresentar estatisticas de um canal");
+        System.out.println("9- Sair");
+        do {
+            System.out.print("Escolha uma opcao: ");
+            op = s.nextInt();
+        } while(op < 1 || op > 9);
+        return op;
+
+    }
 
 
     public void UI() {
@@ -60,8 +175,48 @@ public class TextUserInterface {
             int i = menuPrincipal();
             switch (i) {
                 case 1:
+                    Conectar log = login();
+                    clientObservavel.getClientModel().registarOuLogin(log);
+                    do {
+                        i = menuLogado();
+                        switch (i) {
+                            case 1:
+                                listar_canais();
+                                break;
+                            case 2:
+                                listar_users();
+                                break;
+                            case 3:
+                                String remetente = getInput("Utilizador a quem pretende enviar");
+                                String mensagem = getInput("Mensagem a enviar");
+                                int idr = clientObservavel.getClientModel().getUserIdByName(remetente);
+                                int idMeu = clientObservavel.getClientModel().getUserIdByName(clientObservavel.getClientModel().pedido.getNome());
+                                clientObservavel.getClientModel().mandaMensPessoal(idr, idMeu, mensagem, false);
+                                break;
+                            case 4:
+                                menu_ler_mensagens();
+                                break;
+                            case 5:
+                                menu_editar_canais();
+                                break;
+                            case 6:
+                                String remetenteFich = getInput("Utilizador a quem pretende enviar");
+                                String mensagemFich = getInput("Nome do ficheiro a enviar");
+                                int idrFich = clientObservavel.getClientModel().getUserIdByName(remetenteFich);
+                                int idMeuFich = clientObservavel.getClientModel().getUserIdByName(clientObservavel.getClientModel().pedido.getNome());
+                                clientObservavel.getClientModel().mandaMensPessoal(idrFich, idMeuFich, mensagemFich, true);
+                                break;
+                            case 7:
+                                listar_ficheiros();
+                                break;
+                            case 8:
+                                break;
+                        }
+                    } while(i != 9);
                     break;
                 case 2:
+                    Conectar regis = registar();
+                    clientObservavel.getClientModel().registarOuLogin(regis);
                     break;
             }
         } while(!exit);
@@ -117,43 +272,43 @@ public class TextUserInterface {
         } while (exit);
     }
 
-    /**
-     * Menu depois de login
-     *
-     * @return true for logout, false for exist
-     */
-    private void listarConversasComPessoas() {
-        var listMens = clientObservavel.getClientModel().listMensagens;
-        var listUser = clientObservavel.getClientModel().listUsers;
-        var listDN = clientObservavel.getClientModel().listCanaisDM;
-        List<CanalDM> listMyDn= new LinkedList<>();
-        var myId = clientObservavel.getClientModel().getMyId();
-
-        int input;
-        System.out.println("Lista de dms:");
-        for(var ld : listDN){
-            if(ld.getPessoaDest() == myId || ld.getPessoaCria() == myId)
-                System.out.println(ld.getId() +" - Para "+
-                    ((Utilizador)clientObservavel.getClientModel().getObjectById(ld.getId(), listUser)).getNome());
-        }
-        boolean sair = false;
-        while(!sair) {
-            System.out.println("Digite o numero do canal para abrir a conversa: ");
-            while (!s.hasNextInt()) ;
-            s.nextInt();
-            for(var i : clientObservavel.getClientModel().listCanaisDM){
-                if(i.getId() == input){
-                    sair = true;
-                    break;
-                }
-            }
-        }
-        for(var i : listMens){
-            if(i.getCanalId())
-        }
-
-
-    }
+//    /**
+//     * Menu depois de login
+//     *
+//     * @return true for logout, false for exist
+//     */
+//    private void listarConversasComPessoas() {
+//        var listMens = clientObservavel.getClientModel().listMensagens;
+//        var listUser = clientObservavel.getClientModel().listUsers;
+//        var listDN = clientObservavel.getClientModel().listCanaisDM;
+//        List<CanalDM> listMyDn= new LinkedList<>();
+//        var myId = clientObservavel.getClientModel().getMyId();
+//
+//        int input;
+//        System.out.println("Lista de dms:");
+//        for(var ld : listDN){
+//            if(ld.getPessoaDest() == myId || ld.getPessoaCria() == myId)
+//                System.out.println(ld.getId() +" - Para "+
+//                    ((Utilizador)clientObservavel.getClientModel().getObjectById(ld.getId(), listUser)).getNome());
+//        }
+//        boolean sair = false;
+//        while(!sair) {
+//            System.out.println("Digite o numero do canal para abrir a conversa: ");
+//            while (!s.hasNextInt()) ;
+//            s.nextInt();
+//            for(var i : clientObservavel.getClientModel().listCanaisDM){
+//                if(i.getId() == input){
+//                    sair = true;
+//                    break;
+//                }
+//            }
+//        }
+//        for(var i : listMens){
+//            if(i.getCanalId())
+//        }
+//
+//
+//    }
     private void listar_canais()
     {
         var listGroups = clientObservavel.getClientModel().listCanaisGrupos;
