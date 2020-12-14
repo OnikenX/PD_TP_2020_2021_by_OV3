@@ -335,7 +335,7 @@ public class ServerDB {
                     rstemp.next();
                     //id, rs.getInt(2), rstemp.getInt(2);
                     found = false;
-                    for( i = lowest;id < ((CanalDM)lista.get(i)).getId(); ++i){
+                    for( i = lowest;id <= ((CanalDM)lista.get(i)).getId(); ++i){
                         if(((CanalDM)lista.get(i)).getId() == id){
                             found = true;
                             break;
@@ -360,7 +360,7 @@ public class ServerDB {
 //                    new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
 
                     found = false;
-                    for( i = lowest;id < ((CanalGrupo)lista.get(i)).getId(); ++i  ){
+                    for( i = lowest;id <= ((CanalGrupo)lista.get(i)).getId(); ++i  ){
                         if(((CanalGrupo)lista.get(i)).getId() == id){
                             found = true;
                             break;
@@ -374,10 +374,14 @@ public class ServerDB {
                                 rstemp.getString(4).equals(canalGrupo.getPassword()))){
                             getStatement().executeUpdate("UPDATE canais SET pessoaCria = " + canalGrupo.getPessoaCria() + " WHERE id=" + id + ";");
                             getStatement().executeUpdate("UPDATE canaisDM SET " +
-                                    "nome = " + canalGrupo.getNome() +
-                                    "descricao = "+canalGrupo.getDescricao()+
-                                    "password = " + canalGrupo.getPassword()+
-                                    " WHERE id=" + id + ";");
+
+                                    ", nome = " + canalGrupo.getNome() +
+
+                                    ", descricao = "+canalGrupo.getDescricao()+
+
+                                    ", password = " + canalGrupo.getPassword()+
+
+                                    "  WHERE id=" + id + ";");
                         }
                     }else{
                         addCanalGroup(id, canalGrupo.getPessoaCria(), canalGrupo.getNome(), canalGrupo.getDescricao(), canalGrupo.getPassword());
@@ -385,9 +389,37 @@ public class ServerDB {
                     lowest = id;
                     break;
                 case table_mensagens:
+                    id = rs.getInt(1);
+                    found = false;
+                    for( i = lowest;id <= ((Mensagem)lista.get(i)).getId(); ++i  ){
+                        if(((CanalGrupo)lista.get(i)).getId() == id){
+                            found = true;
+                            break;
+                        }
+                    }
+                    mensagem = (Mensagem) lista.get(i);
+                    if(found) {
+                        if (!(id == mensagem.getId() &&
+                                rs.getTimestamp(2).equals(mensagem.getDataHoraEnvio()) &&
+                                rs.getInt(3) == mensagem.getAuthorId() &&
+                                rs.getInt(4) == mensagem.getCanalId() &&
+                                rs.getBoolean(5) == mensagem.isAFile() &&
+                                rs.getString(6).equals(mensagem.getMensagem()))){
 
+                            getStatement().executeUpdate("UPDATE mensagens SET " +
+                                    ", dataHoraEnvio = " + mensagem.getDataHoraEnvio() +
+                                    ", authorId = "+ mensagem.getAuthorId() +
+                                    ", canalId = " + mensagem.getCanalId() +
+                                    ", isAFile = " +
+                                    " WHERE id=" + id + ";");
+                        }
+                    }else{
+                        addCanalGroup(id, canalGrupo.getPessoaCria(), canalGrupo.getNome(), canalGrupo.getDescricao(), canalGrupo.getPassword());
+                    }
+                    lowest = id;
+                    break;
 
-                    //ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
+                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
                     break;
                 case table_utilizadores:
                     //ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
