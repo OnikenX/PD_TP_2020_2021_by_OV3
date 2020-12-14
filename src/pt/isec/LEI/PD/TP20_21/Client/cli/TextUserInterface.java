@@ -320,7 +320,7 @@ public class TextUserInterface {
     private void listar_users()
     {
         var listUser = clientObservavel.getClientModel().listUsers;
-        System.out.println("Canais: ");
+        System.out.println("Users: ");
         for(int i=0;i<listUser.size();i++)
         {
             System.out.println(listUser.get(i).getNome());
@@ -330,10 +330,10 @@ public class TextUserInterface {
     private void listar_ficheiros()
     {
         List<Mensagem> listMensagens = clientObservavel.getClientModel().listMensagens;
-        System.out.println("Canais: ");
+        System.out.println("Ficheiros: ");
         for(int i = 0; i < listMensagens.size(); i++) {
             if(listMensagens.get(i).isAFile())
-                System.out.println(listMensagens.get(i).getMensagem());
+                System.out.println(listMensagens.get(i).getId() + " - " + listMensagens.get(i).getMensagem());
         }
     }
 
