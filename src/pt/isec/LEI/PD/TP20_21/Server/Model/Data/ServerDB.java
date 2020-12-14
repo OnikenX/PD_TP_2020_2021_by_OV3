@@ -4,6 +4,7 @@ package pt.isec.LEI.PD.TP20_21.Server.Model.Data;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalDM;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
+import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.UtilizadorServer;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
