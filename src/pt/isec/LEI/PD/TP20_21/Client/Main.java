@@ -7,7 +7,7 @@ import pt.isec.LEI.PD.TP20_21.Client.cli.TextUserInterface;
 import pt.isec.LEI.PD.TP20_21.Client.gui.Gui;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
-public class Main extends Application {
+public class Main {
     public static void main(String[] args) {
         if (Utils.Consts.DEBUG)
             System.out.println("A comecar o cliente....");
@@ -18,15 +18,5 @@ public class Main extends Application {
         cli.UI();
     }
 
-    @Override
-    public void start(Stage stage) {
-        //ClientModel maqEstados = new ClientModel();
-        //ClientObservavel clientObservavel = new ClientObservavel(maqEstados);
 
-        //Scene scene = new Scene(new Gui(clientObservavel), 1200, 720);//gui sendo root
-        stage.setTitle("Cliente");
-        //stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
-    }
 }
