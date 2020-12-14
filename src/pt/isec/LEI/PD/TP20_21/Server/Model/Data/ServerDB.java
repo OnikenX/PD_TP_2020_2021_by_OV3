@@ -1,11 +1,13 @@
 package pt.isec.LEI.PD.TP20_21.Server.Model.Data;
 
 
+import jdk.jshell.execution.Util;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Server;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalDM;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
 import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.Utilizador;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.UtilizadorServer;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 
@@ -324,6 +326,7 @@ public class ServerDB {
         CanalDM canalDM;
         CanalGrupo canalGrupo;
         Mensagem mensagem;
+        UtilizadorServer utilizadorServer;
         ResultSet rstemp = null;
         int lowest = 0, i = 0 ;
         boolean found = false;
@@ -344,8 +347,8 @@ public class ServerDB {
                     canalDM = (CanalDM) lista.get(i);
                     if(found) {
                         if (!((rs.getInt(2) == canalDM.getPessoaCria()) && (rstemp.getInt(2) == canalDM.getPessoaDest()))){
-                            getStatement().executeUpdate("UPDATE canais SET pessoaCria = " + canalDM.getPessoaCria() + " WHERE id=" + id + ";");
-                            getStatement().executeUpdate("UPDATE canaisDM SET pessoaDest = " + canalDM.getPessoaDest() + " WHERE id=" + id + ";");
+                            statement.executeUpdate("UPDATE canais SET pessoaCria = " + canalDM.getPessoaCria() + " WHERE id=" + id + ";");
+                            statement.executeUpdate("UPDATE canaisDM SET pessoaDest = " + canalDM.getPessoaDest() + " WHERE id=" + id + ";");
                         }
                     }else{
                         addCanalDM(id, canalDM.getPessoaCria(), canalDM.getPessoaDest());
@@ -354,7 +357,7 @@ public class ServerDB {
                     break;
                 case table_canaisGrupo:
                     id = rs.getInt(1);
-                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+                    rstemp = statement.executeQuery("select * from " + table_canais + ";");
                     rstemp.next();
 
 //                    new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
@@ -372,15 +375,11 @@ public class ServerDB {
                                 rstemp.getString(2).equals(canalGrupo.getNome()) &&
                                 rstemp.getString(3).equals(canalGrupo.getDescricao()) &&
                                 rstemp.getString(4).equals(canalGrupo.getPassword()))){
-                            getStatement().executeUpdate("UPDATE canais SET pessoaCria = " + canalGrupo.getPessoaCria() + " WHERE id=" + id + ";");
-                            getStatement().executeUpdate("UPDATE canaisDM SET " +
-
+                            statement.executeUpdate("UPDATE canais SET pessoaCria = " + canalGrupo.getPessoaCria() + " WHERE id=" + id + ";");
+                            statement.executeUpdate("UPDATE canaisDM SET " +
                                     ", nome = " + canalGrupo.getNome() +
-
                                     ", descricao = "+canalGrupo.getDescricao()+
-
                                     ", password = " + canalGrupo.getPassword()+
-
                                     "  WHERE id=" + id + ";");
                         }
                     }else{
@@ -406,26 +405,51 @@ public class ServerDB {
                                 rs.getBoolean(5) == mensagem.isAFile() &&
                                 rs.getString(6).equals(mensagem.getMensagem()))){
 
-                            getStatement().executeUpdate("UPDATE mensagens SET " +
+                            statement.executeUpdate("UPDATE mensagens SET " +
                                     ", dataHoraEnvio = " + mensagem.getDataHoraEnvio() +
                                     ", authorId = "+ mensagem.getAuthorId() +
                                     ", canalId = " + mensagem.getCanalId() +
-                                    ", isAFile = " +
+                                    ", isAFile = " + (mensagem.isAFile()?1:0)+
+                                    ", mensagem = " + mensagem.getMensagem()+
                                     " WHERE id=" + id + ";");
                         }
                     }else{
-                        addCanalGroup(id, canalGrupo.getPessoaCria(), canalGrupo.getNome(), canalGrupo.getDescricao(), canalGrupo.getPassword());
+                        statement.executeUpdate("insert into mensagens (id, dataHoraEnvio, authorId, canalId, isAFile, mensagem) " +
+                                "values("+id+", '"+mensagem.getDataHoraEnvio()+"  ,'"+mensagem.getAuthorId()+"' , '"+mensagem.getCanalId()+"'  , '"+mensagem.isAFile()+"' , '"+mensagem.getMensagem()+"' );");
+//                        addMensagem(id, mensagem.getDataHoraEnvio(), mensagem.getAuthorId(), mensagem.getCanalId(), (mensagem.isAFile()?1:0), mensagem.getMensagem());
                     }
                     lowest = id;
                     break;
-
-                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
-                    break;
                 case table_utilizadores:
+                    id = rs.getInt(1);
+                    found = false;
+                    for( i = lowest;id <= ((Mensagem)lista.get(i)).getId(); ++i  ){
+                        if(((CanalGrupo)lista.get(i)).getId() == id){
+                            found = true;
+                            break;
+                        }
+                    }
+                     utilizadorServer= (UtilizadorServer) lista.get(i);
+                    if(found) {
+                        if (!(id == utilizadorServer.getId() &&
+                                rs.getString(2).equals(utilizadorServer.getUsername() ) &&
+                                rs.getString(3).equals(utilizadorServer.getNome()) &&
+                                rs.getString(4).equals(utilizadorServer.getHash()))) {
+
+                            statement.executeUpdate("UPDATE utilizadores SET " +
+                                    ", username = " + utilizadorServer.getUsername() +
+                                    ", nome = " + utilizadorServer.getNome() +
+                                    ", hash = " + utilizadorServer.getHash() +
+                                    " WHERE id=" + id + ";");
+                        }
+                    }else{
+                        statement.executeUpdate("insert into utilizadores (id, username, nome, hash)" +
+                                " values ("+id+", '"+utilizadorServer.getUsername()+"', '"+utilizadorServer.getNome()+"', '"+utilizadorServer.getHash()+"');");
+                    }
+
                     //ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
                     break;
                 default:
-
                     throw new Exception("Tabela nao existe.");
             }
         }
@@ -436,8 +460,13 @@ public class ServerDB {
 
     }
 
-
-
+//    private void addMensagem(int id, Timestamp dataHoraEnvio, int authorId, int canalId, int i, String mensagem){
+//        getStatement().executeUpdate( "insert into " +
+//                "mensagens(dataHoraEnvio, authorId, canalId, isAFile, mensagem) " +
+//                "values " +
+//                "("+timestamp+", "+pessoaEnvia+", "+canal_id+", "+
+//                (isAFile? 1:0)+", "+conteudo+")");
+//    }
 
 
 }
