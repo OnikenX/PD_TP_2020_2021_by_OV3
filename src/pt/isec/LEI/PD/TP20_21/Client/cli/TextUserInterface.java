@@ -28,7 +28,7 @@ public class TextUserInterface {
 
 
     private Conectar registar() {
-        System.out.print("Nome próprio: ");
+        System.out.println("Nome próprio: ");
         var nome = s.nextLine();
         var username = getInput("Username: ");
         var pass = getInput("Pass: ");
