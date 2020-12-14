@@ -123,7 +123,6 @@ public class ClientServerConnection extends Thread {
                     outputPipe.flush();
                 }else if(receivedObject.getClass() == ListasParaOClient.class) {
                     clientObservavel.getClientModel().processListaParaOClient((ListasParaOClient) receivedObject);
-
                 }
                 else{
                     System.err.println("Nao sei o que fazer com isto.");
@@ -191,12 +190,28 @@ public class ClientServerConnection extends Thread {
             }catch(java.net.SocketTimeoutException e){
                 e.printStackTrace();
                 System.err.println("Timeout received.");
+                throw new SocketTimeoutException();
             }
             if(Utils.Consts.DEBUG)
                 System.out.println("pacote enviado");
             resposta = (PedidoDeLigar) Utils.bytesToObject(packet.getData());
-            retries = 0;
-            tries = 0;
+            if(resposta  == null){
+                throw new Error("lol no, its null bro");
+            }
+            if(resposta.TcpPort < 1){
+                if(resposta.TcpPort == Utils.Consts.ERROR_SERVER_FULL){
+                        System.err.println("tentar ligar a outro servidor");
+                        ++retries;
+                }else if(resposta.TcpPort == Utils.Consts.ERROR_USER_ALREADY_EXISTS){
+                    throw new Error("Erro, o utilizador ja existe");
+
+                }else if(resposta.TcpPort == Utils.Consts.ERROR_USER_INFO_NOT_MATCH){
+                    throw new Error("Informaçoes de login incorretas");
+                }
+            }else{
+                retries = 0;
+                tries = 0;
+            }
             return packet.getAddress();
         } catch (SocketTimeoutException | SocketException ignored) {
         } catch (IOException e) {

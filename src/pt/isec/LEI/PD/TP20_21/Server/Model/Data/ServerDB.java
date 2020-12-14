@@ -86,7 +86,7 @@ public class ServerDB {
         boolean return_value;
         ResultSet rs = null;
         try {
-            rs = getStatement().executeQuery("SELECT * FROM utilizadores where username = " + username + ";");
+            rs = getStatement().executeQuery("SELECT * FROM utilizadores where username = '" + username + "';");
             if ((return_value = rs.next())) {
                 hash = rs.getString("hash");
             } else {

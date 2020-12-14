@@ -40,8 +40,7 @@ public class UdpServerClientPreConnection extends Thread {
                 socket = new DatagramSocket();
             }
             Conectar conectar = null;
-            byte[] conectarBytes = objectToBytes(new Conectar());
-
+            byte[] conectarBytes =new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             PedidoDeLigar resposta = null;
             boolean registar = false;
             if (Utils.Consts.DEBUG)
@@ -72,21 +71,32 @@ public class UdpServerClientPreConnection extends Thread {
                     continue;
                 }
 
-                //verificação do pedido
+                //
+                if(Utils.Consts.DEBUG)
+                    System.out.println("verificação do pedido");
                 try {
-                    if (!conectar.isRegistado()) {//registar utilizador
-                        //verificar se existe o username
+                    if (!conectar.isRegistado()) {//
+                         if(Utils.Consts.DEBUG)
+                        System.out.println("registar utilizador");
+                        if(Utils.Consts.DEBUG)
+                            System.out.println("verificar se existe o username");
                         if (server.getServerDB().userExist(conectar.getUsername())) {
                             //resposta = new Comunicacoes.PedidoDeLigar(Utils.Consts.ERROR_USER_ALREADY_EXISTS, server.udpMultiCastManager.getServidoresForClient());
                             if (Utils.Consts.DEBUG)
                                 System.out.println("[registo]O utilizador ja existe...");
                         } else //addicionar user
                         {
+                            if(Utils.Consts.DEBUG)
+                                System.out.println("adicionar user");
                             registar = true;
                         }
                     } else//verifica login
                         if (!server.getServerDB().verifyUser(conectar.getUsername(), conectar.getPassword())) {
+                            if(Utils.Consts.DEBUG)
+                                System.out.println("a verificar login");
                             resposta = new PedidoDeLigar(Utils.Consts.ERROR_USER_INFO_NOT_MATCH, server.udpMultiCastManager.getServidoresForClient());
+                            if(Utils.Consts.DEBUG)
+                                System.out.println("verificado, resposta :"+ resposta.toString());
                         }
                 } catch (Exception e) {
                     new Exception("Erros na verificaçao").printStackTrace();
@@ -96,7 +106,8 @@ public class UdpServerClientPreConnection extends Thread {
 
                 //verificação da lotação
                 try {
-
+                        if(Utils.Consts.DEBUG)
+                            System.out.println("verificação da lotação");
                     //caso nao tenha hado erros na verificacao do login/registo
                     if (resposta == null)
                         if (server.udpMultiCastManager.verifyServerAvailability(server.getTcpConnections_size() / 2)) {
@@ -130,6 +141,8 @@ public class UdpServerClientPreConnection extends Thread {
                 packet.setData(respostabytes, 0, respostabytes.length);
                 //O ip e porto de destino ja' se encontram definidos em packet
                 socket.send(packet);
+                if(Utils.Consts.DEBUG)
+                    System.out.println("mensagem enviada");
             }
 
 

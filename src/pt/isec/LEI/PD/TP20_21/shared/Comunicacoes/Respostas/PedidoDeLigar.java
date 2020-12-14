@@ -1,6 +1,5 @@
 package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas;
 
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.Respostas;
 import pt.isec.LEI.PD.TP20_21.shared.IpPort;
 
 import java.io.Serializable;
@@ -31,4 +30,11 @@ public class PedidoDeLigar implements Serializable, Respostas {
         this.servers = null;
     }
 
+    @Override
+    public String toString() {
+        return "PedidoDeLigar{" +
+                "servers=" + servers +
+                ", TcpPort=" + TcpPort +
+                '}';
+    }
 }
