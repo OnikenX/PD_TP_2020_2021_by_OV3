@@ -3,19 +3,18 @@ package pt.isec.LEI.PD.TP20_21.Client.Model;
 import pt.isec.LEI.PD.TP20_21.Client.Model.Connectivity.ClientServerConnection;
 import pt.isec.LEI.PD.TP20_21.Server.Model.Data.ServerDB;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.ListasParaOClient;
-import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.*;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemDM;
+import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.MensagemGrupo;
 import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Respostas.Respostas;
-import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.Canal;
-import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalDM;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Canais.CanalGrupo;
 import pt.isec.LEI.PD.TP20_21.shared.Data.DataBase;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Mensagem;
 import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.Utilizador;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -112,7 +111,7 @@ public class ClientModel {
         if(myID == null)
         {
             for (var i : listUsers)
-                if (i.getUsername() == pedido.getUsername())
+                if (i.getUsername().equals(pedido.getUsername()))
                     myID = i.getId();
         }
         return myID;

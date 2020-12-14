@@ -19,7 +19,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -117,6 +116,8 @@ public class TcpManager {
                 Statement stmt = null;//mesagem a enviar
                 ResultSet rs = null;//resultado
                 s = serverSocket.accept();
+                if(Utils.Consts.DEBUG)
+                    System.out.println("[Client] conneacted");
                 iS = s.getInputStream();
                 oS = s.getOutputStream();
                 var serverDB = server.getServerDB();
@@ -150,6 +151,7 @@ public class TcpManager {
                     }else if (input.getClass() == ApagarGroupo.class){
                         server.getServerDB().deleteCanal(((ApagarGroupo) input).getId());
                     }
+
                 }
             } catch (IOException /*SQLException*/ e) {
                 e.printStackTrace();

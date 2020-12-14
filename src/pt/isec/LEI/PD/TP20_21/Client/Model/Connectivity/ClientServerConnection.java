@@ -74,6 +74,7 @@ public class ClientServerConnection extends Thread {
             if (0 < resposta.TcpPort) {
                 try {
                     connectTcp(serverAdd);
+
                     start();
                     return resposta.TcpPort;
                 } catch (Exception e) {
@@ -104,6 +105,8 @@ public class ClientServerConnection extends Thread {
     @Override
     public void run() {
         super.run();
+        if(Utils.Consts.DEBUG)
+            System.out.println("in thread");
         byte[] receivedBytes;
         Object receivedObject;
         try {
@@ -211,8 +214,8 @@ public class ClientServerConnection extends Thread {
             }else{
                 retries = 0;
                 tries = 0;
+                return packet.getAddress();
             }
-            return packet.getAddress();
         } catch (SocketTimeoutException | SocketException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
@@ -228,7 +231,11 @@ public class ClientServerConnection extends Thread {
      * @throws Exception caso problemas aconteçam
      */
     private void connectTcp(InetAddress ip) throws Exception {
+        if(Utils.Consts.DEBUG)
+            System.out.println("A conectar o tcp");
         socket = new Socket(ip, resposta.TcpPort);
+        if(Utils.Consts.DEBUG)
+            System.out.println("tcp connectado");
         isTCP = socket.getInputStream();
         osTCP = socket.getOutputStream();
     }
