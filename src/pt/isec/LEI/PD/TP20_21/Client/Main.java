@@ -1,5 +1,4 @@
 package pt.isec.LEI.PD.TP20_21.Client;
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -14,7 +13,9 @@ public class Main extends Application {
             System.out.println("A comecar o cliente....");
         //var pedido = new Pedido.Conectar("lol","lol" , "password", false);
         //ClientServerConnection connection = new ClientServerConnection(pedido);
-        TextUserInterface cli = new TextUserInterface();
+        ClientObservavel clientObservavel = new ClientObservavel();
+        TextUserInterface cli = new TextUserInterface(clientObservavel);
+        cli.UI();
     }
 
     @Override

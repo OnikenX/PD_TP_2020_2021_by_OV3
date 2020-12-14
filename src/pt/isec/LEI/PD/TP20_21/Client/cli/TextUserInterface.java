@@ -19,13 +19,12 @@ public class TextUserInterface {
         s = new Scanner(System.in);
         exit = false;
         this.clientObservavel = clientObservavel;
-        UI();
     }
+
 
     public Conectar registar() {
         System.out.print("Nome próprio: ");
         var nome = s.nextLine();
-
         var username = getInput("Username: ");
         var pass = getInput("Pass: ");
         return new Conectar(nome, username, pass, false);
@@ -51,7 +50,7 @@ public class TextUserInterface {
     }
 
 
-    private void UI() {
+    public void UI() {
         do {
             int i = menuPrincipal();
             switch (i) {
@@ -109,7 +108,7 @@ public class TextUserInterface {
                     System.out.println("connectado com o servidor [" + connectionreturn + "]");
             }
             clientObservavel.setPedido(pedido);
-            mainMenu();
+
         } while (exit);
     }
 
@@ -118,55 +117,65 @@ public class TextUserInterface {
      *
      * @return true for logout, false for exist
      */
-    private void mainMenu() {
-        LinkedList<String> ops = new LinkedList<>();
-        ops.add("Adicinar pessoa");
-        ops.add("Listar conversas com pessoas");
+    private void listarConversasComPessoas() {
+        var listMens = clientObservavel.getClientModel().listMensagens;
+        var listUser = clientObservavel.getClientModel().listUsers;
+        var listDN = clientObservavel.getClientModel().listCanaisDM;
+        List<CanalDM> listMyDn= new LinkedList<>();
+        var myId = clientObservavel.getClientModel().getMyId();
 
-//        ops.add("Entrar em sala");
-//        ops.add("Criar sala");
-//        ops.add("Apagar sala");
-        //os 3 anteriores podem ser inseridos num gerir canais
-        ops.add("Gerir canais");
-        ops.add("Apresentar dados estatisticos de canal");//este podia ser uma opcao quando se esta numa conversa ou num canal
-        ops.add("Listar canais entrados");
+        int input;
+        System.out.println("Lista de dms:");
+        for(var ld : listDN){
+            if(ld.getPessoaDest() == myId || ld.getPessoaCria() == myId)
+                System.out.println(ld.getId() +" - Para "+
+                    ((Utilizador)clientObservavel.getClientModel().getObjectById(ld.getId(), listUser)).getNome());
+        }
+        boolean sair = false;
+        while(!sair) {
+            System.out.println("Digite o numero do canal para abrir a conversa: ");
+            while (!s.hasNextInt()) ;
+            s.nextInt();
+            for(var i : clientObservavel.getClientModel().listCanaisDM){
+                if(i.getId() == input){
+                    sair = true;
+                    break;
+                }
+            }
+        }
+        for(var i : listMens){
+            if(i.getCanalId())
+        }
 
-        ops.add("Listar utilizadores no sistema");
-        ops.add("Listar mensagens");//isto provavelmente que e para mostrar quando se abre um canal
-        ops.add("sair");
 
-        int resultado = menu(ops);
-        switch (resultado){
-            case 0:
-                adicinarPessoa();
-                break;
-            case 1:
-               listarConversasComPessoas();
-                break;
-            case 2:
-//                gerirCanais();
-                break;
-            case 3:
-//                apresentarDadosEstatisticosDeCanais();
-                break;
-            case 4:
-//                listarCanaisEntrados();
-                break;
-            case 5:
-//                listarUtilizadoresNoSistema();
-                break;
-            case 6:
-//                listarMensagens();
-                break;
-            default:
-                return;
-
+    }
+    private void listar_canais()
+    {
+        var listGroups = clientObservavel.getClientModel().listCanaisGrupos;
+        System.out.println("Canais: ");
+        for(int i=0;i<listGroups.size();i++)
+        {
+            System.out.println(listGroups.get(i).getNome()+" Descrição: "+listGroups.get(i).getDescricao()+" Criador: "+listGroups.get(i).getPessoaCria());
+        }
+    }
+    private void listar_users()
+    {
+        var listUser = clientObservavel.getClientModel().listUsers;
+        System.out.println("Canais: ");
+        for(int i=0;i<listUser.size();i++)
+        {
+            System.out.println(listUser.get(i).getNome());
         }
     }
 
-    private void listarConversasComPessoas() {
-        var list = clientObservavel.getClientModel().getListUsers();
-        print
+    private void listar_ficheiros()
+    {
+        List<Mensagem> listMensagens = clientObservavel.getClientModel().listMensagens;
+        System.out.println("Canais: ");
+        for(int i = 0; i < listMensagens.size(); i++) {
+            if(listMensagens.get(i).isAFile())
+                System.out.println(listMensagens.get(i).getMensagem());
+        }
     }
 
     private void adicinarPessoa() {

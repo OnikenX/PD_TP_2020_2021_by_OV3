@@ -306,44 +306,44 @@ public class ServerDB {
         return ll;
     }
 
-    public void verificaMudancas(ArrayList<Object> lista, String tabela) throws Exception {
-        var statment = getConn().createStatement();
-        var statmenttemp = getConn().createStatement();
-        var rs = statment.executeQuery("select * from " + tabela + " order by id;");
-        int id;
-        ResultSet rstemp = null;
-
-        while (rs.next()) {
-            switch (tabela) {
-                case table_canaisDM:
-                    id = rs.getInt(1);
-                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
-                    rstemp.next();
-                    id, rs.getInt(2), rstemp.getInt(2)
-
-                    break;
-                case table_canaisGrupo:
-                    id = rs.getInt(1);
-                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
-                    rstemp.next();
-                    ll.add(new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
-                    break;
-                case table_mensagens:
-                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
-                    break;
-                case table_utilizadores:
-                    ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
-                    break;
-                default:
-                    throw new Exception("Tabela nao existe.");
-            }
-        }
-        if(rstemp != null)
-            rstemp.close();
-        rs.close();
-        statement.close();
-
-    }
+//    public void verificaMudancas(ArrayList<Object> lista, String tabela) throws Exception {
+//        var statment = getConn().createStatement();
+//        var statmenttemp = getConn().createStatement();
+//        var rs = statment.executeQuery("select * from " + tabela + " order by id;");
+//        int id;
+//        ResultSet rstemp = null;
+//
+//        while (rs.next()) {
+//            switch (tabela) {
+//                case table_canaisDM:
+//                    id = rs.getInt(1);
+//                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+//                    rstemp.next();
+//                    //id, rs.getInt(2), rstemp.getInt(2);
+//
+//                    break;
+//                case table_canaisGrupo:
+//                    id = rs.getInt(1);
+//                    rstemp = getStatement().executeQuery("select * from " + table_canais + ";");
+//                    rstemp.next();
+//                    ll.add(new CanalGrupo(id, rs.getInt(2), rstemp.getString(2), rstemp.getString(3), rstemp.getString(4)));
+//                    break;
+//                case table_mensagens:
+//                    ll.add(new Mensagem(rs.getInt(1), rs.getTimestamp(2), rs.getInt(3), rs.getInt(4), rs.getBoolean(5), rs.getString(6)));
+//                    break;
+//                case table_utilizadores:
+//                    ll.add(new UtilizadorServer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
+//                    break;
+//                default:
+//                    throw new Exception("Tabela nao existe.");
+//            }
+//        }
+//        if(rstemp != null)
+//            rstemp.close();
+//        rs.close();
+//        statement.close();
+//
+//    }
 
 
 
