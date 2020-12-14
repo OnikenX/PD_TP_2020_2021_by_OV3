@@ -54,7 +54,6 @@ public class UdpServerClientPreConnection extends Thread {
                     registar = false;
                     //recebe o pedido de login/registo
                     socket.receive(packet);
-                    resposta = null;
                     if (Utils.Consts.DEBUG)
                         System.out.println("Foi recebido pedido do cliente {" + packet.getAddress() + "," + packet.getPort() + "} para ligação tcp");
                     conectar = (Conectar) Utils.bytesToObject(packet.getData());

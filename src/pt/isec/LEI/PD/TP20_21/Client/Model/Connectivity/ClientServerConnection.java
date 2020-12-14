@@ -186,7 +186,12 @@ public class ClientServerConnection extends Thread {
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
             packet.setLength(buffer.length);
-            socket.receive(packet);
+            try {
+                socket.receive(packet);
+            }catch(java.net.SocketTimeoutException e){
+                e.printStackTrace();
+                System.err.println("Timeout received.");
+            }
             if(Utils.Consts.DEBUG)
                 System.out.println("pacote enviado");
             resposta = (PedidoDeLigar) Utils.bytesToObject(packet.getData());

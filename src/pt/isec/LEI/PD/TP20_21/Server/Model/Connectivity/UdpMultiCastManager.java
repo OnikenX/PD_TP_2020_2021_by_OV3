@@ -140,16 +140,21 @@ public class UdpMultiCastManager extends Thread {
                     continue;
                 }
                 if (multicastPacket.getMulticastId() == serverMulticastId) {
-                    if (DEBUG) {
-                        System.out.println("E do mesmo servidor, a ignorar...");
-                    }
+//                    if (DEBUG)
+//                        System.out.println("E do mesmo servidor, a ignorar...");
                     continue;
                 }
                 mensagem = multicastPacket.getData();
 
 
                 //verfica o que fazer com o pacote
-
+                try {
+                    respostaDoRecebido(mensagem, packet);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }catch(Exception e){
+                    System.err.println("Exception na interpretacao da mensagem.");
+                }
             }
         } catch (NumberFormatException e) {
             System.err.println("O porto de escuta deve ser um inteiro positivo.");
@@ -174,7 +179,9 @@ public class UdpMultiCastManager extends Thread {
                     break;
                 }
             }
-        } else if (mensagem instanceof Ping) {
+        } else if (mensagem.getClass() == Ping.class || mensagem.getClass() == PingPai.class) {
+            if(DEBUG)
+                System.out.println("[]");
             Ping ping = (Ping) mensagem;
             if (Utils.Consts.DEBUG)
                 System.out.println("[Ping] recebido ... ; locacao: " + ping.getLotacao());
