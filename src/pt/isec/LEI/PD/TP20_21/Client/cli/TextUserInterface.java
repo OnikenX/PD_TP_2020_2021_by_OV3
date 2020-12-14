@@ -165,12 +165,17 @@ public class TextUserInterface {
 
 
     public void UI() {
+        int returned;
         do {
             int i = menuPrincipal();
             switch (i) {
                 case 1:
                     Conectar log = login();
-                    clientObservavel.getClientModel().registarOuLogin(log);
+
+                    returned = clientObservavel.getClientModel().registarOuLogin(log);
+                    if(returned < 1){
+                        continue;
+                    }
                     do {
                         i = menuLogado();
                         switch (i) {
