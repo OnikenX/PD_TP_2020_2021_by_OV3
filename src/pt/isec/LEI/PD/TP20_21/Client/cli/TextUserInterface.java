@@ -184,7 +184,7 @@ public class TextUserInterface {
                                 String remetente = getInput("Utilizador a quem pretende enviar");
                                 String mensagem = getInput("Mensagem a enviar");
                                 int idr = clientObservavel.getClientModel().getUserIdByName(remetente);
-                                int idMeu = clientObservavel.getClientModel().getUserIdByName(clientObservavel.getClientModel().pedido.getNome());
+                                int idMeu = clientObservavel.getClientModel().getMyId();
                                 clientObservavel.getClientModel().mandaMensPessoal(idr, idMeu, mensagem, false);
                                 break;
                             case 4:

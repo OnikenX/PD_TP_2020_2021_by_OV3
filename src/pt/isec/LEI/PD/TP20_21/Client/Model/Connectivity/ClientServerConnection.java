@@ -51,17 +51,20 @@ public class ClientServerConnection extends Thread {
     private final int TIMEOUT = 1;
 
     /**
+     * tenta conectar com o server
      * @return code for the tcpConnection
      * if it returns 0 means there is a problem connnecting to tcp
      */
     public int connectToServer(Conectar pedido) {
         this.pedido = pedido;
+        if(Utils.Consts.DEBUG)
+            System.out.println("a começar connectToServer");
         while (true) {//condição para que o servidor esteja sempre a conectar
             try {
                 while ((serverAdd = connectUdp(pedido)) == null) ;
             } catch (Error e) {
                 //Caso ocorra erro a ligar a um server ele cancela a coneçao.
-                interrupt();
+                //interrupt;
                 e.printStackTrace();
                 return resposta.TcpPort;
             }
@@ -138,6 +141,8 @@ public class ClientServerConnection extends Thread {
     private IpPort getIpPort() {
         if (servers.size() == 0) {
             if (retries <= 3) {
+                if(Utils.Consts.DEBUG)
+                    System.out.println("lol retrie = "+retries);
                 return new IpPort(Utils.Consts.SERVER_ADDRESS, Utils.Consts.UDP_CLIENT_REQUEST_PORT);
             } else {
                 throw new Error("Não existem servidores online contactaveis.");
@@ -164,19 +169,26 @@ public class ClientServerConnection extends Thread {
             var pedidoBytes = objectToBytes(pedido);
             DatagramSocket socket = new DatagramSocket();
             assert pedidoBytes != null;
+
             DatagramPacket packet = new DatagramPacket(
                     pedidoBytes, pedidoBytes.length,
                     InetAddress.getByName(Utils.Consts.SERVER_ADDRESS),
                     Utils.Consts.UDP_CLIENT_REQUEST_PORT
             );
+            if(Utils.Consts.DEBUG)
+                System.out.println("datagram criado "+packet.toString());
             socket.setSoTimeout(TIMEOUT * 1000);
             //send packet
             socket.send(packet);
-
+            if(Utils.Consts.DEBUG)
+                System.out.println("pacote enviado");
             //receive packet
             byte[] buffer = new byte[Utils.Consts.MAX_SIZE_PER_PACKET];
             packet.setData(buffer, 0, buffer.length);
+            packet.setLength(buffer.length);
             socket.receive(packet);
+            if(Utils.Consts.DEBUG)
+                System.out.println("pacote enviado");
             resposta = (PedidoDeLigar) Utils.bytesToObject(packet.getData());
             retries = 0;
             tries = 0;
