@@ -123,6 +123,7 @@ public class UdpServerClientPreConnection extends Thread {
                                 }
                             }
                             resposta = new PedidoDeLigar(server.getTcpPort(), server.udpMultiCastManager.getServidoresForClient());
+                            server.ligarCliente(server.getServerDB().getUserId(conectar.getUsername()));
                         } else {
                             if (Utils.Consts.DEBUG)
                                 System.out.println("Foi aceito o cliente {" + packet.getAddress() + "," + packet.getPort() + "} para se ligar ao tcp");

@@ -25,6 +25,10 @@ public class Server {
         return "server_"+server_number;
     }
 
+    public int ligarCliente(int user_id) throws IOException {
+        return tcpManager.ligarCliente(user_id);
+    }
+
     public int getTcpPort() { return tcpManager.getPort(); }
     public int getTcpConnections_size(){
         return tcpManager.getTcpServerClientConnections().size();

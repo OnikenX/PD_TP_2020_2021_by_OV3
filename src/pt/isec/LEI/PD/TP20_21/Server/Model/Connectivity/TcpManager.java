@@ -14,9 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.LinkedList;
@@ -41,6 +38,8 @@ public class TcpManager {
 
     }
 
+
+
     public TcpManager(Server server) {
         this.server = server;
         try {
@@ -54,7 +53,7 @@ public class TcpManager {
 
     //TODO: continuar a fazer esta parte e completar o TcpServerClientConnection
     public int ligarCliente(int user_id) throws IOException {
-        var socket = serverSocket.accept();
+        //var socket = serverSocket.accept();
         tcpServerClientConnections.add(new TcpServerClientConnection(user_id));
         return getPort();
     }
@@ -98,12 +97,12 @@ public class TcpManager {
         }
 
 
-        /**
-         * Começa a thread que recebe mensagens
-         */
-        public void receiveMessages() {
-            this.start();
-        }
+//        /**
+//         * Começa a thread que recebe mensagens
+//         */
+//        public void receiveMessages() {
+//            this.start();
+//        }
 
         //recebe mensagens
         @Override
@@ -112,16 +111,15 @@ public class TcpManager {
             byte[] bytes;
             Object input;
             try {
-                Connection conn = null;//connecao à base de dados
-                Statement stmt = null;//mesagem a enviar
-                ResultSet rs = null;//resultado
                 s = serverSocket.accept();
                 if(Utils.Consts.DEBUG)
-                    System.out.println("[Client] conneacted");
+                    System.out.println("[Client] connected");
                 iS = s.getInputStream();
                 oS = s.getOutputStream();
                 var serverDB = server.getServerDB();
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisDM), ServerDB.table_canaisDM))));
+                if(Utils.Consts.DEBUG)
+                    System.out.println("enviado uma lista");
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_canaisGrupo), ServerDB.table_canaisGrupo))));
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_utilizadores), ServerDB.table_utilizadores))));
                 oS.write(Objects.requireNonNull(objectToBytes(new ListasParaOClient(serverDB.getListaTabela(ServerDB.table_mensagens), ServerDB.table_mensagens))));
@@ -130,9 +128,6 @@ public class TcpManager {
                     if(input.getClass() == Conectar.class){
                         var mensagem = (Conectar)input;
                         //adicinar coluna do canal normal e dm if not exist
-
-
-                        //
 
                         server.getServerDB();
                     }

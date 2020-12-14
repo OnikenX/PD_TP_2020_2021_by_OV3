@@ -1,5 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.shared.Data;
 
-public interface DataBase {
+import java.io.Serializable;
+
+public interface DataBase extends Serializable {
     public int getId();
 }

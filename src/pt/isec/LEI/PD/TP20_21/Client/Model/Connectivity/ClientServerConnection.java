@@ -107,12 +107,19 @@ public class ClientServerConnection extends Thread {
         super.run();
         if(Utils.Consts.DEBUG)
             System.out.println("in thread");
-        byte[] receivedBytes;
-        Object receivedObject;
+        byte[] receivedBytes = null;
+        Object receivedObject = null;
         try {
             while (true) {
-                receivedBytes = isTCP.readAllBytes();
-                receivedObject = bytesToObject(receivedBytes);
+                try {
+                    receivedBytes = isTCP.readAllBytes();
+                    receivedObject = bytesToObject(receivedBytes);
+                }catch (Exception e){
+                    //TODO: tratar desta
+                    e.printStackTrace();
+
+                    interrupt();
+                }
                 if (receivedObject == null) {
                     if (Utils.Consts.DEBUG)
                         System.out.println("Problemas com o objecto recebido.");
@@ -120,11 +127,15 @@ public class ClientServerConnection extends Thread {
                 }
                 if (Utils.Consts.DEBUG)
                     System.out.println("Recebido um objeto");
-
+                
                 if (receivedObject == Mensagem.class){
+                    
                     outputPipe.write(receivedBytes);
                     outputPipe.flush();
+                    
                 }else if(receivedObject.getClass() == ListasParaOClient.class) {
+                    if(Utils.Consts.DEBUG)
+                        System.out.println("recebido uma lista para o client");
                     clientObservavel.getClientModel().processListaParaOClient((ListasParaOClient) receivedObject);
                 }
                 else{

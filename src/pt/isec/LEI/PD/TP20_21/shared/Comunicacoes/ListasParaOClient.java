@@ -1,8 +1,9 @@
 package pt.isec.LEI.PD.TP20_21.shared.Comunicacoes;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.List;
 
-public class ListasParaOClient {
+public class ListasParaOClient implements Serializable {
     private final List<Object> list;
     private final String tabela;
 
