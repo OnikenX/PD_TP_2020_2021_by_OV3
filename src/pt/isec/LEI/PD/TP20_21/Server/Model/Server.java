@@ -21,8 +21,8 @@ public class Server {
     private ServerDB serverDB;
     public final int server_number;
 
-    public String getServerName(){
-        return "server_"+server_number;
+    public String getServerName() {
+        return "server_" + server_number;
     }
 
     public int ligarCliente(int user_id) throws IOException {

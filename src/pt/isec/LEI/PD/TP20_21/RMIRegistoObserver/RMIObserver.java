@@ -25,10 +25,10 @@ public class RMIObserver extends UnicastRemoteObject implements RMIObserverInter
             System.out.println("Servico GetRemoteFileObserver criado e em execucao...");
 
             //Localiza o servico remoto nomeado "GetRemoteFile"
-            String objectUrl = "rmi://127.0.0.1/RegistoUtilizadores"; //rmiregistry on localhost
+            String objectUrl = "rmi://127.0.0.1/ServerRMI"; //rmiregistry on localhost
 
             if(args.length > 0)
-                objectUrl = "rmi://"+args[0]+"/RegistoUtilizadores";
+                objectUrl = "rmi://"+args[0]+"/ServerRMI";
 
             ServerRMIInterface getRemoteFileService = (ServerRMIInterface) Naming.lookup(objectUrl);
 

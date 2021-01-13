@@ -1,6 +1,7 @@
 package pt.isec.LEI.PD.TP20_21.Client.RMI;
 
 import pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity.RMI.ServerRMIInterface;
+import pt.isec.LEI.PD.TP20_21.shared.Data.Utilizador.UtilizadorServer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +17,11 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
     public ClientRMI() throws RemoteException {
 
     }
+
+    public void receberMensagem(String conteudo) throws java.rmi.RemoteException {
+        System.out.println(conteudo);
+    }
+
 
     public static void main(String[] args) {
         // Fazer aqui tipo menu
@@ -37,7 +43,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
             return;
         }
 
-        objectUrl = "rmi://"+args[0]+"/GetRemoteFile";
+        objectUrl = "rmi://"+args[0]+"/ServerRMI";
 
         try{
             /*
@@ -50,6 +56,12 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
              */
             myRemoteService = new ClientRMI();
 
+            //menu chamado para aqui:
+            UtilizadorServer us = new UtilizadorServer(25, "ola123", "joao caralhao", "oi123");
+            remoteFileService.registoCliente(us);
+            remoteFileService.loginCliente(myRemoteService);
+            remoteFileService.enviaMensagem("caralhoooooo");
+
         }catch(RemoteException e){
             System.out.println("Erro remoto - " + e);
         }catch(NotBoundException e){
@@ -59,15 +71,6 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
         }catch(Exception e){
             System.out.println("Erro - " + e);
         }finally{
-            if(localFileOutputStream != null){
-                /*
-                 * Encerra o ficheiro.
-                 */
-                try{
-                    localFileOutputStream.close();
-                }catch(IOException e){}
-            }
-
             if(myRemoteService != null){
                 /*
                  * Termina o serviço local

@@ -69,6 +69,27 @@ public class ServerDB {
 //                System.out.println("utilizador 0:"+rs.getString("username")+", hash da password:"+rs.getString("hash"));
     }
 
+    public ServerDB(int server_number) throws SQLException, ClassNotFoundException {
+        //sql configs
+//STEP 2: Register JDBC driver
+        Class.forName(JDBC_DRIVER);
+        this.server = null;
+//STEP 2: Open a connection
+        if (DEBUG)
+            System.out.println("Connecting to database...");
+        //sql vars
+        //Connection sqlConnection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "P4ssword@");
+        conn = DriverManager.getConnection(DB_URL + server_number, "server_" + server_number, "W-pass-123");
+        conn.setAutoCommit(true);
+
+        statement = conn.createStatement();
+//STEP 3: Execute a query
+
+//                rs = stmt.executeQuery("SELECT * FROM utilizadores where id = 0;");
+//                rs.next();
+//                System.out.println("utilizador 0:"+rs.getString("username")+", hash da password:"+rs.getString("hash"));
+    }
+
     private synchronized Statement getStatement() {
         return statement;
     }
