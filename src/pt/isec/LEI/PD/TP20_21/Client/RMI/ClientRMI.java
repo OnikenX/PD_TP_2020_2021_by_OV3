@@ -14,12 +14,18 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface {
 
+    static private String nome;
+
     public ClientRMI() throws RemoteException {
 
     }
 
     public void receberMensagem(String conteudo) throws java.rmi.RemoteException {
         System.out.println(conteudo);
+    }
+
+    public String getNome() throws java.rmi.RemoteException {
+        return nome;
     }
 
 
@@ -60,6 +66,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
             UtilizadorServer us = new UtilizadorServer(25, "ola123", "joao caralhao", "oi123");
             remoteFileService.registoCliente(us);
             remoteFileService.loginCliente(myRemoteService);
+            nome = "ola123";
             remoteFileService.enviaMensagem("caralhoooooo");
 
         }catch(RemoteException e){

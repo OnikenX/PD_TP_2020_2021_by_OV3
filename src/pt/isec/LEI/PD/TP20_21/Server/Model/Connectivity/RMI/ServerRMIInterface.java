@@ -13,4 +13,6 @@ public interface ServerRMIInterface extends java.rmi.Remote {
     public void registoCliente(UtilizadorServer user) throws java.rmi.RemoteException, SQLException;
     public void loginCliente(ClientRMIInterface ci) throws java.rmi.RemoteException;
     public void enviaMensagem(String conteudo) throws java.rmi.RemoteException;
+    public void enviaMensagem(String conteudo, String destinatario) throws java.rmi.RemoteException;
+
 }

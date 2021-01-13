@@ -68,6 +68,13 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
         notifyObservers("mensagem: " + conteudo);
     }
 
+    public void enviaMensagem(String conteudo, String destinatario) throws java.rmi.RemoteException {
+        for(var it : clientesLogados) {
+            if(it.getNome() == destinatario)
+                it.receberMensagem(conteudo);
+        }
+    }
+
     public static void main(String[] args) {
 
         try{
@@ -83,7 +90,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
 
                 System.out.println("Registry lancado!");
 
-            }catch(RemoteException e){
+            } catch(RemoteException e){
                 System.out.println("Registry provavelmente ja' em execucao!");
                 r = LocateRegistry.getRegistry();
             }
