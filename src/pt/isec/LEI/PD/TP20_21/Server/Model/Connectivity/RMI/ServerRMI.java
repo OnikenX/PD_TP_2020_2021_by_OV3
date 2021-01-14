@@ -111,7 +111,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
              * obter a sua referencia remota (endereco IP, porto de escuta, etc.).
              */
 
-            r.bind(SERVICE_NAME, serverRegisto);
+            r.bind("rmi://" + ip_registry + "/" + SERVICE_NAME, serverRegisto);
 
             System.out.println("Servico " + SERVICE_NAME + " registado no registry...");
 
@@ -119,7 +119,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
              * Para terminar um servico RMI do tipo UnicastRemoteObject:
              *
              *  UnicastRemoteObject.unexportObject(fileService, true);
-             */
+            */
 
         }catch(RemoteException e){
             System.out.println("Erro remoto - " + e);
