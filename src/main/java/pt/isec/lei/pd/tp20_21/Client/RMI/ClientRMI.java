@@ -10,6 +10,10 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface {
 
@@ -48,12 +52,32 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
             return;
         }
 
-        objectUrl = "rmi://"+args[0]+"/ServerRMI";
+
 
         try{
-            /*
-             * Obtem a referencia remota para o servico com nome "GetRemoteFile"
-             */
+            String [] serviceList = Naming.list(args[0]);
+            List<String> serviceName = new ArrayList<>();
+
+            for(int i = 0; i < serviceList.length; i++) {
+                StringTokenizer tokens = new StringTokenizer(serviceList[i], "/: ");
+                tokens.nextToken(); //OMITE O VALOR DO PORTO
+                serviceName.add(tokens.nextToken());
+                //System.out.println(serviceName);
+            }
+            System.out.println("Selecione uma opcao:");
+
+            for (int i = 0; i < serviceName.size(); i++) {
+                System.out.println(i-1 + "- " + serviceName.get(i));
+            }
+
+            Scanner sc = new Scanner(System.in);
+            int indice = 0;
+
+            do {
+                indice = sc.nextInt();
+            } while(indice < 1 || indice > serviceName.size());
+
+            objectUrl = "rmi://"+args[0]+ "/" + serviceName.get(indice - 1);
             remoteFileService = (ServerRMIInterface) Naming.lookup(objectUrl);
 
             /*
