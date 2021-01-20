@@ -51,7 +51,6 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
 
     public synchronized void notifyObservers(String msg) {
         int i;
-
         for (i = 0; i < observers.size(); i++) {
             try {
                 observers.get(i).notifyNewOperationConcluded(msg);
