@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ServerRMI1" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="pt.isec.LEI.PD.TP20_21.Server.Model.Connectivity.RMI.ServerRMI" />
+    <module name="PD_TP_2020_2021_by_OV3" />
+    <option name="PROGRAM_PARAMETERS" value="-s 1 -n servico1 -i localhost" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="pt.isec.lei.pd.tp20_21.Server.Model.Connectivity.RMI.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
