@@ -24,12 +24,16 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
 
     }
 
-    public void receberMensagem(String conteudo) throws java.rmi.RemoteException {
-        System.out.println(conteudo);
+    public void receberMensagem(String conteudo, String usuario) throws java.rmi.RemoteException {
+        System.out.println("\n\n" + "Mensagem recebida " + conteudo  + "\nDe: " + usuario);
     }
 
     public String getNome() throws java.rmi.RemoteException {
         return nome;
+    }
+
+    public void setNome(String nome) throws java.rmi.RemoteException {
+        this.nome = nome;
     }
 
 
@@ -68,7 +72,8 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
             System.out.println("Selecione uma opcao:");
 
             for (int i = 0; i < serviceName.size(); i++) {
-                System.out.println(i-1 + "- " + serviceName.get(i));
+                //System.out.println((i + 1) + "- " + serviceName.get(i));
+                System.out.printf("%d - %s", i+1, serviceName.get(i));
             }
 
             Scanner sc = new Scanner(System.in);
@@ -87,12 +92,8 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
             myRemoteService = new ClientRMI();
 
             //menu chamado para aqui:
-            UtilizadorServer us = new UtilizadorServer(27, "ola12345", "joao caralhao", "oi123");
-            remoteFileService.registoCliente(us);
-            remoteFileService.loginCliente(myRemoteService);
-            nome = "ola123";
-            remoteFileService.enviaMensagem("caralhooooooo");
-
+            TextUserInterfaceRMI ui = new TextUserInterfaceRMI(remoteFileService, myRemoteService);
+            ui.UI();
         }catch(RemoteException e){
             System.out.println("Erro remoto - " + e);
         }catch(NotBoundException e){

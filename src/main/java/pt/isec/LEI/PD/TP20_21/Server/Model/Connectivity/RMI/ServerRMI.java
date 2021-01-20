@@ -61,27 +61,41 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
             }
         }
     }
+    public void listaClientes(ClientRMIInterface user) throws java.rmi.RemoteException {
+        for (int i = 0; i < clientesLogados.size(); i++) {
+            user.receberMensagem(clientesLogados.get(i).getNome(), "Servidor");
+        }
+    }
 
-    public void registoCliente(UtilizadorServer user) throws java.rmi.RemoteException, SQLException {
-        sb.addUser(user.getUsername(), user.getNome(), user.getHash());
+    public void registoCliente(Conectar user) throws Exception {
+        sb.addUser(user.getUsername(), user.getNome(), Password.getSaltedHash(user.getPassword()));
         notifyObservers("Registo concluido");
     }
 
-    public void loginCliente(ClientRMIInterface ci) throws java.rmi.RemoteException {
-        clientesLogados.add(ci);
+    public boolean loginCliente(ClientRMIInterface ci, String id, String pass) throws java.rmi.RemoteException {
+
+        if(sb.verifyUser(id, pass)) {
+            ci.setNome(id);
+            clientesLogados.add(ci);
+            notifyObservers("Utilizador logado com sucesso");
+            return true;
+        }
         notifyObservers("Utilizador entrou no server");
+        return false;
     }
 
-    public void enviaMensagem(String conteudo) throws java.rmi.RemoteException {
+    public void enviaMensagem(String conteudo, String nome) throws java.rmi.RemoteException {
         for (var it : clientesLogados)
-            it.receberMensagem(conteudo);
-        notifyObservers("mensagem: " + conteudo);
+            it.receberMensagem(conteudo, nome);
+        notifyObservers("mensagem: " + conteudo + "\nDe: " + nome);
     }
 
-    public void enviaMensagem(String conteudo, String destinatario) throws java.rmi.RemoteException {
+    public void enviaMensagem(String conteudo, String destinatario, String nome) throws java.rmi.RemoteException {
         for (var it : clientesLogados) {
-            if (it.getNome().equals(destinatario))
-                it.receberMensagem(conteudo);
+            if (it.getNome().equals(destinatario)) {
+                it.receberMensagem(conteudo, nome);
+                notifyObservers("mensagem: " + conteudo + "\nDe: " + nome + "\nPara " + destinatario);
+            }
         }
     }
 
@@ -127,7 +141,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
             /*
              * Para terminar um servico RMI do tipo UnicastRemoteObject:
              *
-             *  UnicastRemoteObject.unexportObject(fileService, true);
+             * UnicastRemoteObject.unexportObject(fileService, true);
              */
 
         } catch (RemoteException e) {

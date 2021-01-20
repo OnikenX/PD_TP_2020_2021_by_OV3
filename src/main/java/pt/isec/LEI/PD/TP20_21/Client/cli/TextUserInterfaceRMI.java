@@ -6,17 +6,24 @@ import pt.isec.LEI.PD.TP20_21.shared.Comunicacoes.Pedidos.Conectar;
 import pt.isec.LEI.PD.TP20_21.shared.Password;
 import pt.isec.LEI.PD.TP20_21.shared.Utils;
 
+import javax.swing.*;
+import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class TextUserInterfaceRMI {
 
     private Scanner s;
     private boolean exit;
+    private ServerRMIInterface server;
+    private ClientRMIInterface client;
 
 
-    public TextUserInterfaceRMI() {
+    public TextUserInterfaceRMI(ServerRMIInterface server, ClientRMIInterface client) {
         s = new Scanner(System.in);
         exit = false;
+        this.server = server;
+        this.client = client;
     }
 
     //TODO: mudar o que recebe para Conectar
