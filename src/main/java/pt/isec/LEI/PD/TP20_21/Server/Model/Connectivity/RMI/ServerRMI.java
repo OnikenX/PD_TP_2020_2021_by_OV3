@@ -61,6 +61,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerRMIInterface
             }
         }
     }
+
     public void listaClientes(ClientRMIInterface user) throws java.rmi.RemoteException {
         for (int i = 0; i < clientesLogados.size(); i++) {
             user.receberMensagem(clientesLogados.get(i).getNome(), "Servidor");
