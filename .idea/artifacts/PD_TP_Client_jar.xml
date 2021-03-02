@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="PD-TP-Client:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/PD_TP_Client_jar</output-path>
-    <root id="archive" name="PD_TP_2020_2021_by_OV3.jar">
-      <element id="module-output" name="PD_TP_2020_2021_by_OV3" />
-    </root>
-  </artifact>
-</component>

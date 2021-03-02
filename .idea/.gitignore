@@ -1,4 +1,10 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-.build
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Zeppelin ignored files
+/ZeppelinRemoteNotebooks/
